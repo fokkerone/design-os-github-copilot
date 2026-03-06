@@ -11,6 +11,8 @@ Refer to @agents.md for the full Design OS context, file structure, and conventi
 
 You are helping the user create or update realistic sample data for a section of their product. This data will be used to populate screen designs. You will also generate TypeScript types based on the data structure.
 
+**Golden rule: NEVER generate files without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
+
 ## Step 1: Check Prerequisites
 
 First, identify the target section and verify that `spec.md` exists for it.
@@ -35,11 +37,9 @@ Read the existing `data.json` and `types.ts` files, then ask the user:
 
 "Sample data already exists for **[Section Title]**. What would you like to change about the existing data shape or sample data?"
 
-Wait for the user's response describing what they want changed. Once you receive their notes, **immediately proceed** to update `data.json` and `types.ts` based on their requested changes — do not present a draft for approval.
+Wait for the user's response. Once they describe the changes, update `data.json` and `types.ts` accordingly.
 
-After updating, inform the user:
-
-"I've updated the sample data and types for **[Section Title]** based on your feedback. Review the changes and let me know if you'd like further adjustments, or use the `design-screen` agent when you're ready."
+After updating, inform the user and ask if they'd like further adjustments.
 
 Stop here — the remaining steps below are for generating new data from scratch.
 
@@ -59,7 +59,7 @@ Show a warning but continue:
 
 "Note: A global data shape hasn't been defined yet. I'll create entity structures based on the section spec, but for consistency across sections, consider using the `data-shape` agent first."
 
-## Step 4: Analyze and Generate
+## Step 4: Ask Clarifying Questions
 
 Read and analyze `product/sections/[section-id]/spec.md` to understand:
 
@@ -70,7 +70,17 @@ Read and analyze `product/sections/[section-id]/spec.md` to understand:
 
 **If a global data shape exists:** Cross-reference the spec with the data shape. Use the same entity names and ensure consistency.
 
-**Immediately proceed** to generate both files — do not present a draft for approval.
+**Do NOT generate the files yet.** First, ask the user clarifying questions about the data shape for this section. Example questions:
+- "Based on the spec, I see these entities: [Entity1], [Entity2]. Does that match your expectations, or are there others?"
+- "What statuses should [Entity] have? (e.g., draft, active, archived)"
+- "Should [Entity] include [field]? Or is that out of scope?"
+- "How many sample records would be useful for the design? (5-10 is typical)"
+
+Ask questions using the `ask_questions` tool. Have a back-and-forth until you clearly understand the data structure the user wants.
+
+## Step 5: Generate the Files
+
+Once the user has confirmed the data structure, generate both files:
 
 ### Generate `product/sections/[section-id]/data.json`
 
@@ -200,7 +210,7 @@ export interface InvoiceListProps {
 - Add JSDoc comments for callback props to explain when they're called
 - **Match entity names from the global data shape if one exists**
 
-## Step 5: Inform and Next Steps
+## Step 6: Inform and Next Steps
 
 After creating both files, let the user know:
 
@@ -217,6 +227,7 @@ Review the files and let me know if you'd like any adjustments. When you're read
 
 ## Important Notes
 
+- **Always ask clarifying questions before generating** — never auto-generate from the spec alone
 - Generate realistic, believable sample data - not "Lorem ipsum" or "Test 123"
 - Include 5-10 sample records for main entities (enough to show a realistic list)
 - Include edge cases: empty arrays, long text, different statuses
@@ -225,5 +236,4 @@ Review the files and let me know if you'd like any adjustments. When you're read
 - Always generate types.ts alongside data.json
 - Callback props should cover all actions mentioned in the spec
 - **Use entity names from the global data shape for consistency across sections**
-- Do NOT present a draft for approval — generate the files immediately and let the user review after
 - If the user requests changes after reviewing, update the files immediately

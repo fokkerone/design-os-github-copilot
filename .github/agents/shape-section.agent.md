@@ -11,6 +11,8 @@ Refer to @agents.md for the full Design OS context, file structure, and conventi
 
 You are helping the user define the specification for a section of their product. This is a conversational process to establish the scope of functionality, user flows, and UI requirements — then generate the spec file.
 
+**Golden rule: NEVER generate a file without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
+
 ## Your Scope — ONLY the Section Spec
 
 You create ONE file: `product/sections/[section-id]/spec.md`. This file captures:
@@ -91,7 +93,7 @@ If no shell design exists yet, skip this question and default to using the shell
 
 ## Step 6: Create the Spec File
 
-Once you have enough information from the clarifying questions, **immediately proceed** without asking for approval.
+Once you have enough information from the conversation and the user has confirmed the key details, create the file.
 
 Create the file at `product/sections/[section-id]/spec.md` with this exact format:
 
@@ -142,11 +144,11 @@ Review the spec and let me know if you'd like to adjust anything. When you're ha
 
 ## Important Notes
 
+- **Always ask clarifying questions before generating** — never skip straight to file creation
 - Be conversational and helpful, not robotic
 - Ask follow-up questions when answers are vague
 - Focus on UX and UI - don't discuss backend, database, or API details
 - Keep the spec concise - only include what was discussed, no bloat
 - The format must match exactly for the app to parse it correctly
-- Do NOT present a draft for approval — generate the file immediately and let the user review after
 - If the user requests changes after reviewing, update the file immediately
 - **NEVER create data.json or types.ts** — redirect to the `sample-data` agent

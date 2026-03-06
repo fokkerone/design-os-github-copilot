@@ -11,6 +11,8 @@ Refer to @agents.md for the full Design OS context, file structure, and conventi
 
 You are helping the user create or update the general shape of their product's data — the core entities ("nouns") and how they relate to each other. This creates a shared vocabulary that ensures consistency across sections when generating sample data and screen designs. This is not the final data model — it's a starting point that the implementation agent will extend and refine.
 
+**Golden rule: NEVER generate a file without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
+
 ## Step 1: Check Current State
 
 First, check if `product/data-shape/data-shape.md` exists.
@@ -37,13 +39,9 @@ Present the current state and ask what to change:
 
 What would you like to change about the entities or relationships?"
 
-Wait for the user's response describing what they want changed. Once you receive their notes, **immediately proceed** to update `product/data-shape/data-shape.md` based on their requested changes — do not present a draft for approval.
+Wait for the user's response. Once they describe the changes, update `product/data-shape/data-shape.md` accordingly.
 
-After updating, inform the user:
-
-"I've updated the data shape based on your feedback. Review the changes and let me know if you'd like further adjustments."
-
-Stop here — the remaining steps below are for generating a new data shape from scratch.
+After updating, inform the user and ask if they'd like further adjustments.
 
 ---
 
@@ -61,16 +59,21 @@ If either file is missing, let the user know:
 
 Stop here if prerequisites are missing.
 
-### Analyze and Generate
+### Ask Clarifying Questions
 
-Review the product overview and roadmap, then **immediately proceed** to create the data shape file — do not present a draft for approval.
+Read the product overview and roadmap to understand the product, then ask the user questions about their data. **Do NOT generate the data shape without asking questions first.**
 
-Identify:
-- **Entity names** — The main nouns (things users create, view, or manage)
-- **Plain-language descriptions** — What each entity represents
-- **Relationships** — How entities connect to each other
+Example questions to ask (adapt based on the product):
+- "What are the main 'things' users will create, view, or manage in this product? (e.g., Projects, Invoices, Clients)"
+- "How do these things relate to each other?"
+- "Are there any entities that are shared across multiple sections?"
+- "Is there a central entity that everything revolves around?"
 
-Create `product/data-shape/data-shape.md` with this format:
+Ask questions using the `ask_questions` tool. Have a back-and-forth until you clearly understand the entities and relationships the user wants.
+
+### Generate the Data Shape
+
+Once the user has confirmed the entities and relationships, create `product/data-shape/data-shape.md` with this format:
 
 ```markdown
 # Data Shape
@@ -111,11 +114,11 @@ Review and let me know if you'd like to adjust anything. When you're ready, use 
 
 ## Important Notes
 
+- **Always ask clarifying questions before generating** — never auto-generate from the product overview alone
 - Keep it **minimal** — entity names, descriptions, and relationships
 - Do NOT define detailed schemas, field types, or validation rules
 - Use plain language that a non-technical person could understand
 - Relationships are conceptual — they describe how data relates from the user's perspective, not database structure
 - The implementation agent will decide how to model, store, and extend these entities
 - Entity names should be singular (User, Invoice, Project — not Users, Invoices)
-- Do NOT present a draft for approval — generate the file immediately and let the user review after
 - If the user requests changes after reviewing, update the file immediately

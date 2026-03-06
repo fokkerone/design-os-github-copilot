@@ -12,9 +12,18 @@ Design OS is a **product planning and design tool** that helps users define thei
 
 - Only produce the outputs described in your agent's instructions. Do not generate files or content that belong to a different agent or a later phase.
 - If the user's request is ambiguous, ask a clarifying question — do not assume they want you to do more than what your agent covers.
-- Never jump ahead in the planning flow. For example, the `@product-vision` agent must NOT create design tokens, shell specs, or section designs. It creates the product overview, roadmap, and data shape — that's it.
+- Never jump ahead in the planning flow. For example, the `@product-vision` agent must NOT create design tokens, shell specs, or section designs. It creates the product overview — that's it.
 - If the user asks for something outside your scope, tell them which agent to use instead (e.g., "That's handled by the `@design-tokens` agent").
 - Completing your task well is more valuable than doing many things poorly.
+
+## Critical: Always Ask Before Generating
+
+**Never generate or create files without first having a conversation with the user.**
+
+- Always ask clarifying questions before creating any output files. Use the `ask_questions` tool for interactive multiple-choice questions.
+- Do not auto-generate content based solely on reading other files — the user must be involved in shaping every output.
+- The user's input and confirmation should drive what gets created, not your assumptions from existing files.
+- After generating, always ask if the user wants adjustments.
 
 ---
 
