@@ -1,6 +1,6 @@
 ---
 name: shape-section
-description: Define the specification for a product section. Conversational process to establish scope, user flows, and UI requirements, then generates the spec, sample data, and TypeScript types.
+description: Define the specification for a product section. Conversational process to establish scope, user flows, and UI requirements, then generates spec.md only.
 ---
 
 Refer to @agents.md for the full Design OS context, file structure, and conventions.
@@ -9,7 +9,21 @@ Refer to @agents.md for the full Design OS context, file structure, and conventi
 
 # Shape Section
 
-You are helping the user define the specification for a section of their product. This is a conversational process to establish the scope of functionality, user flows, and UI requirements — then automatically generate the spec and sample data.
+You are helping the user define the specification for a section of their product. This is a conversational process to establish the scope of functionality, user flows, and UI requirements — then generate the spec file.
+
+## Your Scope — ONLY the Section Spec
+
+You create ONE file: `product/sections/[section-id]/spec.md`. This file captures:
+- Overview of the section
+- User flows
+- UI requirements
+- Shell configuration
+
+**You do NOT:**
+- Create or modify `data.json` — that's the `sample-data` agent
+- Create or modify `types.ts` — that's the `sample-data` agent
+- Create screen design components — that's the `design-screen` agent
+- Ask questions about data entities, fields, or TypeScript types
 
 ## Step 1: Check Prerequisites
 
@@ -59,6 +73,8 @@ Example questions (adapt based on their input and the section):
 
 Ask questions one or two at a time, conversationally. Focus on user experience and interface requirements - no backend or database details.
 
+**Do NOT ask about:** data entities, fields, TypeScript types, or sample data structure — that's handled by the `sample-data` agent.
+
 ## Step 5: Ask About Shell Configuration
 
 If a shell design has been created for this project (check if `src/shell/components/AppShell.tsx` exists), ask the user about shell usage:
@@ -73,11 +89,9 @@ Options:
 
 If no shell design exists yet, skip this question and default to using the shell.
 
-## Step 6: Auto-Proceed — Create Spec and Sample Data
+## Step 6: Create the Spec File
 
-Once you have enough information from the clarifying questions, **immediately proceed** without asking for approval. Do all of the following in sequence:
-
-### 6a: Create the Spec File
+Once you have enough information from the clarifying questions, **immediately proceed** without asking for approval.
 
 Create the file at `product/sections/[section-id]/spec.md` with this exact format:
 
@@ -109,62 +123,22 @@ Create the file at `product/sections/[section-id]/spec.md` with this exact forma
 - The section-id is the slug version of the section title (lowercase, hyphens instead of spaces)
 - Don't add features that weren't discussed. Don't leave out features that were discussed.
 
-### 6b: Generate Sample Data and Types
+## Step 7: Inform the User
 
-Immediately after writing the spec, run the full sample data generation process for this section:
+After the spec file is created, present a summary:
 
-1. **Check for global data shape** — Read `product/data-shape/data-shape.md` if it exists. Use entity names and relationships as a guide for consistency.
-
-2. **Analyze the spec** — Determine what data entities are implied by the user flows, what fields each entity needs, and what actions can be taken (these become callback props).
-
-3. **Create `product/sections/[section-id]/data.json`** with:
-   - A `_meta` section with human-readable descriptions of each entity and their relationships
-   - Realistic, believable sample data (not "Lorem ipsum" or "Test 123")
-   - 5-10 sample records for main entities
-   - Varied content: mix short/long text, different statuses
-   - Edge cases: at least one empty array, one long description
-   - TypeScript-friendly structure with consistent field names
-
-   Required `_meta` structure:
-   ```json
-   {
-     "_meta": {
-       "models": {
-         "entityName": "Plain-language description of what this entity represents."
-       },
-       "relationships": [
-         "Description of how models connect to each other"
-       ]
-     }
-   }
-   ```
-
-4. **Create `product/sections/[section-id]/types.ts`** with:
-   - Data interfaces inferred from sample data (strings, numbers, booleans, arrays, nested objects)
-   - Union types for status/enum fields based on the spec
-   - A Props interface named `[SectionName]Props` with data as props and optional callback props for each action
-   - JSDoc comments on callback props
-   - PascalCase for interface names, camelCase for property names
-
-### 6c: Inform the User
-
-After all files are created, present a summary:
-
-"I've created the following for **[Section Title]**:
-
-1. **Spec** — `product/sections/[section-id]/spec.md`
-2. **Sample Data** — `product/sections/[section-id]/data.json` ([X] records)
-3. **TypeScript Types** — `product/sections/[section-id]/types.ts`
-
-Here's a quick summary of the spec:
+"I've created the specification for **[Section Title]** at `product/sections/[section-id]/spec.md`.
 
 **Overview:** [2-3 sentence summary]
 
-**User Flows:** [Brief list]
+**User Flows:**
+- [Flow 1]
+- [Flow 2]
+- [Flow 3]
 
-**Sample data includes:** [Brief description of entities and record counts]
+Review the spec and let me know if you'd like to adjust anything. When you're happy with it, use the `sample-data` agent to generate sample data and TypeScript types for this section."
 
-Feel free to review these files. Let me know if you'd like to adjust anything in the spec or sample data. When you're ready, use the `design-screen` agent to create the screen design for this section."
+**Stop here.** Do not proceed to create sample data, types, or screen designs.
 
 ## Important Notes
 
@@ -173,5 +147,6 @@ Feel free to review these files. Let me know if you'd like to adjust anything in
 - Focus on UX and UI - don't discuss backend, database, or API details
 - Keep the spec concise - only include what was discussed, no bloat
 - The format must match exactly for the app to parse it correctly
-- Do NOT present a draft for approval — go straight to writing the files after gathering enough info
-- If the user requests changes after reviewing, update the relevant files immediately
+- Do NOT present a draft for approval — generate the file immediately and let the user review after
+- If the user requests changes after reviewing, update the file immediately
+- **NEVER create data.json or types.ts** — redirect to the `sample-data` agent

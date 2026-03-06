@@ -41,27 +41,33 @@ The product you're planning and designing. When creating screen designs and expo
 
 Design OS follows a structured planning sequence. Each step has a dedicated Copilot agent. Use one agent at a time — complete each step before moving to the next.
 
-### 1. Product Vision (`@product-vision`)
-Define your product overview, roadmap sections, and data shape — all in one conversational flow. After answering clarifying questions, all three files are generated automatically.
-**Output:** `product/product-overview.md`, `product/product-roadmap.md`, `product/data-shape/data-shape.md`
+### 1. Product Overview (`@product-vision`)
+Define your product name, description, problems/solutions, and key features.
+**Output:** `product/product-overview.md`
 
-Use `@product-roadmap`, `@data-shape` individually to update those files after initial creation.
+### 2. Product Roadmap (`@product-roadmap`)
+Define the main sections (features/areas) of the product.
+**Output:** `product/product-roadmap.md`
 
-### 2. Design System (`@design-tokens`)
+### 3. Data Shape (`@data-shape`)
+Sketch out the core entities and their relationships.
+**Output:** `product/data-shape/data-shape.md`
+
+### 4. Design System (`@design-tokens`)
 Choose your color palette (from Tailwind) and typography (from Google Fonts). These tokens are applied to all screen designs.
 **Output:** `product/design-system/colors.json`, `product/design-system/typography.json`
 
-### 3. Application Shell (`@design-shell`)
+### 5. Application Shell (`@design-shell`)
 Design the persistent navigation and layout that wraps all sections.
 **Output:** `product/shell/spec.md`, `src/shell/components/`
 
-### 4. For Each Section:
+### 6. For Each Section:
 - `@shape-section` — Define the specification and generate sample data + types
 - `@sample-data` — Update sample data and types (if already created)
 - `@design-screen` — Create screen designs
 - `@screenshot-design` — Capture screenshots
 
-### 5. Export (`@export-product`)
+### 7. Export (`@export-product`)
 Generate the complete export package with all components, types, and handoff documentation.
 **Output:** `product-plan/`
 
