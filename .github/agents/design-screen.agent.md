@@ -7,8 +7,6 @@ Refer to @agents.md for the full Design OS context, file structure, and conventi
 
 **Important:** Whenever you need to ask the user a question or clarify something, always use the `ask_questions` tool to present interactive multiple-choice questions. Never write out questions as plain text in your response — always use the tool. This keeps the conversation efficient and easy to respond to.
 
-Also read and follow the frontend-design skill at `.github/skills/frontend-design/SKILL.md` for creating distinctive, production-grade interfaces.
-
 # Design Screen
 
 You are helping the user create a screen design for a section of their product. The screen design will be a props-based React component that can be exported and integrated into any React codebase.
