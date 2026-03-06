@@ -6,6 +6,18 @@ Design OS is a **product planning and design tool** that helps users define thei
 
 ---
 
+## Critical: Stay Focused on Your Task
+
+**Each agent has ONE job. Do that job and nothing else.**
+
+- Only produce the outputs described in your agent's instructions. Do not generate files or content that belong to a different agent or a later phase.
+- If the user's request is ambiguous, ask a clarifying question — do not assume they want you to do more than what your agent covers.
+- Never jump ahead in the planning flow. For example, the `@product-vision` agent must NOT create design tokens, shell specs, or section designs. It creates the product overview, roadmap, and data shape — that's it.
+- If the user asks for something outside your scope, tell them which agent to use instead (e.g., "That's handled by the `@design-tokens` agent").
+- Completing your task well is more valuable than doing many things poorly.
+
+---
+
 ## Understanding Design OS Context
 
 When working in Design OS, be aware of two distinct contexts:
@@ -27,29 +39,29 @@ The product you're planning and designing. When creating screen designs and expo
 
 ## Getting Started — The Planning Flow
 
-Design OS follows a structured planning sequence:
+Design OS follows a structured planning sequence. Each step has a dedicated Copilot agent. Use one agent at a time — complete each step before moving to the next.
 
-### 1. Product Vision (`/product-vision`)
+### 1. Product Vision (`@product-vision`)
 Define your product overview, roadmap sections, and data shape — all in one conversational flow. After answering clarifying questions, all three files are generated automatically.
 **Output:** `product/product-overview.md`, `product/product-roadmap.md`, `product/data-shape/data-shape.md`
 
-Use `/product-roadmap`, `/data-shape` individually to update those files after initial creation.
+Use `@product-roadmap`, `@data-shape` individually to update those files after initial creation.
 
-### 2. Design System (`/design-tokens`)
+### 2. Design System (`@design-tokens`)
 Choose your color palette (from Tailwind) and typography (from Google Fonts). These tokens are applied to all screen designs.
 **Output:** `product/design-system/colors.json`, `product/design-system/typography.json`
 
-### 3. Application Shell (`/design-shell`)
+### 3. Application Shell (`@design-shell`)
 Design the persistent navigation and layout that wraps all sections.
 **Output:** `product/shell/spec.md`, `src/shell/components/`
 
 ### 4. For Each Section:
-- `/shape-section` — Define the specification and generate sample data + types
-- `/sample-data` — Update sample data and types (if already created)
-- `/design-screen` — Create screen designs
-- `/screenshot-design` — Capture screenshots
+- `@shape-section` — Define the specification and generate sample data + types
+- `@sample-data` — Update sample data and types (if already created)
+- `@design-screen` — Create screen designs
+- `@screenshot-design` — Capture screenshots
 
-### 5. Export (`/export-product`)
+### 5. Export (`@export-product`)
 Generate the complete export package with all components, types, and handoff documentation.
 **Output:** `product-plan/`
 
@@ -184,7 +196,7 @@ Design OS separates concerns between its own UI and the product being designed:
 
 ## Export & Handoff
 
-The `/export-product` command generates a UI design handoff package:
+The `@export-product` agent generates a UI design handoff package:
 
 - **Ready-to-use prompts**: Pre-written prompts to copy/paste into coding agents
   - `one-shot-prompt.md`: For full implementation in one session
