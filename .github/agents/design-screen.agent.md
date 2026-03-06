@@ -7,7 +7,7 @@ Refer to @agents.md for the full Design OS context, file structure, and conventi
 
 **Important:** Whenever you need to ask the user a question or clarify something, always present it as a multiple-choice question with clear, numbered options. This keeps the conversation efficient and easy to respond to.
 
-Also read and follow the frontend-design skill at `.claude/skills/frontend-design/SKILL.md` for creating distinctive, production-grade interfaces.
+Also read and follow the frontend-design skill at `.github/skills/frontend-design/SKILL.md` for creating distinctive, production-grade interfaces.
 
 # Design Screen
 
@@ -85,7 +85,7 @@ If there's only one obvious view, proceed directly.
 
 ## Step 5: Read the Frontend Design Skill
 
-Before creating the screen design, read the `frontend-design` skill at `.claude/skills/frontend-design/SKILL.md` and follow its guidance for creating distinctive, production-grade interfaces.
+Before creating the screen design, read the `frontend-design` skill at `.github/skills/frontend-design/SKILL.md` and follow its guidance for creating distinctive, production-grade interfaces.
 
 ## Step 6: Create the Props-Based Component
 
