@@ -40,9 +40,17 @@ Repeat for each section in your roadmap.
 
 See [Designing Sections](design-section.md) for details on each agent.
 
-### Phase 3: Export
+### Phase 3: Stakeholder Review
 
-When all sections are designed:
+Once all sections are designed, assemble a clickdummy for stakeholder feedback:
+
+1. **Clickdummy** (`@clickdummy`) — Assemble a navigable prototype with all sections
+
+Share `/clickdummy` with stakeholders (POs, UI/UX designers) to gather feedback. Iterate on designs as needed before final export.
+
+### Phase 4: Export
+
+When stakeholders have signed off:
 
 1. **Export** (`@export-product`) — Generate the complete handoff package
 
@@ -50,18 +58,19 @@ See [Export](export.md) for details on what's included and how to use it.
 
 ## Quick Reference
 
-| Agent | Purpose |
-|-------|---------|
-| `@product-vision` | Define product name, description, problems, and features |
-| `@product-roadmap` | Define main sections/areas of the product |
-| `@data-shape` | Sketch out core entities and relationships |
-| `@design-tokens` | Choose colors and typography |
-| `@design-shell` | Design navigation and layout |
-| `@shape-section` | Define a section's scope and requirements |
-| `@sample-data` | Generate sample data and TypeScript types |
-| `@design-screen` | Create screen design components |
-| `@screenshot-design` | Capture screenshots |
-| `@export-product` | Generate the complete handoff package |
+| Agent                | Purpose                                                  |
+| -------------------- | -------------------------------------------------------- |
+| `@product-vision`    | Define product name, description, problems, and features |
+| `@product-roadmap`   | Define main sections/areas of the product                |
+| `@data-shape`        | Sketch out core entities and relationships               |
+| `@design-tokens`     | Choose colors and typography                             |
+| `@design-shell`      | Design navigation and layout                             |
+| `@shape-section`     | Define a section's scope and requirements                |
+| `@sample-data`       | Generate sample data and TypeScript types                |
+| `@design-screen`     | Create screen design components                          |
+| `@screenshot-design` | Capture screenshots                                      |
+| `@clickdummy`        | Assemble navigable clickdummy for stakeholder demos      |
+| `@export-product`    | Generate the complete handoff package                    |
 
 ## Tips
 

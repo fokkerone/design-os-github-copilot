@@ -6,6 +6,7 @@ import { SectionsPage } from '@/components/SectionsPage'
 import { SectionPage } from '@/components/SectionPage'
 import { ScreenDesignPage, ScreenDesignFullscreen } from '@/components/ScreenDesignPage'
 import { ShellDesignPage, ShellDesignFullscreen } from '@/components/ShellDesignPage'
+import { ClickdummyPage } from '@/components/ClickdummyPage'
 import { ExportPage } from '@/components/ExportPage'
 
 export const router = createBrowserRouter([
@@ -44,6 +45,10 @@ export const router = createBrowserRouter([
   {
     path: '/shell/design/fullscreen',
     element: <ShellDesignFullscreen />,
+  },
+  {
+    path: '/clickdummy',
+    element: <ClickdummyPage />,
   },
   {
     path: '/export',

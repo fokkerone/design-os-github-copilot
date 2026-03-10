@@ -2,24 +2,35 @@
  * Product data loading and markdown parsing utilities
  */
 
-import type { ProductOverview, ProductRoadmap, Problem, Section, ProductData } from '@/types/product'
-import { loadDataShape, hasDataShape } from './data-shape-loader'
-import { loadDesignSystem, hasDesignSystem } from './design-system-loader'
-import { loadShellInfo, hasShell } from './shell-loader'
+import type {
+  ProductOverview,
+  ProductRoadmap,
+  Problem,
+  Section,
+  ProductData,
+} from "@/types/product";
+import { loadDataShape, hasDataShape } from "./data-shape-loader";
+import { loadDesignSystem, hasDesignSystem } from "./design-system-loader";
+import { loadShellInfo, hasShell } from "./shell-loader";
 
 // Load markdown files from /product/ directory at build time
-const productFiles = import.meta.glob('/product/*.md', {
-  query: '?raw',
-  import: 'default',
+const productFiles = import.meta.glob("/product/*.md", {
+  query: "?raw",
+  import: "default",
   eager: true,
-}) as Record<string, string>
+}) as Record<string, string>;
 
 // Load zip files from root directory at build time
-const exportZipFiles = import.meta.glob('/product-plan.zip', {
-  query: '?url',
-  import: 'default',
+const exportZipFiles = import.meta.glob("/product-plan.zip", {
+  query: "?url",
+  import: "default",
   eager: true,
-}) as Record<string, string>
+}) as Record<string, string>;
+
+// Check for clickdummy component at build time
+const clickdummyFiles = import.meta.glob("/src/clickdummy/ClickdummyApp.tsx", {
+  eager: true,
+}) as Record<string, unknown>;
 
 /**
  * Slugify a string for use as an ID
@@ -28,9 +39,9 @@ const exportZipFiles = import.meta.glob('/product-plan.zip', {
 function slugify(str: string): string {
   return str
     .toLowerCase()
-    .replace(/\s+&\s+/g, '-and-') // Convert " & " to "-and-" first
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
+    .replace(/\s+&\s+/g, "-and-") // Convert " & " to "-and-" first
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 /**
@@ -52,56 +63,62 @@ function slugify(str: string): string {
  * - Feature 2
  */
 export function parseProductOverview(md: string): ProductOverview | null {
-  if (!md || !md.trim()) return null
+  if (!md || !md.trim()) return null;
 
   try {
     // Normalize line endings (Windows CRLF → LF)
-    const normalizedMd = md.replace(/\r\n/g, '\n')
+    const normalizedMd = md.replace(/\r\n/g, "\n");
 
     // Extract product name from first # heading
-    const nameMatch = normalizedMd.match(/^#\s+(.+)$/m)
-    const name = nameMatch?.[1]?.trim() || 'Product Overview'
+    const nameMatch = normalizedMd.match(/^#\s+(.+)$/m);
+    const name = nameMatch?.[1]?.trim() || "Product Overview";
 
     // Extract description - content between ## Description and next ##
-    const descMatch = normalizedMd.match(/## Description\s*\n+([\s\S]*?)(?=\n## |\n#[^#]|$)/)
-    const description = descMatch?.[1]?.trim() || ''
+    const descMatch = normalizedMd.match(/## Description\s*\n+([\s\S]*?)(?=\n## |\n#[^#]|$)/);
+    const description = descMatch?.[1]?.trim() || "";
 
     // Extract problems - ### Problem N: Title pattern
-    const problemsSection = normalizedMd.match(/## Problems & Solutions\s*\n+([\s\S]*?)(?=\n## |\n#[^#]|$)/)
-    const problems: Problem[] = []
+    const problemsSection = normalizedMd.match(
+      /## Problems & Solutions\s*\n+([\s\S]*?)(?=\n## |\n#[^#]|$)/,
+    );
+    const problems: Problem[] = [];
 
     if (problemsSection?.[1]) {
-      const problemMatches = [...problemsSection[1].matchAll(/### Problem \d+:\s*(.+)\n+([\s\S]*?)(?=\n### |\n## |$)/g)]
+      const problemMatches = [
+        ...problemsSection[1].matchAll(/### Problem \d+:\s*(.+)\n+([\s\S]*?)(?=\n### |\n## |$)/g),
+      ];
       for (const match of problemMatches) {
         problems.push({
           title: match[1].trim(),
           solution: match[2].trim(),
-        })
+        });
       }
     }
 
     // Extract features - bullet list after ## Key Features
-    const featuresSection = normalizedMd.match(/## Key Features\s*\n+([\s\S]*?)(?=\n## |\n#[^#]|$)/)
-    const features: string[] = []
+    const featuresSection = normalizedMd.match(
+      /## Key Features\s*\n+([\s\S]*?)(?=\n## |\n#[^#]|$)/,
+    );
+    const features: string[] = [];
 
     if (featuresSection?.[1]) {
-      const lines = featuresSection[1].split('\n')
+      const lines = featuresSection[1].split("\n");
       for (const line of lines) {
-        const trimmed = line.trim()
-        if (trimmed.startsWith('- ')) {
-          features.push(trimmed.slice(2).trim())
+        const trimmed = line.trim();
+        if (trimmed.startsWith("- ")) {
+          features.push(trimmed.slice(2).trim());
         }
       }
     }
 
     // Return null if we couldn't parse anything meaningful
     if (!description && problems.length === 0 && features.length === 0) {
-      return null
+      return null;
     }
 
-    return { name, description, problems, features }
+    return { name, description, problems, features };
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -120,40 +137,42 @@ export function parseProductOverview(md: string): ProductOverview | null {
  * [One sentence description]
  */
 export function parseProductRoadmap(md: string): ProductRoadmap | null {
-  if (!md || !md.trim()) return null
+  if (!md || !md.trim()) return null;
 
   try {
-    const sections: Section[] = []
+    const sections: Section[] = [];
 
     // Normalize line endings (Windows CRLF → LF)
-    const normalizedMd = md.replace(/\r\n/g, '\n')
+    const normalizedMd = md.replace(/\r\n/g, "\n");
 
     // Match sections with pattern ### N. Title
-    const sectionMatches = [...normalizedMd.matchAll(/### (\d+)\.\s*(.+)\n+([\s\S]*?)(?=\n### |\n## |\n#[^#]|$)/g)]
+    const sectionMatches = [
+      ...normalizedMd.matchAll(/### (\d+)\.\s*(.+)\n+([\s\S]*?)(?=\n### |\n## |\n#[^#]|$)/g),
+    ];
 
     for (const match of sectionMatches) {
-      const order = parseInt(match[1], 10)
-      const title = match[2].trim()
-      const description = match[3].trim()
+      const order = parseInt(match[1], 10);
+      const title = match[2].trim();
+      const description = match[3].trim();
 
       sections.push({
         id: slugify(title),
         title,
         description,
         order,
-      })
+      });
     }
 
     // Sort by order
-    sections.sort((a, b) => a.order - b.order)
+    sections.sort((a, b) => a.order - b.order);
 
     if (sections.length === 0) {
-      return null
+      return null;
     }
 
-    return { sections }
+    return { sections };
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -161,8 +180,8 @@ export function parseProductRoadmap(md: string): ProductRoadmap | null {
  * Load all product data from markdown files and other sources
  */
 export function loadProductData(): ProductData {
-  const overviewContent = productFiles['/product/product-overview.md']
-  const roadmapContent = productFiles['/product/product-roadmap.md']
+  const overviewContent = productFiles["/product/product-overview.md"];
+  const roadmapContent = productFiles["/product/product-roadmap.md"];
 
   return {
     overview: overviewContent ? parseProductOverview(overviewContent) : null,
@@ -170,36 +189,43 @@ export function loadProductData(): ProductData {
     dataShape: loadDataShape(),
     designSystem: loadDesignSystem(),
     shell: loadShellInfo(),
-  }
+  };
 }
 
 /**
  * Check if product overview has been defined
  */
 export function hasProductOverview(): boolean {
-  return '/product/product-overview.md' in productFiles
+  return "/product/product-overview.md" in productFiles;
 }
 
 /**
  * Check if product roadmap has been defined
  */
 export function hasProductRoadmap(): boolean {
-  return '/product/product-roadmap.md' in productFiles
+  return "/product/product-roadmap.md" in productFiles;
 }
 
 /**
  * Check if export zip file exists
  */
 export function hasExportZip(): boolean {
-  return '/product-plan.zip' in exportZipFiles
+  return "/product-plan.zip" in exportZipFiles;
+}
+
+/**
+ * Check if clickdummy has been assembled
+ */
+export function hasClickdummy(): boolean {
+  return "/src/clickdummy/ClickdummyApp.tsx" in clickdummyFiles;
 }
 
 /**
  * Get the URL of the export zip file (if it exists)
  */
 export function getExportZipUrl(): string | null {
-  return exportZipFiles['/product-plan.zip'] || null
+  return exportZipFiles["/product-plan.zip"] || null;
 }
 
 // Re-export utility functions for checking individual pieces
-export { hasDataShape, hasDesignSystem, hasShell }
+export { hasDataShape, hasDesignSystem, hasShell };

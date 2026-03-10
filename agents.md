@@ -32,13 +32,17 @@ Design OS is a **product planning and design tool** that helps users define thei
 When working in Design OS, be aware of two distinct contexts:
 
 ### 1. Design OS Application
+
 The React application that displays and manages planning files. When modifying the Design OS UI itself:
+
 - Files live in `src/` (components, pages, utilities)
 - Uses the Design OS design system (stone palette, DM Sans, etc.)
 - Provides the interface for viewing specs, screen designs, exports, etc.
 
 ### 2. Product Design (Screen Designs & Exports)
+
 The product you're planning and designing. When creating screen designs and exports:
+
 - Screen design components live in `src/sections/[section-name]/` and `src/shell/`
 - Product definition files live in `product/`
 - Exports are packaged to `product-plan/` for integration into a separate codebase
@@ -51,32 +55,44 @@ The product you're planning and designing. When creating screen designs and expo
 Design OS follows a structured planning sequence. Each step has a dedicated Copilot agent. Use one agent at a time — complete each step before moving to the next.
 
 ### 1. Product Overview (`@product-vision`)
+
 Define your product name, description, problems/solutions, and key features.
 **Output:** `product/product-overview.md`
 
 ### 2. Product Roadmap (`@product-roadmap`)
+
 Define the main sections (features/areas) of the product.
 **Output:** `product/product-roadmap.md`
 
 ### 3. Data Shape (`@data-shape`)
+
 Sketch out the core entities and their relationships.
 **Output:** `product/data-shape/data-shape.md`
 
 ### 4. Design System (`@design-tokens`)
+
 Choose your color palette (from Tailwind) and typography (from Google Fonts). These tokens are applied to all screen designs.
 **Output:** `product/design-system/colors.json`, `product/design-system/typography.json`
 
 ### 5. Application Shell (`@design-shell`)
+
 Design the persistent navigation and layout that wraps all sections.
 **Output:** `product/shell/spec.md`, `src/shell/components/`
 
 ### 6. For Each Section:
+
 - `@shape-section` — Define the specification and generate sample data + types
 - `@sample-data` — Update sample data and types (if already created)
 - `@design-screen` — Create screen designs
 - `@screenshot-design` — Capture screenshots
 
-### 7. Export (`@export-product`)
+### 7. Clickdummy (`@clickdummy`)
+
+Assemble a fully navigable clickdummy from all designed sections. Wraps screen designs in the application shell with working inter-section navigation at `/clickdummy/preview`. Use this to demo to stakeholders and gather feedback before exporting.
+**Output:** `src/clickdummy/ClickdummyApp.tsx`, route at `/clickdummy/preview`
+
+### 8. Export (`@export-product`)
+
 Generate the complete export package with all components, types, and handoff documentation.
 **Output:** `product-plan/`
 

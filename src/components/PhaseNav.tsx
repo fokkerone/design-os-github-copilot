@@ -1,10 +1,10 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useMemo } from 'react'
-import { FileText, Boxes, Layout, LayoutList, Package } from 'lucide-react'
-import { loadProductData, hasExportZip } from '@/lib/product-loader'
+import { FileText, Boxes, Layout, LayoutList, MousePointer2, Package } from 'lucide-react'
+import { loadProductData, hasExportZip, hasClickdummy } from '@/lib/product-loader'
 import { getAllSectionIds, getSectionScreenDesigns } from '@/lib/section-loader'
 
-export type Phase = 'product' | 'data-shape' | 'design' | 'sections' | 'export'
+export type Phase = 'product' | 'data-shape' | 'design' | 'sections' | 'clickdummy' | 'export'
 
 interface PhaseConfig {
   id: Phase
@@ -18,6 +18,7 @@ const phases: PhaseConfig[] = [
   { id: 'data-shape', label: 'Data Shape', icon: Boxes, path: '/data-shape' },
   { id: 'design', label: 'Design', icon: Layout, path: '/design' },
   { id: 'sections', label: 'Sections', icon: LayoutList, path: '/sections' },
+  { id: 'clickdummy', label: 'Clickdummy', icon: MousePointer2, path: '/clickdummy' },
   { id: 'export', label: 'Export', icon: Package, path: '/export' },
 ]
 
@@ -58,6 +59,8 @@ function usePhaseStatuses(): PhaseInfo[] {
     currentPhaseId = 'design'
   } else if (currentPath === '/sections' || currentPath.startsWith('/sections/')) {
     currentPhaseId = 'sections'
+  } else if (currentPath === '/clickdummy') {
+    currentPhaseId = 'clickdummy'
   } else if (currentPath === '/export') {
     currentPhaseId = 'export'
   }
@@ -65,12 +68,16 @@ function usePhaseStatuses(): PhaseInfo[] {
   // Check if export zip exists
   const exportZipExists = hasExportZip()
 
+  // Check if clickdummy has been assembled
+  const clickdummyExists = hasClickdummy()
+
   // Determine completion status
   const phaseComplete: Record<Phase, boolean> = {
     'product': hasOverview && hasRoadmap,
     'data-shape': hasDataShape,
     'design': hasDesignSystem || hasShell,
     'sections': hasSections,
+    'clickdummy': clickdummyExists,
     'export': exportZipExists,
   }
 
@@ -103,11 +110,10 @@ export function PhaseNav() {
             {/* Connector line */}
             {!isFirst && (
               <div
-                className={`w-4 sm:w-8 lg:w-12 h-px transition-colors duration-200 ${
-                  status === 'upcoming'
+                className={`w-4 sm:w-8 lg:w-12 h-px transition-colors duration-200 ${status === 'upcoming'
                     ? 'bg-stone-200 dark:bg-stone-700'
                     : 'bg-stone-400 dark:bg-stone-500'
-                }`}
+                  }`}
               />
             )}
 
@@ -125,14 +131,12 @@ export function PhaseNav() {
               `}
             >
               <Icon
-                className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                  status === 'current' ? '' : status === 'completed' ? '' : 'opacity-60'
-                }`}
+                className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${status === 'current' ? '' : status === 'completed' ? '' : 'opacity-60'
+                  }`}
                 strokeWidth={1.5}
               />
-              <span className={`text-sm font-medium hidden sm:inline ${
-                status === 'upcoming' ? 'opacity-60' : ''
-              }`}>
+              <span className={`text-sm font-medium hidden sm:inline ${status === 'upcoming' ? 'opacity-60' : ''
+                }`}>
                 {phase.label}
               </span>
 
