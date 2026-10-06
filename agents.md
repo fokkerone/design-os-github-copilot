@@ -62,6 +62,7 @@ Design OS follows a structured planning sequence. Each step has a dedicated agen
 | 3. Data Shape | `@02-data-shape` | `/data-shape` |
 | 4. Design System | `@03-design-system` | `/design-tokens` |
 | 5. Application Shell | `@04-design-shell` | `/design-shell` |
+| User Flows (any time after step 2) | `@userflow` | `/design-os:userflow` |
 | 6a. Shape Section | `@05-shape-section` | `/shape-section` |
 | 6b. Sample Data | `@06-sample-data` | `/sample-data` |
 | 6c. Design Screen | `@07-design-screen` | `/design-screen` |
@@ -95,6 +96,15 @@ Define your visual identity: colors (from Tailwind), typography (from Google Fon
 Design the persistent navigation and layout that wraps all sections. Uses design system personality and UI style preferences if available.
 **Output:** `product/shell/spec.md`, `src/shell/components/`
 
+### User Flows (any time after the roadmap)
+
+Design concrete user flows with the REFINE and CARE frameworks, chain-of-thought reasoning, and edge-case red-teaming. Every flow gets a Mermaid diagram, a step table, rules, edge cases, and a mapping to sections and screen designs. It is ingested into the project brain automatically.
+- **plan**: plan flows ahead, before sections or screens exist
+- **prototype**: add a flow to the existing prototype and get a gap list of missing screens and states
+- **Shape Section** can create flows inline or link existing wiki flows (multi-select). Spec bullets then end in `(flow: <flow-id>)`, and the Design OS app renders the diagram.
+
+**Output:** `product/flows/[flow-id].md`, `wiki/flows/[flow-id].md`
+
 ### 6. For Each Section
 
 - **Shape Section** — Define the specification (only spec.md)
@@ -111,6 +121,30 @@ Assemble a fully navigable clickdummy from all designed sections. Wraps screen d
 
 Generate the complete export package with all components, types, and handoff documentation.
 **Output:** `product-plan/`
+
+---
+
+## Project Brain (`wiki/`)
+
+`wiki/` is a Karpathy-style LLM wiki and Obsidian vault: the persistent memory behind the planning flow. Sources (`wiki/raw/` plus the `product/` artifacts) are compiled into domain pages (`wiki/<domain>/`). The agent maintains the wiki; the user reads it and asks questions.
+
+- **Before asking clarifying questions** in any planning step, check `wiki/Home.md` and the relevant domain pages for prior decisions, research and feedback. Reference them in your questions instead of re-asking what is already settled.
+- **Never edit wiki pages directly** from a planning command. Use the wiki commands, which keep `Home.md`, `log.md` and `_manifest.json` consistent.
+- **After a planning step**, suggest `/design-os:wiki-ingest --product` to compile the new artifact, and `/design-os:wiki-capture` if the session produced decisions that are not in the artifact.
+
+| Command | Purpose |
+|---------|---------|
+| `/design-os:wiki-ingest` | Compile a raw file, URL, capture, or `--product` / `--pending` sources |
+| `/design-os:wiki-capture` | Save session decisions and feedback to `wiki/raw/` (or compile with `--full`) |
+| `/design-os:wiki-query` | Answer from the wiki with citations |
+| `/design-os:wiki-status` | Dashboard and pending sources |
+| `/design-os:wiki-lint` | Health check (read-only until confirmed) |
+| `/design-os:wiki-cross-link` | Insert missing `[[wikilinks]]` |
+| `/design-os:wiki-taxonomy` | Audit tags and domains |
+| `/design-os:wiki-rebuild` | Archive, rebuild, restore |
+| `/design-os:userflow` | Design a user flow, then ingest it into `wiki/flows/` |
+
+Skills (the schema) live in `.claude/skills/designos-wiki-*`, `designos-cross-linker` and `designos-tag-taxonomy`. Every wiki page is created from a template in `wiki/_templates/`. Every diagram is Mermaid (syntax reference: the `mermaid-diagrams` skill) and must pass `npm run validate:mermaid`.
 
 ---
 
@@ -131,6 +165,9 @@ product/                           # Product definition (portable)
 │
 ├── shell/                         # Application shell
 │   └── spec.md                    # Shell specification
+│
+├── flows/                         # User flows (/design-os:userflow)
+│   └── [flow-id].md               # Context, rules, Mermaid diagram, steps, edge cases, mapping
 │
 └── sections/
     └── [section-name]/
@@ -154,6 +191,16 @@ src/
         │   ├── [Component].tsx
         │   └── index.ts
         └── [ViewName].tsx         # Preview wrapper
+
+wiki/                              # Project brain (Karpathy LLM wiki, Obsidian vault)
+├── Home.md                        # Vault index: domains + recent updates
+├── log.md                         # Append-only activity log
+├── _manifest.json                 # Ingestion history (sources → pages, product/ hashes)
+├── _meta/taxonomy.md              # Canonical domains and tags
+├── _archives/                     # Snapshots from /design-os:wiki-rebuild
+├── _templates/                    # Page templates (page, flow, domain-home, raw-source, capture)
+├── raw/                           # Immutable sources + session captures
+└── [domain]/                      # Compiled pages (product, data, design-system, ...)
 
 product-plan/                      # Export package (generated)
 ├── README.md                      # Quick start guide

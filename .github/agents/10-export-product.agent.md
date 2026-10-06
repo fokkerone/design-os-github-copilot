@@ -79,6 +79,9 @@ product-plan/
 ├── data-shapes/
 │   ├── README.md
 │   └── overview.ts
+├── flows/ (if product/flows/ exists)
+│   ├── README.md
+│   └── [flow-id].md
 ├── shell/
 │   ├── README.md
 │   ├── components/
@@ -192,7 +195,7 @@ Copy `product/sections/[section-id]/data.json` to `product-plan/sections/[sectio
 
 ## Step 8: Generate Section READMEs
 
-For each section, create `product-plan/sections/[section-id]/README.md` with: overview, user flows, design decisions, data shapes, visual reference note, components list, and callback props table.
+For each section, create `product-plan/sections/[section-id]/README.md` with: overview, user flows (for bullets ending in `(flow: [flow-id])`, link `../../flows/[flow-id].md` and include its Mermaid diagram), design decisions, data shapes, visual reference note, components list, and callback props table.
 
 ## Step 9: Generate Section Test Instructions
 
@@ -290,6 +293,12 @@ Copy any `.png` files from:
 
 - `product/shell/` → `product-plan/shell/`
 - `product/sections/[section-id]/` → `product-plan/sections/[section-id]/`
+
+## Step 14b: Copy User Flows (if exist)
+
+If `product/flows/` contains `.md` files, copy each one unchanged to `product-plan/flows/[flow-id].md`. Then create `product-plan/flows/README.md` with a table listing each flow (title, status, sections, step count, edge-case count) and a note that every flow contains a Mermaid diagram, a step table, rules, and edge cases. These serve as acceptance criteria for implementation.
+
+In `tests.md` for a section with linked flows, add one test group per linked flow covering its happy path and each edge case (E1…En).
 
 ## Step 15: Create Zip File
 
