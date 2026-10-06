@@ -189,16 +189,18 @@ Ask (multiSelect) which existing section specs should list this flow, with the m
 
 Do not change anything else in the spec. Sections without a `spec.md` are listed with the hint to run `/shape-section`, which can link the flow from the wiki.
 
+If at least one spec now links the flow, set `status: in-spec` in the flow file's **frontmatter** and run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md`. A status change is metadata: it is synced, not re-ingested.
+
 ## Step 13 — Interactive artifact (optional, Claude Code only)
 
 Ask: Publish interactive flow (for stakeholders) / Skip (Recommended unless they mentioned sharing). If yes, load the `artifact-design` skill and build one HTML page:
 
-- Rendered Mermaid diagram (Mermaid from `cdn.jsdelivr.net/npm/mermaid`), with nodes clickable to highlight the matching step row
+- Rendered Mermaid diagram (artifacts render `<pre class="mermaid">` natively, so don't load a library), with nodes clickable to highlight the matching step row
 - Step table and edge-case table
 - Review panel: multi-select checklist "Which edge cases are acceptable as handled?" and a notes field per step
 - Styled after `.claude/DESIGN.md`, light and dark mode, works at phone width
 
-Publish it with the `Artifact` tool and add the link to the flow file under `## Artifacts`.
+Publish it with the `Artifact` tool. Add the URL to `artifacts:` in the flow file's **frontmatter** (not to the body), then run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md`. Tell the user the artifact is private until they share it.
 
 ## Step 14 — Handoff
 
@@ -228,6 +230,7 @@ status: planned | in-prototype | in-spec
 mode: plan | prototype
 sections: [<section-id>, ...]
 patterns: [<reference pattern>, ...]
+artifacts: []
 updated: <YYYY-MM-DD>
 ---
 
@@ -287,7 +290,7 @@ flowchart TD
 - [ ] <...>
 ````
 
-`status`: `planned` (just designed), `in-prototype` (every step `exists`), `in-spec` (linked from at least one section spec). Update it when that changes.
+`status`: `planned` (just designed), `in-prototype` (every step `exists`), `in-spec` (linked from at least one section spec). Update it when that changes, then run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md`. Status and artifacts live in frontmatter, so changing them never triggers a re-ingest.
 
 ---
 

@@ -12,7 +12,7 @@ You create ONE file: `product/sections/[section-id]/spec.md`. This file captures
 - UI requirements
 - Shell configuration
 
-Exception: when the user chooses to create a flow inline (Step 4b.2), the `designos-userflow` skill also writes `product/flows/<flow-id>.md` and its wiki page. Linking existing flows never changes those files.
+Exception: when the user chooses to create a flow inline (Step 4b.2), the `designos-userflow` skill also writes `product/flows/<flow-id>.md` and its wiki page. Linking a flow changes only its metadata: set `status: in-spec` in the frontmatter of each linked flow in `product/flows/`, then run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md` once per flow. Never edit the body of a flow file from here.
 
 **You do NOT:**
 - Create or modify `data.json` — that's the `/sample-data` command

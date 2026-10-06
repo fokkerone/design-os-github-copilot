@@ -4,7 +4,8 @@ summary: <who achieves what, from trigger to success, in 1–2 sentences>
 tags: [flows, <topic-tags e.g. auth, onboarding>]
 sources: [product/flows/<flow-id>.md]
 flow_id: <flow-id>
-flow_status: <planned | in-prototype | in-spec>
+flow_status: <planned | in-prototype | in-spec>   # maintained by `npm run -s wiki -- sync-meta`
+artifacts: []                                      # maintained by `npm run -s wiki -- sync-meta`
 sections: [<section-id>]
 created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}

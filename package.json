@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "validate:mermaid": "node scripts/validate-mermaid.mjs"
+    "validate:mermaid": "node scripts/validate-mermaid.mjs",
+    "wiki": "node scripts/wiki.mjs"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",

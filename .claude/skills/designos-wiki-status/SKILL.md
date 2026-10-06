@@ -27,9 +27,7 @@ Read `wiki/_manifest.json` and `wiki/log.md`.
 - **Orphans:** count only (details via lint).
 - **Tags:** top 10; tags not in `_meta/taxonomy.md`.
 - **Provenance:** average extracted / inferred / ambiguous; pages with >50 % inferred.
-- **Pending sources:**
-  - `wiki/raw/` files (excluding `README.md`, `.gitkeep`) without a manifest entry
-  - `product/**/*.md` artifacts without a manifest entry (**new**) or whose `shasum -a 256` differs from the latest manifest hash (**changed**)
+- **Pending sources:** run `npm run -s wiki -- pending` and report its `new`, `changed` and `meta` rows (content hash of the body vs. the manifest; frontmatter-only changes show as `meta`).
 - **DesignOS coverage:** for each planning step (overview, roadmap, data shape, design system, shell, each section spec in `product/sections/*/`, each flow in `product/flows/`), whether the artifact exists and whether the wiki covers it.
 - **Flows:** count by `status` (planned / in-prototype / in-spec), flows with open gaps, and flows not linked from any section spec.
 

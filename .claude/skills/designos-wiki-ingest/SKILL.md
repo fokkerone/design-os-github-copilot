@@ -68,7 +68,16 @@ DesignOS product artifacts:
 /design-os:wiki-ingest --pending     # every raw/ file and capture not yet in _manifest.json
 ```
 
-With no argument, list pending sources (`--pending` + `--product` candidates) and ask which to compile.
+With no argument, run `npm run -s wiki -- pending` and ask which sources to compile.
+
+**Bookkeeping goes through `scripts/wiki.mjs`.** Use one script call per step and never chain shell commands:
+
+| Command | Purpose |
+|---------|---------|
+| `npm run -s wiki -- pending` | Sources that are `new` or `changed` (need an ingest), and flows whose metadata is out of sync (`meta`) |
+| `npm run -s wiki -- hash <path>` | Content hash of one source |
+| `npm run -s wiki -- record <path> --type … --disposition … --title "…" [--created …] [--updated …] [--note "…"]` | Writes the manifest entry **and** the log entry (Steps 10–11) |
+| `npm run -s wiki -- sync-meta product/flows/<id>.md` | Copies flow metadata (status, artifacts) into the wiki without an ingest |
 
 **Compile one source at a time.** `Home.md`, `log.md`, `_manifest.json` and cascade updates are shared state, so do not parallelize compilation.
 
@@ -90,7 +99,12 @@ If `wiki/` structure is missing, create only what is missing, and never overwrit
 
 ### 2. Detect changes (product sources)
 
-For `product/` artifacts, compute `shasum -a 256 <path>` and compare against the latest manifest entry for that path. Same hash → skip ("unchanged"). Different hash or no entry → compile.
+Run `npm run -s wiki -- pending`. It compares the **content hash** of each `product/` artifact with the latest manifest entry for that path:
+- `new` (no entry) or `changed` (content differs) → compile.
+- not listed → unchanged, skip.
+- `meta` → only the frontmatter of a flow changed (e.g. `status`, `artifacts`). **This is not an ingest.** Run `npm run -s wiki -- sync-meta <path>` instead. It updates `flow_status`/`artifacts` on the wiki page and the status in `wiki/flows/Home.md`, and logs a single `meta` line.
+
+The content hash covers the body only. YAML frontmatter is metadata and never triggers a re-ingest. So put volatile metadata (status, links to artifacts, review dates) into frontmatter, not into the body.
 
 ### 3. Scan the existing wiki first
 
@@ -182,41 +196,19 @@ Product artifacts change often: when `product/` now says something different fro
 
 Ensure new pages link to related existing pages and vice versa. For a larger ingest, suggest `/design-os:wiki-cross-link`.
 
-### 10. Append to log.md
+### 10–11. Record the ingest (manifest + log)
 
-```markdown
-## [YYYY-MM-DD] ingest | <primary page title>
+One call writes both the `_manifest.json` entry (with content hash and timestamp) and the `log.md` entry. Do not edit these two files by hand:
 
-- **Source:** `<path>` (<raw | capture | product>)
-- **Disposition:** <New; Update; Disputed>
-- **Created:** [[<domain>/<page>]]
-- **Updated:** [[<domain>/<page>]]
+```
+npm run -s wiki -- record <source-path> --type <product|raw|capture> \
+  --disposition <New|Update|Disputed, comma-separated> --title "<primary page title>" \
+  --created <domain/page,domain/page> --updated <domain/page> [--note "<what changed>"]
 ```
 
-For No material:
+For No material: `npm run -s wiki -- record <source-path> --type <type> --disposition "No material"` (writes the machine-readable `ingest | no material: <path>` log heading).
 
-```markdown
-## [YYYY-MM-DD] ingest | no material: <path>
-
-- **Disposition:** No material
-```
-
-### 11. Update _manifest.json
-
-Append to `sources`:
-
-```json
-{
-  "id": "<YYYY-MM-DD>-<source-slug>",
-  "type": "raw | capture | product",
-  "path": "<project-root-relative path>",
-  "sha256": "<hash, product sources only>",
-  "ingested_at": "<ISO timestamp>",
-  "disposition": ["New"],
-  "pages_created": ["<domain>/<page>"],
-  "pages_updated": ["<domain>/<page>"]
-}
-```
+Run it **after** the page is written and validated, because the hash is taken at that moment. For a flow, run `npm run -s wiki -- sync-meta <path>` right after, so `flow_status` and `artifacts` match the source.
 
 ### 12. Handoff
 

@@ -33,14 +33,14 @@ Also read `wiki/_manifest.json`, `wiki/_meta/taxonomy.md`, `wiki/log.md`.
 | c | **Missing cross-links** | warning | Prose mentions another page's title/alias without linking it. |
 | d | **Contradictions** | critical | Pages with overlapping tags/domains asserting opposite things about the same decision, entity, token, or flow, without a `Status: Disputed` block. Flag for human review; never auto-resolve. |
 | e | **Stale file refs** | warning | Backtick paths (`product/...`, `src/...`) that no longer exist. |
-| f | **Outdated by product/** | critical | For each `product/` path in a page's `sources:`, the current `shasum -a 256` differs from the hash in the latest manifest entry for that path → the page may no longer reflect the artifact. Also: claims superseded by newer sources but shown without a `Status: Outdated` block. |
+| f | **Outdated by product/** | critical | Run `npm run -s wiki -- pending`: every `changed` product source means the pages built from it may no longer reflect the artifact (content hash of the body differs from the manifest). `meta` rows are metadata drift only (warning; fix with `sync-meta`). Also: claims superseded by newer sources but shown without a `Status: Outdated` block. |
 | g | **Ungrounded facts** | warning | Spot-check numbers, dates, names and quotes on pages with non-`product/` sources: each must appear verbatim in a listed source. Report misses; do not guess corrections. |
 | h | **Missing frontmatter** | warning | Missing `title`, `summary`, `tags`, `created`, `updated` (content pages) or `sources` (non-archived content pages). |
 | i | **Malformed status blocks** | warning | `Status: Outdated` without a date, or a status block without an explanation. |
 | j | **Undocumented domains** | warning | Domain folder without `Home.md`. |
 | k | **Domain drift** | warning | Folder not listed in `_meta/taxonomy.md` (Domains table or Project Domains). Classify: typo, duplicate of an existing domain, or unregistered new domain. |
 | l | **Index drift** | warning | Page missing from its domain `Home.md`, or a `Home.md` entry pointing to a missing page. |
-| m | **Pending sources** | info | `wiki/raw/` files (not `README.md`/`.gitkeep`) and `product/**/*.md` artifacts with no manifest entry. |
+| m | **Pending sources** | info | `new` rows from `npm run -s wiki -- pending` (raw files and product artifacts never ingested). |
 | n | **Missing concept pages** | info | Terms mentioned across ≥3 pages with no dedicated page (e.g. a data entity from the data shape). |
 | o | **Flow integrity** | critical | For every `wiki/flows/*.md` (except `Home.md`): has a `## Diagram` with a ```` ```mermaid ```` block that is identical to the one in its `product/flows/` source; step ids in the diagram match the Steps table; `sections:` ids exist in `product/sections/` or the roadmap. For every `(flow: <id>)` bullet in `product/sections/*/spec.md`: `product/flows/<id>.md` exists. Flows whose mapping still lists `gap`/`partial` steps are reported as info. |
 | p | **Invalid Mermaid** | critical | Run `npm run validate:mermaid -- wiki product/flows` and report every failing block with file and line. Diagrams drawn as ASCII art or images instead of Mermaid count as warnings. |
