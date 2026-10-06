@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Maximize2, GripVertical, Layout, Smartphone, Tablet, Monitor, LayoutDashboard, CalendarDays, Users, BookOpen, Circle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { RenderComponent } from '@/components/RenderComponent'
 import { loadScreenDesignComponent, sectionUsesShell } from '@/lib/section-loader'
 import { loadAppShell, hasShellComponents, loadShellInfo } from '@/lib/shell-loader'
 import { loadProductData } from '@/lib/product-loader'
@@ -184,6 +185,133 @@ export function ScreenDesignPage() {
   )
 }
 
+type LazyComponent<P = object> = React.LazyExoticComponent<React.ComponentType<P>>
+type ShellProps = { children?: React.ReactNode }
+
+// Lazy components are created once per screen design / section and cached at
+// module level, so their identity is stable across renders.
+const screenDesignCache = new Map<string, LazyComponent | null>()
+const appShellCache = new Map<string, LazyComponent<ShellProps> | null>()
+
+function getLazyScreenDesign(sectionId: string, screenDesignName: string): LazyComponent | null {
+  const key = `${sectionId}/${screenDesignName}`
+  if (!screenDesignCache.has(key)) screenDesignCache.set(key, createLazyScreenDesign(sectionId, screenDesignName))
+  return screenDesignCache.get(key) ?? null
+}
+
+function createLazyScreenDesign(sectionId: string, screenDesignName: string): LazyComponent | null {
+  const loader = loadScreenDesignComponent(sectionId, screenDesignName)
+  if (!loader) return null
+  // Wrap the loader to handle potential export issues
+  return React.lazy(async () => {
+    try {
+      const module = await loader()
+      if (module && typeof module.default === 'function') {
+        return module
+      }
+      console.error('Screen design does not have a valid default export:', screenDesignName)
+      return { default: () => <div>Invalid screen design: {screenDesignName}</div> }
+    } catch (e) {
+      console.error('Failed to load screen design:', screenDesignName, e)
+      return { default: () => <div>Failed to load: {screenDesignName}</div> }
+    }
+  })
+}
+
+function getLazyAppShell(sectionId: string | undefined): LazyComponent<ShellProps> | null {
+  const key = sectionId ?? ''
+  if (!appShellCache.has(key)) appShellCache.set(key, createLazyAppShell(sectionId))
+  return appShellCache.get(key) ?? null
+}
+
+function createLazyAppShell(sectionId: string | undefined): LazyComponent<ShellProps> | null {
+  // Check if this section should use the shell (based on spec.md config)
+  if (sectionId && !sectionUsesShell(sectionId)) {
+    console.log('[ScreenDesignFullscreen] Section configured to not use shell')
+    return null
+  }
+
+  // Check if shell components exist
+  const shellExists = hasShellComponents()
+  console.log('[ScreenDesignFullscreen] Shell exists:', shellExists)
+  if (!shellExists) return null
+
+  const loader = loadAppShell()
+  console.log('[ScreenDesignFullscreen] AppShell loader:', loader)
+  if (!loader) {
+    console.warn('[ScreenDesignFullscreen] hasShellComponents() returned true but loadAppShell() returned null')
+    return null
+  }
+
+  // Wrap the loader to provide default props to the shell
+  return React.lazy(async () => {
+    try {
+      const module = await loader() as Record<string, unknown>
+      const ShellComponent = (module?.default || module?.AppShell) as React.ComponentType<Record<string, unknown>>
+
+      if (typeof ShellComponent !== 'function') {
+        console.warn('[ScreenDesignFullscreen] AppShell does not have a valid export')
+        return { default: ({ children }: { children?: React.ReactNode }) => <>{children}</> }
+      }
+
+      // Create a wrapper that provides default props to the shell
+      const ShellWrapper = ({ children }: { children?: React.ReactNode }) => {
+        // Try to get navigation items from shell spec
+        const shellInfo = loadShellInfo()
+        const specNavItems = shellInfo?.spec?.navigationItems || []
+
+        // Icon mapping for known section labels
+        const iconMap: Record<string, typeof Circle> = {
+          dashboard: LayoutDashboard,
+          'rotation planning': CalendarDays,
+          profiles: Users,
+          'knowledge base': BookOpen,
+        }
+
+        // Parse navigation items from spec (format: "**Label** → Description")
+        const navigationItems = specNavItems.length > 0
+          ? specNavItems.map((item, index) => {
+            // Extract label from **Label** format
+            const labelMatch = item.match(/\*\*([^*]+)\*\*/)
+            const label = labelMatch ? labelMatch[1] : item.split('→')[0]?.trim() || `Item ${index + 1}`
+            return {
+              label,
+              href: `/${label.toLowerCase().replace(/\s+/g, '-')}`,
+              icon: iconMap[label.toLowerCase()] || Circle,
+              isActive: index === 0,
+            }
+          })
+          : [
+            { label: 'Dashboard', href: '/', icon: LayoutDashboard, isActive: true },
+            { label: 'Items', href: '/items', icon: Circle },
+            { label: 'Settings', href: '/settings', icon: Circle },
+          ]
+
+        const defaultUser = {
+          name: 'Demo User',
+        }
+
+        // Pass props dynamically - the shell component decides what it needs
+        return (
+          <ShellComponent
+            navigationItems={navigationItems}
+            user={defaultUser}
+            onNavigate={() => { }}
+            onLogout={() => { }}
+          >
+            {children}
+          </ShellComponent>
+        )
+      }
+
+      return { default: ShellWrapper }
+    } catch (e) {
+      console.error('[ScreenDesignFullscreen] Failed to load AppShell:', e)
+      return { default: ({ children }: { children?: React.ReactNode }) => <>{children}</> }
+    }
+  })
+}
+
 /**
  * Fullscreen version of a screen design (for screenshots)
  * Syncs theme with parent window via localStorage
@@ -193,114 +321,10 @@ export function ScreenDesignFullscreen() {
   const { sectionId, screenDesignName } = useParams<{ sectionId: string; screenDesignName: string }>()
 
   // Load screen design component
-  const ScreenDesignComponent = useMemo(() => {
-    if (!sectionId || !screenDesignName) return null
-    const loader = loadScreenDesignComponent(sectionId, screenDesignName)
-    if (!loader) return null
-    // Wrap the loader to handle potential export issues
-    return React.lazy(async () => {
-      try {
-        const module = await loader()
-        if (module && typeof module.default === 'function') {
-          return module
-        }
-        console.error('Screen design does not have a valid default export:', screenDesignName)
-        return { default: () => <div>Invalid screen design: {screenDesignName}</div> }
-      } catch (e) {
-        console.error('Failed to load screen design:', screenDesignName, e)
-        return { default: () => <div>Failed to load: {screenDesignName}</div> }
-      }
-    })
-  }, [sectionId, screenDesignName])
+  const ScreenDesignComponent = sectionId && screenDesignName ? getLazyScreenDesign(sectionId, screenDesignName) : null
 
   // Load AppShell component if it exists AND this section uses the shell
-  const AppShellComponent = useMemo(() => {
-    // Check if this section should use the shell (based on spec.md config)
-    if (sectionId && !sectionUsesShell(sectionId)) {
-      console.log('[ScreenDesignFullscreen] Section configured to not use shell')
-      return null
-    }
-
-    // Check if shell components exist
-    const shellExists = hasShellComponents()
-    console.log('[ScreenDesignFullscreen] Shell exists:', shellExists)
-    if (!shellExists) return null
-
-    const loader = loadAppShell()
-    console.log('[ScreenDesignFullscreen] AppShell loader:', loader)
-    if (!loader) {
-      console.warn('[ScreenDesignFullscreen] hasShellComponents() returned true but loadAppShell() returned null')
-      return null
-    }
-
-    // Wrap the loader to provide default props to the shell
-    return React.lazy(async () => {
-      try {
-        const module = await loader() as Record<string, unknown>
-        const ShellComponent = (module?.default || module?.AppShell) as React.ComponentType<Record<string, unknown>>
-
-        if (typeof ShellComponent !== 'function') {
-          console.warn('[ScreenDesignFullscreen] AppShell does not have a valid export')
-          return { default: ({ children }: { children?: React.ReactNode }) => <>{children}</> }
-        }
-
-        // Create a wrapper that provides default props to the shell
-        const ShellWrapper = ({ children }: { children?: React.ReactNode }) => {
-          // Try to get navigation items from shell spec
-          const shellInfo = loadShellInfo()
-          const specNavItems = shellInfo?.spec?.navigationItems || []
-
-          // Icon mapping for known section labels
-          const iconMap: Record<string, typeof Circle> = {
-            dashboard: LayoutDashboard,
-            'rotation planning': CalendarDays,
-            profiles: Users,
-            'knowledge base': BookOpen,
-          }
-
-          // Parse navigation items from spec (format: "**Label** → Description")
-          const navigationItems = specNavItems.length > 0
-            ? specNavItems.map((item, index) => {
-              // Extract label from **Label** format
-              const labelMatch = item.match(/\*\*([^*]+)\*\*/)
-              const label = labelMatch ? labelMatch[1] : item.split('→')[0]?.trim() || `Item ${index + 1}`
-              return {
-                label,
-                href: `/${label.toLowerCase().replace(/\s+/g, '-')}`,
-                icon: iconMap[label.toLowerCase()] || Circle,
-                isActive: index === 0,
-              }
-            })
-            : [
-              { label: 'Dashboard', href: '/', icon: LayoutDashboard, isActive: true },
-              { label: 'Items', href: '/items', icon: Circle },
-              { label: 'Settings', href: '/settings', icon: Circle },
-            ]
-
-          const defaultUser = {
-            name: 'Demo User',
-          }
-
-          // Pass props dynamically - the shell component decides what it needs
-          return (
-            <ShellComponent
-              navigationItems={navigationItems}
-              user={defaultUser}
-              onNavigate={() => { }}
-              onLogout={() => { }}
-            >
-              {children}
-            </ShellComponent>
-          )
-        }
-
-        return { default: ShellWrapper }
-      } catch (e) {
-        console.error('[ScreenDesignFullscreen] Failed to load AppShell:', e)
-        return { default: ({ children }: { children?: React.ReactNode }) => <>{children}</> }
-      }
-    })
-  }, [sectionId]) // Depends on sectionId to check section-specific shell config
+  const AppShellComponent = getLazyAppShell(sectionId)
 
   // Sync theme with parent window
   useEffect(() => {
@@ -354,9 +378,9 @@ export function ScreenDesignFullscreen() {
           </div>
         }
       >
-        <AppShellComponent>
-          <ScreenDesignComponent />
-        </AppShellComponent>
+        <RenderComponent component={AppShellComponent}>
+          <RenderComponent component={ScreenDesignComponent} />
+        </RenderComponent>
       </Suspense>
     )
   }
@@ -370,7 +394,7 @@ export function ScreenDesignFullscreen() {
         </div>
       }
     >
-      <ScreenDesignComponent />
+      <RenderComponent component={ScreenDesignComponent} />
     </Suspense>
   )
 }

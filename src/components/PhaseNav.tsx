@@ -156,5 +156,3 @@ export function PhaseNav() {
     </nav>
   )
 }
-
-export { phases }
