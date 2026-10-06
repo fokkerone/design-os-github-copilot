@@ -8,6 +8,8 @@ import { ScreenDesignPage, ScreenDesignFullscreen } from '@/components/ScreenDes
 import { ShellDesignPage, ShellDesignFullscreen } from '@/components/ShellDesignPage'
 import { ClickdummyPage } from '@/components/ClickdummyPage'
 import { ExportPage } from '@/components/ExportPage'
+import { WikiPage } from '@/components/WikiPage'
+import { WikiArticlePage } from '@/components/WikiArticlePage'
 
 export const router = createBrowserRouter([
   {
@@ -53,5 +55,13 @@ export const router = createBrowserRouter([
   {
     path: '/export',
     element: <ExportPage />,
+  },
+  {
+    path: '/wiki',
+    element: <WikiPage />,
+  },
+  {
+    path: '/wiki/*',
+    element: <WikiArticlePage />,
   },
 ])

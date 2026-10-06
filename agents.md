@@ -126,7 +126,7 @@ Generate the complete export package with all components, types, and handoff doc
 
 ## Project Brain (`wiki/`)
 
-`wiki/` is a Karpathy-style LLM wiki and Obsidian vault: the persistent memory behind the planning flow. Sources (`wiki/raw/` plus the `product/` artifacts) are compiled into domain pages (`wiki/<domain>/`). The agent maintains the wiki; the user reads it and asks questions.
+`wiki/` is a Karpathy-style LLM wiki and Obsidian vault: the persistent memory behind the planning flow. Read it in the Design OS app at `/wiki` (header button "Wiki"), or open the folder in Obsidian. Sources (`wiki/raw/` plus the `product/` artifacts) are compiled into domain pages (`wiki/<domain>/`). The agent maintains the wiki; the user reads it and asks questions.
 
 - **Before asking clarifying questions** in any planning step, check `wiki/Home.md` and the relevant domain pages for prior decisions, research and feedback. Reference them in your questions instead of re-asking what is already settled.
 - **Never edit wiki pages directly** from a planning command. Use the wiki commands, which keep `Home.md`, `log.md` and `_manifest.json` consistent.

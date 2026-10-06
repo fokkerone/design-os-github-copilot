@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { ChevronDown, ChevronRight, GitBranch, PanelTop, Square } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { BookOpen, ChevronDown, ChevronRight, GitBranch, PanelTop, Square } from 'lucide-react'
 import { EmptyState } from '@/components/EmptyState'
 import { MermaidDiagram } from '@/components/MermaidDiagram'
 import { loadFlow } from '@/lib/flow-loader'
+import { getWikiPage } from '@/lib/wiki-loader'
 import type { ParsedSpec } from '@/types/section'
 
 interface SpecCardProps {
@@ -52,7 +54,18 @@ function LinkedFlowItem({ text, flowId }: LinkedFlowItemProps) {
                 ) : (
                   <p className="text-sm text-stone-500 dark:text-stone-400">No Mermaid diagram in this flow yet.</p>
                 )}
-                <p className="font-mono text-xs text-stone-400 dark:text-stone-500">product/flows/{flowId}.md</p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-mono text-xs text-stone-400 dark:text-stone-500">product/flows/{flowId}.md</p>
+                  {getWikiPage(`flows/${flowId}`) && (
+                    <Link
+                      to={`/wiki/flows/${flowId}`}
+                      className="inline-flex items-center gap-1 text-xs text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
+                    >
+                      <BookOpen className="w-3.5 h-3.5" strokeWidth={1.5} />
+                      Open in wiki
+                    </Link>
+                  )}
+                </div>
               </>
             ) : (
               <p className="text-sm text-stone-500 dark:text-stone-400">
