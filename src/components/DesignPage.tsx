@@ -175,7 +175,7 @@ export function DesignPage() {
                       </div>
                     ) : (
                       <ColorPalette
-                        colors={designSystem.colors as Record<string, unknown>}
+                        colors={designSystem.colors}
                       />
                     )}
                   </div>
@@ -515,7 +515,7 @@ function ColorSwatch({ label, colorName }: ColorSwatchProps) {
 }
 
 /** Renders a nested color palette (for Apple-style design systems with object-based colors) */
-function ColorPalette({ colors }: { colors: Record<string, unknown> }) {
+function ColorPalette({ colors }: { colors: object }) {
   return (
     <div className='space-y-4'>
       {Object.entries(colors).map(([groupName, group]) => {

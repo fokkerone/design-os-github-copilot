@@ -21,3 +21,11 @@ dist/
 # Logs
 *.log
 npm-debug.log*
+
+# Agents
+agents/**/node_modules/
+agents/**/dist/
+.agent-sessions/
+
+# Claude Code worktrees
+.claude/worktrees/

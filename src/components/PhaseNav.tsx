@@ -49,7 +49,8 @@ function usePhaseStatuses(): PhaseInfo[] {
 
   // Determine current phase from URL
   const currentPath = location.pathname
-  let currentPhaseId: Phase = 'product'
+  // The wiki is not a planning phase, so no phase is current there
+  let currentPhaseId: Phase | null = currentPath.startsWith('/wiki') ? null : 'product'
 
   if (currentPath === '/' || currentPath === '/product') {
     currentPhaseId = 'product'
@@ -155,5 +156,3 @@ export function PhaseNav() {
     </nav>
   )
 }
-
-export { phases }

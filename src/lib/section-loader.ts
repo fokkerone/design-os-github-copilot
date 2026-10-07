@@ -7,7 +7,7 @@
  * - src/sections/[section-id]/[PageName].tsx  - Screen design pages
  */
 
-import type { SectionData, ParsedSpec, ScreenDesignInfo, ScreenshotInfo } from '@/types/section'
+import type { SectionData, ParsedSpec, ScreenDesignInfo, ScreenshotInfo, UserFlowItem } from '@/types/section'
 import type { ComponentType } from 'react'
 
 // Load spec.md files from product/sections at build time
@@ -72,6 +72,16 @@ function extractScreenshotName(path: string): string | null {
 }
 
 /**
+ * Split a User Flows bullet into text and an optional linked flow id
+ * e.g., "Checkout — cart to confirmation (flow: checkout)" -> { text: "Checkout — cart to confirmation", flowId: "checkout" }
+ */
+function parseUserFlowItem(bullet: string): UserFlowItem {
+  const match = bullet.match(/^(.*?)\s*\(flow:\s*([a-z0-9-]+)\s*\)\s*$/i)
+  if (!match) return { text: bullet, flowId: null }
+  return { text: match[1].trim(), flowId: match[2].toLowerCase() }
+}
+
+/**
  * Parse spec.md content into ParsedSpec structure
  *
  * Expected format:
@@ -82,7 +92,7 @@ function extractScreenshotName(path: string): string | null {
  *
  * ## User Flows
  * - Flow 1
- * - Flow 2
+ * - Flow 2 — short summary (flow: flow-id)   <- links product/flows/flow-id.md
  *
  * ## UI Requirements
  * - Requirement 1
@@ -106,13 +116,16 @@ export function parseSpec(md: string): ParsedSpec | null {
     // Extract user flows - bullet list after ## User Flows
     const userFlowsSection = md.match(/## User Flows\s*\n+([\s\S]*?)(?=\n## |\n#[^#]|$)/)
     const userFlows: string[] = []
+    const userFlowItems: UserFlowItem[] = []
 
     if (userFlowsSection?.[1]) {
       const lines = userFlowsSection[1].split('\n')
       for (const line of lines) {
         const trimmed = line.trim()
         if (trimmed.startsWith('- ')) {
-          userFlows.push(trimmed.slice(2).trim())
+          const item = parseUserFlowItem(trimmed.slice(2).trim())
+          userFlows.push(item.text)
+          userFlowItems.push(item)
         }
       }
     }
@@ -136,7 +149,7 @@ export function parseSpec(md: string): ParsedSpec | null {
     const shellDisabled = /(?:^|\n)\s*-?\s*shell\s*:\s*false/i.test(md)
     const useShell = !shellDisabled
 
-    return { title, overview, userFlows, uiRequirements, useShell }
+    return { title, overview, userFlows, userFlowItems, uiRequirements, useShell }
   } catch {
     return null
   }

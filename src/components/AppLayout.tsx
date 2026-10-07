@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Layers, ArrowLeft } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Layers, ArrowLeft, BookOpen } from 'lucide-react'
 import { PhaseNav } from './PhaseNav'
 import { ThemeToggle } from './ThemeToggle'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,7 @@ export function AppLayout({
   showPhaseNav = true,
 }: AppLayoutProps) {
   const navigate = useNavigate()
+  const location = useLocation()
 
   // Determine if this is a sub-page (has back navigation)
   const isSubPage = !!backTo
@@ -61,8 +62,8 @@ export function AppLayout({
           ) : (
             /* Main page header with phase nav - full width */
             <div className="flex items-center justify-between gap-4">
-              {/* Theme Toggle on left for balance */}
-              <div className="w-10 shrink-0">
+              {/* Spacer on the left, same width as the right-hand actions, keeps the phase nav centered */}
+              <div className="w-24 shrink-0">
                 {/* Empty spacer for balance */}
               </div>
 
@@ -73,8 +74,20 @@ export function AppLayout({
                 </div>
               )}
 
-              {/* Theme Toggle */}
-              <div className="w-10 shrink-0 flex justify-end">
+              {/* Wiki + Theme Toggle */}
+              <div className="w-24 shrink-0 flex items-center justify-end gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/wiki')}
+                  aria-current={location.pathname.startsWith('/wiki') ? 'page' : undefined}
+                  className={`px-2 ${location.pathname.startsWith('/wiki')
+                    ? 'bg-stone-900 dark:bg-stone-100 text-stone-100 dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-stone-200 hover:text-stone-100 dark:hover:text-stone-900'
+                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'}`}
+                >
+                  <BookOpen className="w-4 h-4 mr-1.5" strokeWidth={1.5} />
+                  Wiki
+                </Button>
                 <ThemeToggle />
               </div>
             </div>

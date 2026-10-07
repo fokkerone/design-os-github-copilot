@@ -23,8 +23,7 @@ function extractMeta(data: Record<string, unknown>): DataMeta | null {
 }
 
 function getDataWithoutMeta(data: Record<string, unknown>): Record<string, unknown> {
-  const { _meta, ...rest } = data
-  return rest
+  return Object.fromEntries(Object.entries(data).filter(([key]) => key !== '_meta'))
 }
 
 function countRecords(data: Record<string, unknown>): number {

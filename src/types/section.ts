@@ -11,10 +11,19 @@ export interface SectionData {
   screenshots: ScreenshotInfo[]
 }
 
+export interface UserFlowItem {
+  /** Bullet text with the `(flow: id)` marker removed */
+  text: string
+  /** Id of a linked flow in product/flows/[flow-id].md, or null for an inline bullet */
+  flowId: string | null
+}
+
 export interface ParsedSpec {
   title: string
   overview: string
   userFlows: string[]
+  /** Same bullets as userFlows, with linked flow ids resolved */
+  userFlowItems: UserFlowItem[]
   uiRequirements: string[]
   /** Whether screen designs for this section should be wrapped in the app shell. Defaults to true. */
   useShell: boolean

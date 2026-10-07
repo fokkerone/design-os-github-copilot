@@ -1,8 +1,9 @@
-import { Suspense, useMemo, useState, useRef, useCallback, useEffect } from 'react'
+import { Suspense, useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, PanelLeft, Maximize2, GripVertical, Smartphone, Tablet, Monitor } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { RenderComponent } from '@/components/RenderComponent'
 import { loadShellPreview } from '@/lib/shell-loader'
 import React from 'react'
 
@@ -174,17 +175,23 @@ export function ShellDesignPage() {
   )
 }
 
+// The lazy preview is created once at module level, so its identity is stable across renders
+let shellPreviewComponent: React.LazyExoticComponent<React.ComponentType> | null | undefined
+
+function getLazyShellPreview() {
+  if (shellPreviewComponent === undefined) {
+    const loader = loadShellPreview()
+    shellPreviewComponent = loader ? React.lazy(loader) : null
+  }
+  return shellPreviewComponent
+}
+
 /**
  * Fullscreen version of the shell preview (for screenshots)
  * Syncs theme with parent window via localStorage
  */
 export function ShellDesignFullscreen() {
-  const shellPreviewLoader = loadShellPreview()
-
-  const ShellPreviewComponent = useMemo(() => {
-    if (!shellPreviewLoader) return null
-    return React.lazy(shellPreviewLoader)
-  }, [shellPreviewLoader])
+  const ShellPreviewComponent = getLazyShellPreview()
 
   // Sync theme with parent window
   useEffect(() => {
@@ -236,7 +243,7 @@ export function ShellDesignFullscreen() {
         </div>
       }
     >
-      <ShellPreviewComponent />
+      <RenderComponent component={ShellPreviewComponent} />
     </Suspense>
   )
 }

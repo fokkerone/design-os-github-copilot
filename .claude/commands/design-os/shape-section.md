@@ -12,6 +12,8 @@ You create ONE file: `product/sections/[section-id]/spec.md`. This file captures
 - UI requirements
 - Shell configuration
 
+Exception: when the user chooses to create a flow inline (Step 4b.2), the `designos-userflow` skill also writes `product/flows/<flow-id>.md` and its wiki page. Linking a flow changes only its metadata: set `status: in-spec` in the frontmatter of each linked flow in `product/flows/`, then run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md` once per flow. Never edit the body of a flow file from here.
+
 **You do NOT:**
 - Create or modify `data.json` — that's the `/sample-data` command
 - Create or modify `types.ts` — that's the `/sample-data` command
@@ -52,7 +54,7 @@ Ask 4-6 targeted questions to define:
 
 - **Main user actions/tasks** - What can users do in this section?
 - **Information to display** - What data and content needs to be shown?
-- **Key user flows** - What are the step-by-step interactions?
+- **Key user flows** - What are the step-by-step interactions? (Detailed flows are handled in Step 4b.)
 - **UI patterns** - Any specific interactions, layouts, or components needed?
 - **Scope boundaries** - What should be explicitly excluded?
 
@@ -67,6 +69,41 @@ Example questions (adapt based on their input and the section):
 Ask questions one or two at a time, conversationally. Focus on user experience and interface requirements - no backend or database details.
 
 **Do NOT ask about:** data entities, fields, TypeScript types, or sample data structure — that's handled by the `/sample-data` command.
+
+## Step 4b: Define User Flows
+
+User flows can be simple bullets, or full flows (Mermaid diagram, steps, edge cases) that live in `product/flows/` and in the project brain at `wiki/flows/`.
+
+First collect the candidate flows:
+- Read `wiki/flows/Home.md` and the frontmatter of `wiki/flows/*.md` (fall back to `product/flows/*.md` if the wiki has no flows yet).
+- Rank them by relevance to this section: flows whose `sections:` include this section id come first, then flows whose title or summary matches the section's topic.
+
+Then ask (multiSelect) **how to define the flows for this section**, using the `AskUserQuestion` tool:
+- **Link existing flows**: only offer this if candidate flows exist
+- **Create a new flow inline**: a full flow with diagram and edge cases
+- **Simple bullets**: short flow descriptions written straight into the spec
+
+### 4b.1 Link existing flows (multi-select)
+
+Ask a multiSelect question listing the candidate flows: label = flow title, description = summary + status (e.g. "planned · 6 steps · 4 edge cases"). The question tool shows at most 4 options per question, so present the most relevant flows first and spread them over up to 4 questions. The user can type further flow ids through "Other".
+
+For each selected flow, the spec gets one bullet: `- <Flow title> — <one-line summary> (flow: <flow-id>)`.
+
+### 4b.2 Create a new flow inline
+
+Run the `designos-userflow` skill (`.claude/skills/designos-userflow/SKILL.md`) in **`inline` mode**:
+- The section is preset to this section id.
+- Pre-fill the Context answers from what the user has told you so far, and confirm them instead of asking again.
+- The skill runs the full pipeline (Rules, Example, Reasoning, Happy path, Edge cases, Nuance, Mapping), writes `product/flows/<flow-id>.md`, and ingests it into `wiki/flows/`.
+- It does **not** edit this spec. You add the `(flow: <flow-id>)` bullet yourself in Step 6.
+
+Repeat for every additional flow the user wants to create. Return to the spec conversation afterwards.
+
+### 4b.3 Simple bullets
+
+Ask for, or confirm, short flow descriptions as before. They are written as plain bullets without a `(flow: …)` marker.
+
+Linked flows, inline-created flows, and simple bullets can be mixed in one spec.
 
 ## Step 5: Ask About Shell Configuration
 
@@ -96,9 +133,9 @@ Create the file at `product/sections/[section-id]/spec.md` with this exact forma
 
 ## User Flows
 - [Flow 1]
-- [Flow 2]
+- [Linked flow title] — [one-line summary] (flow: [flow-id])
 - [Flow 3]
-[Add all flows discussed]
+[Add all flows discussed: linked, inline-created, and simple bullets]
 
 ## UI Requirements
 - [Requirement 1]
@@ -111,6 +148,7 @@ Create the file at `product/sections/[section-id]/spec.md` with this exact forma
 ```
 
 **Important:**
+- User Flows bullets that reference a flow end with `(flow: <flow-id>)`, where `<flow-id>` is the file name in `product/flows/`. Simple bullets have no marker. The Design OS app renders linked flows with their Mermaid diagram.
 - Set `shell: true` if the section should display inside the app shell (this is the default)
 - Set `shell: false` if the section should display as a standalone page without the shell
 - The section-id is the slug version of the section title (lowercase, hyphens instead of spaces)
@@ -129,6 +167,8 @@ After the spec file is created, present a summary:
 - [Flow 2]
 - [Flow 3]
 
+**Linked flows:** [list of flow ids, or "none"]
+
 Review the spec and let me know if you'd like to adjust anything. When you're happy with it, run `/sample-data` to generate sample data and TypeScript types for this section."
 
 **Stop here.** Do not proceed to create sample data, types, or screen designs.
@@ -142,4 +182,5 @@ Review the spec and let me know if you'd like to adjust anything. When you're ha
 - Keep the spec concise - only include what was discussed, no bloat
 - The format must match exactly for the app to parse it correctly
 - If the user requests changes after reviewing, update the file immediately
+- After the spec is written, suggest that the user run `/design-os:wiki-ingest --product` so the project brain picks up the section and its flow links
 - **NEVER create data.json or types.ts** — redirect to the `/sample-data` command
