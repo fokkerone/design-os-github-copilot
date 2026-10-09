@@ -17,10 +17,20 @@ The DesignOS project brain: a [Karpathy-style LLM wiki](https://gist.github.com/
 |-------|----------|---------------|
 | Sources | `wiki/raw/` (articles, research, notes, captures) + `product/` (DesignOS artifacts) | You (raw), DesignOS commands (product) |
 | Compiled wiki | `wiki/<domain>/*.md` | The agent, via the commands below |
-| Templates | `wiki/_templates/` (page, flow, domain index, raw source, capture), also used by Obsidian *Insert template* | Maintainers |
+| Templates | `wiki/_templates/` (page, flow, persona, domain index, raw source, capture), also used by Obsidian *Insert template* | Maintainers |
 | Schema | `.claude/skills/designos-wiki-*/SKILL.md` | Maintainers |
 
 All diagrams are **Mermaid**. Check them with `npm run validate:mermaid`.
+
+## How To
+
+New here? Start with the guides that ship with Design OS: [[how-to/Home|How To]].
+
+1. [[how-to/getting-started]] — run the app, pick Claude Code or Copilot
+2. [[how-to/planning-flow]] — every planning step in order
+3. [[how-to/project-brain]] — how this wiki works
+4. [[how-to/user-flows]] — design user flows
+5. [[how-to/personas]] — create and validate personas
 
 ## Domains
 

@@ -6,6 +6,7 @@ sources: [product/flows/<flow-id>.md]
 flow_id: <flow-id>
 flow_status: <planned | in-prototype | in-spec>   # maintained by `npm run -s wiki -- sync-meta`
 artifacts: []                                      # maintained by `npm run -s wiki -- sync-meta`
+personas: []                                       # maintained by `npm run -s wiki -- sync-meta`
 sections: [<section-id>]
 created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}
@@ -45,7 +46,7 @@ flowchart TD
 <Narrative walk-through of the happy path in 1–3 short paragraphs: trigger, key decisions, end state. Reference step ids (S1…). The only synthesized section — mark interpretation ^[inferred].>
 
 ## Context
-- **User:** <persona/role>
+- **User:** [[personas/<persona-id>]] or <role, when no persona exists>
 - **Intent:** <goal>
 - **Trigger:** <entry point>
 - **Success:** <end state>
@@ -84,6 +85,7 @@ flowchart TD
 
 ## Related
 - [[flows/<other-flow-id>]] — <sub-flow or related flow>
+- [[personas/<persona-id>]] — <persona this flow is designed for>
 - [[decisions/<page>]] — <decision that constrained this flow>
 - `product/sections/<section-id>/spec.md` — <section this flow touches>
 - `product/flows/<flow-id>.md` — source

@@ -12,7 +12,7 @@ You create ONE file: `product/sections/[section-id]/spec.md`. This file captures
 - UI requirements
 - Shell configuration
 
-Exception: when the user chooses to create a flow inline (Step 4b.2), the `designos-userflow` skill also writes `product/flows/<flow-id>.md` and its wiki page. Linking a flow changes only its metadata: set `status: in-spec` in the frontmatter of each linked flow in `product/flows/`, then run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md` once per flow. Never edit the body of a flow file from here.
+Exception: when the user chooses to create a flow inline (Step 4b.2) or a persona inline (Step 4c), the `designos-userflow` or `designos-persona` skill also writes `product/flows/<flow-id>.md` or `product/personas/<persona-id>.md` and its wiki page. Linking a flow changes only its metadata: set `status: in-spec` in the frontmatter of each linked flow in `product/flows/`, then run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md` once per flow. Never edit the body of a flow file from here. Linking a persona changes only its metadata too: add this section id to `sections:` in the frontmatter of each linked `product/personas/<persona-id>.md`, set `status: active` if it was `draft`, then run `npm run -s wiki -- sync-meta product/personas/<persona-id>.md` once per persona. Never edit the body of a persona file from here.
 
 **You do NOT:**
 - Create or modify `data.json` — that's the `/sample-data` command
@@ -105,6 +105,17 @@ Ask for, or confirm, short flow descriptions as before. They are written as plai
 
 Linked flows, inline-created flows, and simple bullets can be mixed in one spec.
 
+## Step 4c: Personas
+
+Personas say who this section is designed for. They live in `product/personas/` and in the project brain at `wiki/personas/`.
+
+Collect the candidates from `wiki/personas/Home.md` and the frontmatter of `wiki/personas/*.md` (fall back to `product/personas/*.md`). Rank them: personas whose `sections:` include this section id first, then personas whose job story or pain points match the section's topic, primary personas before secondary.
+
+- **Personas exist:** ask a multiSelect question using the `AskUserQuestion` tool: "Which personas is this section designed for?" Label = persona name, description = archetype · priority · confidence. Recommend the best-ranked primary persona. Spread more than 4 candidates over up to 4 questions.
+- **No persona fits, or none exist:** offer **Create a persona inline** (runs the `designos-persona` skill in `inline` mode, pre-filled from this conversation, and returns here) / **Skip personas** (the section works without them).
+
+For each selected persona, the spec gets one bullet under `## Personas`: `- <Persona name> — <archetype> (persona: <persona-id>)`. Use the persona's pain points and design implications as input for the UI requirements: propose them in Step 4's questions instead of asking from scratch.
+
 ## Step 5: Ask About Shell Configuration
 
 If a shell design has been created for this project (check if `src/shell/components/AppShell.tsx` exists), ask the user about shell usage:
@@ -137,6 +148,10 @@ Create the file at `product/sections/[section-id]/spec.md` with this exact forma
 - [Flow 3]
 [Add all flows discussed: linked, inline-created, and simple bullets]
 
+## Personas
+- [Persona name] — [archetype] (persona: [persona-id])
+[Only if personas were linked in Step 4c; omit the heading otherwise]
+
 ## UI Requirements
 - [Requirement 1]
 - [Requirement 2]
@@ -149,6 +164,7 @@ Create the file at `product/sections/[section-id]/spec.md` with this exact forma
 
 **Important:**
 - User Flows bullets that reference a flow end with `(flow: <flow-id>)`, where `<flow-id>` is the file name in `product/flows/`. Simple bullets have no marker. The Design OS app renders linked flows with their Mermaid diagram.
+- Personas bullets end with `(persona: <persona-id>)`, where `<persona-id>` is the file name in `product/personas/`. The Design OS app shows them with their job story and a link to the wiki.
 - Set `shell: true` if the section should display inside the app shell (this is the default)
 - Set `shell: false` if the section should display as a standalone page without the shell
 - The section-id is the slug version of the section title (lowercase, hyphens instead of spaces)
@@ -168,6 +184,8 @@ After the spec file is created, present a summary:
 - [Flow 3]
 
 **Linked flows:** [list of flow ids, or "none"]
+
+**Personas:** [list of persona ids, or "none"]
 
 Review the spec and let me know if you'd like to adjust anything. When you're happy with it, run `/sample-data` to generate sample data and TypeScript types for this section."
 

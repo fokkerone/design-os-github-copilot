@@ -7,7 +7,7 @@
  * - src/sections/[section-id]/[PageName].tsx  - Screen design pages
  */
 
-import type { SectionData, ParsedSpec, ScreenDesignInfo, ScreenshotInfo, UserFlowItem } from '@/types/section'
+import type { SectionData, ParsedSpec, PersonaLink, ScreenDesignInfo, ScreenshotInfo, UserFlowItem } from '@/types/section'
 import type { ComponentType } from 'react'
 
 // Load spec.md files from product/sections at build time
@@ -82,6 +82,16 @@ function parseUserFlowItem(bullet: string): UserFlowItem {
 }
 
 /**
+ * Split a Personas bullet into text and an optional persona id
+ * e.g., "Ana — The cautious first-timer (persona: cautious-first-timer)" -> { text: "Ana — The cautious first-timer", personaId: "cautious-first-timer" }
+ */
+function parsePersonaLink(bullet: string): PersonaLink {
+  const match = bullet.match(/^(.*?)\s*\(persona:\s*([a-z0-9-]+)\s*\)\s*$/i)
+  if (!match) return { text: bullet, personaId: null }
+  return { text: match[1].trim(), personaId: match[2].toLowerCase() }
+}
+
+/**
  * Parse spec.md content into ParsedSpec structure
  *
  * Expected format:
@@ -93,6 +103,9 @@ function parseUserFlowItem(bullet: string): UserFlowItem {
  * ## User Flows
  * - Flow 1
  * - Flow 2 — short summary (flow: flow-id)   <- links product/flows/flow-id.md
+ *
+ * ## Personas (optional)
+ * - Persona name — archetype (persona: persona-id)   <- links product/personas/persona-id.md
  *
  * ## UI Requirements
  * - Requirement 1
@@ -130,6 +143,17 @@ export function parseSpec(md: string): ParsedSpec | null {
       }
     }
 
+    // Extract personas - bullet list after ## Personas
+    const personasSection = md.match(/## Personas\s*\n+([\s\S]*?)(?=\n## |\n#[^#]|$)/)
+    const personas: PersonaLink[] = []
+
+    if (personasSection?.[1]) {
+      for (const line of personasSection[1].split('\n')) {
+        const trimmed = line.trim()
+        if (trimmed.startsWith('- ')) personas.push(parsePersonaLink(trimmed.slice(2).trim()))
+      }
+    }
+
     // Extract UI requirements - bullet list after ## UI Requirements
     const uiReqSection = md.match(/## UI Requirements\s*\n+([\s\S]*?)(?=\n## |\n#[^#]|$)/)
     const uiRequirements: string[] = []
@@ -149,7 +173,7 @@ export function parseSpec(md: string): ParsedSpec | null {
     const shellDisabled = /(?:^|\n)\s*-?\s*shell\s*:\s*false/i.test(md)
     const useShell = !shellDisabled
 
-    return { title, overview, userFlows, userFlowItems, uiRequirements, useShell }
+    return { title, overview, userFlows, userFlowItems, personas, uiRequirements, useShell }
   } catch {
     return null
   }

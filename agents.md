@@ -62,6 +62,7 @@ Design OS follows a structured planning sequence. Each step has a dedicated agen
 | 3. Data Shape | `@02-data-shape` | `/data-shape` |
 | 4. Design System | `@03-design-system` | `/design-tokens` |
 | 5. Application Shell | `@04-design-shell` | `/design-shell` |
+| Personas (any time after step 1) | `@persona` | `/design-os:persona` |
 | User Flows (any time after step 2) | `@userflow` | `/design-os:userflow` |
 | 6a. Shape Section | `@05-shape-section` | `/shape-section` |
 | 6b. Sample Data | `@06-sample-data` | `/sample-data` |
@@ -96,6 +97,16 @@ Define your visual identity: colors (from Tailwind), typography (from Google Fon
 Design the persistent navigation and layout that wraps all sections. Uses design system personality and UI style preferences if available.
 **Output:** `product/shell/spec.md`, `src/shell/components/`
 
+### Personas (any time after the product overview)
+
+Create personas and proto-personas in an interactive session: a JTBD job story, Cooper's end, experience and life goals, thinking style and behavioral dimensions instead of demographics, pain points with current workarounds, context of use, inclusion, and design implications. A red-team pass removes stereotypes, and every untested claim gets an assumption id with an evidence level (`assumption` → `hypothesis` → `signal` → `firsthand` → `pattern`).
+- **proto**: assumption-based, labeled "assumptions, not research"
+- **research**: grounded in interviews and research from `wiki/raw/` and `wiki/research/`
+- **validate**: record new evidence and raise or lower the confidence
+- Product Vision, User Flows and Shape Section use existing personas; section specs link them via `(persona: <persona-id>)` bullets under `## Personas`, and flows list them in `personas:` frontmatter. The export copies them to `product-plan/personas/`.
+
+**Output:** `product/personas/[persona-id].md`, `wiki/personas/[persona-id].md`
+
 ### User Flows (any time after the roadmap)
 
 Design concrete user flows with the REFINE and CARE frameworks, chain-of-thought reasoning, and edge-case red-teaming. Every flow gets a Mermaid diagram, a step table, rules, edge cases, and a mapping to sections and screen designs. It is ingested into the project brain automatically.
@@ -128,6 +139,7 @@ Generate the complete export package with all components, types, and handoff doc
 
 `wiki/` is a Karpathy-style LLM wiki and Obsidian vault: the persistent memory behind the planning flow. Read it in the Design OS app at `/wiki` (header button "Wiki"), or open the folder in Obsidian. Sources (`wiki/raw/` plus the `product/` artifacts) are compiled into domain pages (`wiki/<domain>/`). The agent maintains the wiki; the user reads it and asks questions.
 
+- **How To**: `wiki/how-to/` ships step-by-step guides for Design OS, the wiki, user flows and personas. It is a system domain maintained in the repository: never compiled, never cleared by a rebuild. Keep it up to date when commands change.
 - **Before asking clarifying questions** in any planning step, check `wiki/Home.md` and the relevant domain pages for prior decisions, research and feedback. Reference them in your questions instead of re-asking what is already settled.
 - **Never edit wiki pages directly** from a planning command. Use the wiki commands, which keep `Home.md`, `log.md` and `_manifest.json` consistent.
 - **After a planning step**, suggest `/design-os:wiki-ingest --product` to compile the new artifact, and `/design-os:wiki-capture` if the session produced decisions that are not in the artifact.
@@ -143,6 +155,7 @@ Generate the complete export package with all components, types, and handoff doc
 | `/design-os:wiki-taxonomy` | Audit tags and domains |
 | `/design-os:wiki-rebuild` | Archive, rebuild, restore |
 | `/design-os:userflow` | Design a user flow, then ingest it into `wiki/flows/` |
+| `/design-os:persona` | Create or validate a persona, then ingest it into `wiki/personas/` |
 
 Skills (the schema) live in `.claude/skills/designos-wiki-*`, `designos-cross-linker` and `designos-tag-taxonomy`. Every wiki page is created from a template in `wiki/_templates/`. Every diagram is Mermaid (syntax reference: the `mermaid-diagrams` skill) and must pass `npm run validate:mermaid`.
 
@@ -165,6 +178,9 @@ product/                           # Product definition (portable)
 │
 ├── shell/                         # Application shell
 │   └── spec.md                    # Shell specification
+│
+├── personas/                      # Personas (/design-os:persona)
+│   └── [persona-id].md            # Job story, goals, thinking style, pain points, evidence
 │
 ├── flows/                         # User flows (/design-os:userflow)
 │   └── [flow-id].md               # Context, rules, Mermaid diagram, steps, edge cases, mapping
@@ -198,7 +214,8 @@ wiki/                              # Project brain (Karpathy LLM wiki, Obsidian 
 ├── _manifest.json                 # Ingestion history (sources → pages, product/ hashes)
 ├── _meta/taxonomy.md              # Canonical domains and tags
 ├── _archives/                     # Snapshots from /design-os:wiki-rebuild
-├── _templates/                    # Page templates (page, flow, domain-home, raw-source, capture)
+├── _templates/                    # Page templates (page, flow, persona, domain-home, raw-source, capture)
+├── how-to/                        # Shipped step-by-step guides (system domain, maintained in the repo)
 ├── raw/                           # Immutable sources + session captures
 └── [domain]/                      # Compiled pages (product, data, design-system, ...)
 

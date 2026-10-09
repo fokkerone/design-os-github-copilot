@@ -21,7 +21,9 @@ function matches(page: WikiPageData, query: string): boolean {
 }
 
 function PageRow({ page }: { page: WikiPageData }) {
-  const status = typeof page.frontmatter.flow_status === 'string' ? page.frontmatter.flow_status : null
+  const fm = page.frontmatter
+  const rawStatus = fm.flow_status ?? fm.persona_status
+  const status = typeof rawStatus === 'string' ? rawStatus : null
   return (
     <li>
       <Link
@@ -87,6 +89,12 @@ export function WikiPage() {
               Compile your planning files with <code className="font-mono">/design-os:wiki-ingest --product</code>, or
               design a flow with <code className="font-mono">/design-os:userflow</code>.
             </p>
+            <Link
+              to="/wiki/how-to/Home"
+              className="mt-4 inline-block text-sm text-stone-900 dark:text-stone-100 underline decoration-lime-500 decoration-2 underline-offset-2"
+            >
+              Read the How To guides
+            </Link>
           </div>
         ) : (
           <>

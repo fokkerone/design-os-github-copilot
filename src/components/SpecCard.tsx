@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Link } from 'react-router-dom'
-import { BookOpen, ChevronDown, ChevronRight, GitBranch, PanelTop, Square } from 'lucide-react'
+import { BookOpen, ChevronDown, ChevronRight, GitBranch, PanelTop, Square, UserRound } from 'lucide-react'
 import { EmptyState } from '@/components/EmptyState'
 import { MermaidDiagram } from '@/components/MermaidDiagram'
 import { loadFlow } from '@/lib/flow-loader'
+import { loadPersona } from '@/lib/persona-loader'
 import { getWikiPage } from '@/lib/wiki-loader'
 import type { ParsedSpec } from '@/types/section'
 
@@ -80,7 +81,58 @@ function LinkedFlowItem({ text, flowId }: LinkedFlowItemProps) {
   )
 }
 
+interface LinkedPersonaItemProps {
+  text: string
+  personaId: string
+}
+
+function LinkedPersonaItem({ text, personaId }: LinkedPersonaItemProps) {
+  const persona = loadPersona(personaId)
+  const hasWikiPage = getWikiPage(`personas/${personaId}`) !== null
+
+  return (
+    <li className="flex items-start gap-3">
+      <UserRound className="w-3.5 h-3.5 text-lime-600 dark:text-lime-400 mt-0.5 shrink-0" strokeWidth={1.75} />
+      <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <span className="text-sm text-stone-700 dark:text-stone-300">{text}</span>
+          {persona && (
+            <span className="text-xs text-stone-500 dark:text-stone-400">
+              {[persona.priority, persona.kind, `${persona.confidence} confidence`].filter(Boolean).join(' · ')}
+            </span>
+          )}
+        </div>
+        {persona ? (
+          <>
+            {persona.jobStory && (
+              <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed">{persona.jobStory}</p>
+            )}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-mono text-xs text-stone-400 dark:text-stone-500">product/personas/{personaId}.md</p>
+              {hasWikiPage && (
+                <Link
+                  to={`/wiki/personas/${personaId}`}
+                  className="inline-flex items-center gap-1 text-xs text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
+                >
+                  <BookOpen className="w-3.5 h-3.5" strokeWidth={1.5} />
+                  Open in wiki
+                </Link>
+              )}
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-stone-500 dark:text-stone-400">
+            Persona file <span className="font-mono">product/personas/{personaId}.md</span> not found. Create it with{' '}
+            <span className="font-mono">/design-os:persona</span>.
+          </p>
+        )}
+      </div>
+    </li>
+  )
+}
+
 export function SpecCard({ spec, sectionTitle, sectionName }: SpecCardProps) {
+  const [personasOpen, setPersonasOpen] = useState(false)
   const [userFlowsOpen, setUserFlowsOpen] = useState(false)
   const [uiReqOpen, setUiReqOpen] = useState(false)
 
@@ -102,6 +154,41 @@ export function SpecCard({ spec, sectionTitle, sectionName }: SpecCardProps) {
           <p className="text-stone-600 dark:text-stone-400 leading-relaxed">
             {spec.overview}
           </p>
+        )}
+
+        {/* Personas - Expandable */}
+        {spec.personas.length > 0 && (
+          <Collapsible open={personasOpen} onOpenChange={setPersonasOpen}>
+            <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-left group">
+              <span className="text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide">
+                Personas
+                <span className="ml-2 text-stone-400 dark:text-stone-500 normal-case tracking-normal">
+                  ({spec.personas.length})
+                </span>
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 text-stone-400 dark:text-stone-500 transition-transform ${personasOpen ? 'rotate-180' : ''
+                  }`}
+                strokeWidth={1.5}
+              />
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <ul className="space-y-3 pt-2">
+                {spec.personas.map((item, index) =>
+                  item.personaId ? (
+                    <LinkedPersonaItem key={index} text={item.text} personaId={item.personaId} />
+                  ) : (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="w-1.5 h-1.5 rounded-full bg-stone-900 dark:bg-stone-100 mt-2 shrink-0" />
+                      <span className="text-stone-700 dark:text-stone-300 text-sm">
+                        {item.text}
+                      </span>
+                    </li>
+                  )
+                )}
+              </ul>
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
         {/* User Flows - Expandable */}

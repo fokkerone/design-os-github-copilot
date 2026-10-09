@@ -68,6 +68,9 @@ product-plan/
 ├── flows/ (if product/flows/ exists)
 │   ├── README.md
 │   └── [flow-id].md
+├── personas/ (if product/personas/ exists)
+│   ├── README.md
+│   └── [persona-id].md
 ├── shell/
 │   ├── README.md
 │   ├── components/
@@ -84,7 +87,7 @@ product-plan/
 
 ## Step 4: Generate product-overview.md
 
-Create `product-plan/product-overview.md` with: product name, summary, planned sections list, product entities, design system info, and implementation sequence (milestones starting with Shell, then each section).
+Create `product-plan/product-overview.md` with: product name, summary, personas (if `product/personas/` exists: one line per persona with name, archetype and job story, primary first), planned sections list, product entities, design system info, and implementation sequence (milestones starting with Shell, then each section).
 
 ## Step 4b: Copy Design System Documentation (if exists)
 
@@ -176,7 +179,7 @@ Copy `product/sections/[section-id]/data.json` to `product-plan/sections/[sectio
 
 ## Step 8: Generate Section READMEs
 
-For each section, create `product-plan/sections/[section-id]/README.md` with: overview, user flows (for bullets ending in `(flow: [flow-id])`, link `../../flows/[flow-id].md` and include its Mermaid diagram), design decisions, data shapes, visual reference note, components list, and callback props table.
+For each section, create `product-plan/sections/[section-id]/README.md` with: overview, user flows (for bullets ending in `(flow: [flow-id])`, link `../../flows/[flow-id].md` and include its Mermaid diagram), personas (for bullets ending in `(persona: [persona-id])`, link `../../personas/[persona-id].md` with the job story and design implications), design decisions, data shapes, visual reference note, components list, and callback props table.
 
 ## Step 9: Generate Section Test Instructions
 
@@ -277,6 +280,12 @@ Copy any `.png` files from:
 If `product/flows/` contains `.md` files, copy each one unchanged to `product-plan/flows/[flow-id].md`. Then create `product-plan/flows/README.md` with a table listing each flow (title, status, sections, step count, edge-case count) and a note that every flow contains a Mermaid diagram, a step table, rules, and edge cases. These serve as acceptance criteria for implementation.
 
 In `tests.md` for a section with linked flows, add one test group per linked flow covering its happy path and each edge case (E1…En).
+
+## Step 14c: Copy Personas (if exist)
+
+If `product/personas/` contains `.md` files, copy each one unchanged to `product-plan/personas/[persona-id].md`. Then create `product-plan/personas/README.md` with a table listing each persona (name, archetype, priority, kind, confidence, linked sections and flows), primary personas first, and this note: personas of kind `proto` are assumptions, not research; the implementation team should treat their Assumptions & Evidence table as open questions, not requirements. Each persona's Design Implications and Accessibility & Inclusion sections are design constraints for implementation.
+
+In the one-shot and section prompts, point to `personas/README.md` as context for who the UI is for.
 
 ## Step 15: Create Zip File
 

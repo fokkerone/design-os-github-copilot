@@ -26,10 +26,17 @@ Domains are concern-centric, not source-centric. A page's domain describes *what
 | `shell` | `shell/` | Global navigation, layout pattern, user menu | `product/shell/spec.md` |
 | `ui` | `ui/` | Reusable screen & interaction patterns, component conventions, responsive / dark-mode rules | `product/sections/*/spec.md` |
 | `flows` | `flows/` | User flows: one page per flow with Mermaid diagram, steps, rules, edge cases, section mapping | `product/flows/*.md` |
+| `personas` | `personas/` | Personas and proto-personas: one page per persona with job story, goals, thinking style, pain points, evidence | `product/personas/*.md` |
 | `decisions` | `decisions/` | Decision records: why X was chosen over Y | captures, any |
-| `research` | `research/` | Users, personas, competitors, market, external articles | `wiki/raw/` |
+| `research` | `research/` | User research findings, competitors, market, external articles (personas themselves go to `personas/`) | `wiki/raw/` |
 | `feedback` | `feedback/` | Stakeholder and user feedback on screens and the clickdummy | captures |
 | `handoff` | `handoff/` | Export & implementation notes for the target codebase | `product-plan/`, captures |
+
+### System Domains
+
+| Domain | Folder | What goes here | Maintained by |
+|--------|--------|----------------|---------------|
+| `how-to` | `how-to/` | Step-by-step guides for Design OS, the wiki, user flows and personas. Shipped with the repository. | Maintainers only. Never routed to by ingest or capture, never cleared by rebuild, exempt from orphan, source and pending checks. |
 
 ### Routing Rules
 
@@ -42,11 +49,12 @@ Assign each knowledge unit to a domain with this decision tree:
 5. **Colors, typography, tokens, brand, voice, UI style**? → `design-system/`
 6. **Global navigation, layout, user menu**? → `shell/`
 7. **A concrete user flow** (steps from trigger to goal)? → `flows/` (one page per flow, id = flow id)
-8. **Reusable screen/interaction pattern or component convention**? → `ui/`
-9. **Users, personas, competitors, market, external knowledge**? → `research/`
-10. **Feedback from stakeholders or users**? → `feedback/`
-11. **Export, handoff, implementation notes**? → `handoff/`
-12. **Section-specific knowledge that fits none of the above**?
+8. **A persona or proto-persona** (`product/personas/*.md`)? → `personas/` (one page per persona, id = persona id)
+9. **Reusable screen/interaction pattern or component convention**? → `ui/`
+10. **User research findings, competitors, market, external knowledge**? → `research/`
+11. **Feedback from stakeholders or users**? → `feedback/`
+12. **Export, handoff, implementation notes**? → `handoff/`
+13. **Section-specific knowledge that fits none of the above**?
     → Create a domain named after the section id (e.g. `invoices/`)
     → Add it under "Project Domains" below before creating the folder
 
@@ -73,15 +81,18 @@ Tags mirror domain names. Every content page gets the tag of its domain.
 - `shell` — navigation and layout chrome
 - `ui` — screen and interaction patterns
 - `flows` — user flows
+- `personas` — personas and proto-personas
 - `decisions` — decision records
 - `research` — external and user research
 - `feedback` — stakeholder and user feedback
 - `handoff` — export and implementation notes
+- `how-to` — Design OS guides (system domain)
 
 ## Topic Tags
 
 - `entity` — a single data entity
-- `persona` — a user persona or target group
+- `proto-persona` — an assumption-based persona that still needs validation
+- `negative-persona` — a persona the product deliberately does not design for
 - `competitor` — a competing product
 - `color` — color palette and usage
 - `typography` — fonts and type scale
@@ -119,6 +130,6 @@ _(add project-specific topic tags here)_
 - `userflow` → `flows`
 - `user-flow` → `flows`
 - `flow` → `flows`
-- `personas` → `persona`
+- `persona` → `personas`
 
 _(non-canonical → canonical mappings, managed by `/design-os:wiki-taxonomy`)_

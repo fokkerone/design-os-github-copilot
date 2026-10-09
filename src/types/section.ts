@@ -18,12 +18,21 @@ export interface UserFlowItem {
   flowId: string | null
 }
 
+export interface PersonaLink {
+  /** Bullet text with the `(persona: id)` marker removed */
+  text: string
+  /** Id of a persona in product/personas/[persona-id].md, or null for a plain bullet */
+  personaId: string | null
+}
+
 export interface ParsedSpec {
   title: string
   overview: string
   userFlows: string[]
   /** Same bullets as userFlows, with linked flow ids resolved */
   userFlowItems: UserFlowItem[]
+  /** Bullets under ## Personas */
+  personas: PersonaLink[]
   uiRequirements: string[]
   /** Whether screen designs for this section should be wrapped in the app shell. Defaults to true. */
   useShell: boolean

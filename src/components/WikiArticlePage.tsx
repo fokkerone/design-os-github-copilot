@@ -9,6 +9,22 @@ function list(value: FrontmatterValue | undefined): string[] {
   return typeof value === 'string' && value ? [value] : []
 }
 
+function WikiLinks({ domain, ids }: { domain: string; ids: string[] }) {
+  return (
+    <span className="flex flex-wrap gap-x-3 gap-y-1">
+      {ids.map((id) =>
+        getWikiPage(`${domain}/${id}`) ? (
+          <Link key={id} to={`/wiki/${domain}/${id}`} className="underline decoration-stone-300 dark:decoration-stone-600 underline-offset-2 hover:decoration-stone-500">
+            {id}
+          </Link>
+        ) : (
+          <span key={id}>{id}</span>
+        )
+      )}
+    </span>
+  )
+}
+
 function Property({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-2 text-sm">
@@ -45,7 +61,14 @@ export function WikiArticlePage() {
   }
 
   const fm = page.frontmatter
-  const status = typeof fm.flow_status === 'string' ? fm.flow_status : null
+  const rawStatus = fm.flow_status ?? fm.persona_status
+  const status = typeof rawStatus === 'string' ? rawStatus : null
+  // Persona pages: "primary · proto · low confidence"
+  const persona = [fm.persona_priority, fm.persona_kind, fm.confidence && `${fm.confidence} confidence`]
+    .filter((value): value is string => typeof value === 'string' && value !== '')
+    .join(' · ')
+  const flows = list(fm.flows)
+  const personas = list(fm.personas)
   const sections = list(fm.sections)
   const sources = list(fm.sources)
   const artifacts = list(fm.artifacts)
@@ -68,11 +91,22 @@ export function WikiArticlePage() {
           {page.summary && <p className="text-stone-600 dark:text-stone-400 leading-relaxed">{page.summary}</p>}
         </header>
 
-        {(page.updated || page.tags.length > 0 || status || sections.length > 0 || sources.length > 0 || artifacts.length > 0) && (
+        {(page.updated || page.tags.length > 0 || status || persona || sections.length > 0 || flows.length > 0 || personas.length > 0 || sources.length > 0 || artifacts.length > 0) && (
           <dl className="divide-y divide-stone-200 dark:divide-stone-800 border-y border-stone-200 dark:border-stone-800">
             {status && (
               <Property label="Status">
                 <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-lime-100 text-lime-800 dark:bg-lime-900/40 dark:text-lime-300">{status}</span>
+              </Property>
+            )}
+            {persona && <Property label="Persona">{persona}</Property>}
+            {personas.length > 0 && (
+              <Property label="Personas">
+                <WikiLinks domain="personas" ids={personas} />
+              </Property>
+            )}
+            {flows.length > 0 && (
+              <Property label="Flows">
+                <WikiLinks domain="flows" ids={flows} />
               </Property>
             )}
             {sections.length > 0 && (

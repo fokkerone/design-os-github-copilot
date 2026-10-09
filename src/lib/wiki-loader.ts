@@ -125,9 +125,12 @@ export function getWikiPage(path: string): WikiPage | null {
   return pagesByPath.get(path.replace(/\/$/, '')) || null
 }
 
-/** Whether the vault holds any compiled knowledge (beyond Home and log) */
+/** Domains shipped with the repository instead of compiled from sources */
+export const SYSTEM_DOMAINS = ['how-to']
+
+/** Whether the vault holds any compiled knowledge (beyond Home, log and the shipped how-to guides) */
 export function hasWikiContent(): boolean {
-  return getContentPages().length > 0
+  return getContentPages().some((page) => !SYSTEM_DOMAINS.includes(page.domain))
 }
 
 /** Content pages: everything except indexes, the log and underscore files */
@@ -135,14 +138,14 @@ export function getContentPages(): WikiPage[] {
   return pages.filter((page) => !page.isIndex && page.domain !== '' && !page.domain.startsWith('_'))
 }
 
-/** Content pages grouped by domain folder, domains sorted by name */
+/** Content pages grouped by domain folder, domains sorted by name, system domains last */
 export function getWikiDomains(): { domain: string; pages: WikiPage[] }[] {
   const groups = new Map<string, WikiPage[]>()
   for (const page of getContentPages()) {
     groups.set(page.domain, [...(groups.get(page.domain) || []), page])
   }
   return [...groups.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
+    .sort(([a], [b]) => Number(SYSTEM_DOMAINS.includes(a)) - Number(SYSTEM_DOMAINS.includes(b)) || a.localeCompare(b))
     .map(([domain, domainPages]) => ({ domain, pages: domainPages }))
 }
 

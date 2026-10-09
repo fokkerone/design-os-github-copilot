@@ -30,7 +30,7 @@ No mode given → ask which one.
 
 ## Safety Rules
 
-- **Never delete** `wiki/raw/`, `wiki/.obsidian/`, `wiki/_archives/`, `wiki/_templates/`, or `wiki/log.md` (append-only).
+- **Never delete** `wiki/raw/`, `wiki/.obsidian/`, `wiki/_archives/`, `wiki/_templates/`, `wiki/how-to/` (system domain, shipped with the repo), or `wiki/log.md` (append-only).
 - **Always archive** before rebuild or restore.
 - **Always confirm** destructive steps: print exactly what will be deleted/overwritten and wait for an explicit yes.
 
@@ -56,17 +56,18 @@ No mode given → ask which one.
 
 After archiving and confirmation:
 
-1. **Clear** compiled content: all domain folders and `.md` files in `wiki/` except `log.md`, plus `_manifest.json`, `_lint-report.md`, `_insights.md`. Keep `_meta/taxonomy.md` (vocabulary is still valid), `_templates/`, `raw/`, `.obsidian/`, `_archives/`.
-2. **Re-initialize:** fresh `wiki/Home.md` (same template as the initial vault), `_manifest.json` → `{"sources": []}`.
+1. **Clear** compiled content: all domain folders and `.md` files in `wiki/` except `log.md`, plus `_manifest.json`, `_lint-report.md`, `_insights.md`. Keep `_meta/taxonomy.md` (vocabulary is still valid), `_templates/`, `how-to/`, `raw/`, `.obsidian/`, `_archives/`.
+2. **Re-initialize:** fresh `wiki/Home.md` (same template as the initial vault, including the How To section), `_manifest.json` → `{"sources": []}`.
 3. **Recompile, one source at a time,** with the `designos-wiki-ingest` process, in planning-flow order so later artifacts build on earlier ones:
    1. `product/product-overview.md`
    2. `product/product-roadmap.md`
    3. `product/data-shape/data-shape.md`
    4. `product/design-system/design-system.md`
    5. `product/shell/spec.md`
-   6. `product/sections/*/spec.md` (roadmap order)
-   7. `product/flows/*.md` (alphabetical)
-   8. `wiki/raw/*` sorted by collected/capture date, oldest first
+   6. `product/personas/*.md` (primary first, then alphabetical)
+   7. `product/sections/*/spec.md` (roadmap order)
+   8. `product/flows/*.md` (alphabetical)
+   9. `wiki/raw/*` sorted by collected/capture date, oldest first
 4. **Post-rebuild:** run the `designos-cross-linker` and `designos-tag-taxonomy` (audit) processes.
 5. Append:
    ```markdown

@@ -20,6 +20,8 @@ You create ONE file: `product/product-overview.md`. This file captures:
 
 ## Step 1: Gather Initial Input
 
+Before asking, check `product/personas/*.md` and `wiki/personas/Home.md`. If personas exist, treat them as the answer to "who is it for": mention them by name and archetype in your opening question, and derive problem candidates from their job stories and pain points instead of asking for the users again. Do not edit persona files from here.
+
 First, ask the user to share their raw notes, ideas, or thoughts about the product they want to build. Be warm and open-ended:
 
 "I'd love to help you define your product vision. Tell me about the product you're building — share any notes, ideas, or rough thoughts you have. What problem are you trying to solve? Who is it for? Don't worry about structure yet, just share what's on your mind."
@@ -42,7 +44,7 @@ Focus ONLY on these areas:
 - "What would you like to call this product? (A short, memorable name)"
 
 Example questions (adapt based on their input):
-- "Who is the primary user of this product? Can you describe them?"
+- "Who is the primary user of this product? Can you describe them?" (skip when personas exist; confirm the primary persona instead)
 - "What's the single biggest pain point you're addressing?"
 - "How do people currently solve this problem without your product?"
 - "What makes your approach different or better?"
@@ -94,6 +96,8 @@ After creating the file, present a summary and point to the next step:
 **Key features:** [Feature 1], [Feature 2], [Feature 3]
 
 Review the file and let me know if you'd like to adjust anything. When you're happy with it, run `/product-roadmap` to define your product sections."
+
+If no personas exist yet, add: "Want to make the target users concrete? `/design-os:persona` creates a proto-persona from what we discussed, before or after the roadmap."
 
 **Stop here.** Do not proceed to create any other files.
 

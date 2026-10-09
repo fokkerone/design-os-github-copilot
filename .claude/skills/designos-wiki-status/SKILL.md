@@ -28,8 +28,9 @@ Read `wiki/_manifest.json` and `wiki/log.md`.
 - **Tags:** top 10; tags not in `_meta/taxonomy.md`.
 - **Provenance:** average extracted / inferred / ambiguous; pages with >50 % inferred.
 - **Pending sources:** run `npm run -s wiki -- pending` and report its `new`, `changed` and `meta` rows (content hash of the body vs. the manifest; frontmatter-only changes show as `meta`).
-- **DesignOS coverage:** for each planning step (overview, roadmap, data shape, design system, shell, each section spec in `product/sections/*/`, each flow in `product/flows/`), whether the artifact exists and whether the wiki covers it.
+- **DesignOS coverage:** for each planning step (overview, roadmap, data shape, design system, shell, each section spec in `product/sections/*/`, each flow in `product/flows/`, each persona in `product/personas/`), whether the artifact exists and whether the wiki covers it.
 - **Flows:** count by `status` (planned / in-prototype / in-spec), flows with open gaps, and flows not linked from any section spec.
+- **Personas:** count by `priority` and `kind`, `confidence` distribution, open assumptions (rows below `signal`), personas not linked from any flow or section, and whether a `primary` persona exists.
 
 ### 3. Print the dashboard
 

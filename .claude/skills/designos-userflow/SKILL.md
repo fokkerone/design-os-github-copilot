@@ -63,7 +63,8 @@ Read what exists. Skip missing files without comment:
 - `product/sections/*/spec.md`: existing user flows and UI requirements
 - `src/sections/*/*.tsx`: existing screen designs (file name = screen design name)
 - `product/flows/*.md`: existing flows (avoid duplicates, reuse as sub-flows)
-- Project brain: `wiki/Home.md`, `wiki/flows/Home.md`, and a full-text search of `wiki/` for the flow topic. Pull in decisions (`wiki/decisions/`), personas (`wiki/research/`), and feedback (`wiki/feedback/`) that constrain this flow.
+- `product/personas/*.md`: personas (job story, goals, pain points, context of use, accessibility, design implications)
+- Project brain: `wiki/Home.md`, `wiki/flows/Home.md`, `wiki/personas/Home.md`, and a full-text search of `wiki/` for the flow topic. Pull in decisions (`wiki/decisions/`), research (`wiki/research/`), and feedback (`wiki/feedback/`) that constrain this flow.
 
 If a flow on the same topic already exists, ask: update it (Recommended) / create a variant / create anyway.
 
@@ -80,7 +81,7 @@ Switch to the **QA Lead** persona only in Step 7.
 Ask (one call, up to 4 questions):
 
 1. **Goal / user intent**: what the user is trying to achieve. Options are derived from the roadmap and overview.
-2. **Primary user**: persona or role. Options come from the overview and wiki research.
+2. **Primary user**: offer the personas from `product/personas/` first (label = persona name, description = archetype · priority · confidence; recommend the primary persona whose job story fits the goal). If none fits or none exist, offer roles from the overview and the option **Create persona first**, which runs the `designos-persona` skill in `inline` mode and returns here. A chosen persona pre-fills the **User state** question from its context of use and accessibility, and its pain points and design implications become rule candidates in Step 3.
 3. **Trigger / entry point**: where the flow starts (shell nav item, deep link, email, notification, another flow).
 4. **User state**: the emotional and situational state, e.g. stressed / in a hurry / first-time / expert / on mobile. multiSelect. This drives the Nuance stage.
 
@@ -179,6 +180,8 @@ Then run `npm run validate:mermaid -- product/flows/<flow-id>.md`. If the diagra
 
 Immediately compile the flow into the wiki by following the `designos-wiki-ingest` skill with source `product/flows/<flow-id>.md` (type `product`, domain `flows`, using the **flow page** format defined there). Use the template `wiki/_templates/flow.md`. This creates or updates `wiki/flows/<flow-id>.md` and `wiki/flows/Home.md`, and records the hash in `wiki/_manifest.json`.
 
+If the flow lists `personas:`, add `<flow-id>` to `flows:` in the frontmatter of each `product/personas/<persona-id>.md` (never edit a persona's body) and run `npm run -s wiki -- sync-meta product/personas/<persona-id>.md` once per persona.
+
 ## Step 12 — Link to section specs (not in `inline` mode)
 
 Ask (multiSelect) which existing section specs should list this flow, with the mapped sections recommended. For each one chosen, add exactly one bullet to `## User Flows` in `product/sections/<section-id>/spec.md`:
@@ -231,6 +234,7 @@ mode: plan | prototype
 sections: [<section-id>, ...]
 patterns: [<reference pattern>, ...]
 artifacts: []
+personas: [<persona-id>, ...]
 updated: <YYYY-MM-DD>
 ---
 
@@ -240,7 +244,7 @@ updated: <YYYY-MM-DD>
 <2–3 sentences: who, goal, start → end.>
 
 ## Context
-- **User:** <persona/role>
+- **User:** <persona name> (`<persona-id>`) or <role, when no persona exists>
 - **Intent:** <what they want to achieve>
 - **Trigger:** <entry point>
 - **Success:** <end state>
@@ -289,6 +293,8 @@ flowchart TD
 ## Open Questions
 - [ ] <...>
 ````
+
+`personas` lists the persona ids the flow is designed for (metadata like `status`; Step 11 mirrors the link into each persona).
 
 `status`: `planned` (just designed), `in-prototype` (every step `exists`), `in-spec` (linked from at least one section spec). Update it when that changes, then run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md`. Status and artifacts live in frontmatter, so changing them never triggers a re-ingest.
 

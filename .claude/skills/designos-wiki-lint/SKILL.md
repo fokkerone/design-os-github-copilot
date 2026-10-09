@@ -28,7 +28,7 @@ Also read `wiki/_manifest.json`, `wiki/_meta/taxonomy.md`, `wiki/log.md`.
 
 | # | Check | Severity | Detection |
 |---|-------|----------|-----------|
-| a | **Orphaned pages** | warning | No inbound `[[wikilink]]`. `Home.md` files, `log.md`, `_lint-report.md`, `_insights.md` are exempt. |
+| a | **Orphaned pages** | warning | No inbound `[[wikilink]]`. `Home.md` files, `log.md`, `_lint-report.md`, `_insights.md` and `how-to/` pages are exempt. |
 | b | **Broken wikilinks** | critical | `[[target]]` resolves to no `.md` in the vault (match by path or by file name, as Obsidian does). |
 | c | **Missing cross-links** | warning | Prose mentions another page's title/alias without linking it. |
 | d | **Contradictions** | critical | Pages with overlapping tags/domains asserting opposite things about the same decision, entity, token, or flow, without a `Status: Disputed` block. Flag for human review; never auto-resolve. |
@@ -43,8 +43,9 @@ Also read `wiki/_manifest.json`, `wiki/_meta/taxonomy.md`, `wiki/log.md`.
 | m | **Pending sources** | info | `new` rows from `npm run -s wiki -- pending` (raw files and product artifacts never ingested). |
 | n | **Missing concept pages** | info | Terms mentioned across ≥3 pages with no dedicated page (e.g. a data entity from the data shape). |
 | o | **Flow integrity** | critical | For every `wiki/flows/*.md` (except `Home.md`): has a `## Diagram` with a ```` ```mermaid ```` block that is identical to the one in its `product/flows/` source; step ids in the diagram match the Steps table; `sections:` ids exist in `product/sections/` or the roadmap. For every `(flow: <id>)` bullet in `product/sections/*/spec.md`: `product/flows/<id>.md` exists. Flows whose mapping still lists `gap`/`partial` steps are reported as info. |
+| o2 | **Persona integrity** | critical | For every `wiki/personas/*.md` (except `Home.md`): `product/personas/<id>.md` exists; a `proto` persona keeps the proto banner and its evidence levels match the source (never higher); every `A` id cited in Thinking Style, Pain Points or Design Implications exists in the Assumptions table. For every `(persona: <id>)` bullet in `product/sections/*/spec.md` and every id in a flow's `personas:` frontmatter: `product/personas/<id>.md` exists. Personas still at `confidence: low` with `status: active` are reported as info (validation pending). Personas with demographic detail but no Design Implication that uses it are a warning. |
 | p | **Invalid Mermaid** | critical | Run `npm run validate:mermaid -- wiki product/flows` and report every failing block with file and line. Diagrams drawn as ASCII art or images instead of Mermaid count as warnings. |
-| q | **Template drift** | warning | Content pages missing required sections of their template (`wiki/_templates/page.md` for Summary/Related, `wiki/_templates/flow.md` for all flow sections). |
+| q | **Template drift** | warning | Content pages missing required sections of their template (`wiki/_templates/page.md` for Summary/Related, `wiki/_templates/flow.md` for all flow sections, `wiki/_templates/persona.md` for Job Story, Goals, Needs & Pain Points, Design Implications and Assumptions & Evidence). |
 
 ### 3. Write the report
 
