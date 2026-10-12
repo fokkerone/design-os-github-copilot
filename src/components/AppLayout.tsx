@@ -15,7 +15,7 @@ interface AppLayoutProps {
   backLabel?: string
   /** Whether to show the phase nav (default: true) */
   showPhaseNav?: boolean
-  /** Content width: "default" (768px, reading pages) or "wide" (1280px, token/data-heavy pages) */
+  /** Content width: "wide" (1280px, default for all content pages) or "default" (768px, narrow reading width) */
   width?: 'default' | 'wide'
 }
 
@@ -30,7 +30,7 @@ export function AppLayout({
   backTo,
   backLabel = 'Back',
   showPhaseNav = true,
-  width = 'default',
+  width = 'wide',
 }: AppLayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
