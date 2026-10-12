@@ -21,6 +21,32 @@ If it doesn't exist:
 
 Stop here if the prerequisite is missing.
 
+## Step 1b: Check for Imported Design Tokens (DTCG)
+
+Check if `product/design-system/import/tokens.json` exists. This is the **token import path** — a Figma/DTCG export that replaces the interview for colors, typography, spacing, radius and shadows.
+
+```
+product/design-system/import/        # inputs (never edited by agents)
+├── tokens.json   (required)  W3C DTCG tokens, e.g. Figma variables export
+├── DESIGN.md     (optional)  Figma style export: gradients, text styles, effects, components
+└── skill.md      (optional)  typeui guidance: mission, rules, accessibility, tone
+        │  npm run tokens:build   (Style Dictionary, deterministic + idempotent)
+        ▼
+product/design-system/
+├── tokens/tokens.css    Tailwind v4 theme: :root/.dark + @theme, colors in OKLCH
+├── tokens/tokens.json   normalized model the Design OS app renders (schema designos-tokens/v1)
+└── DESIGN.md            merged guide: tokens + DESIGN.md + skill.md + import report
+```
+
+If `import/tokens.json` exists:
+
+1. Run `npm run tokens:build` (or `npm run tokens:check` to verify the outputs are current). Never hand-edit the generated files — fix the inputs and rebuild. Same inputs always produce byte-identical outputs.
+2. Read `product/design-system/DESIGN.md` and summarize for the user: semantic colors, fonts, the warnings from section 12 (import report).
+3. Ask whether they also want to define brand personality, voice and UI style preferences. Only those go into `design-system.json`; colors and typography come from the import. Do not duplicate token values in `design-system.json` or `design-system.md`.
+4. Continue with Step 8 (confirm). The Design page in the app shows the imported system at `/design`.
+
+If `import/` does not exist, continue with Step 2 (interview path).
+
 ## Step 2: Check for Existing Design System
 
 Check if `product/design-system/design-system.json` already exists.

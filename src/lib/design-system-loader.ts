@@ -4,6 +4,7 @@
  */
 
 import type { DesignSystem, ColorTokens, TypographyTokens } from "@/types/product";
+import { hasDesignTokens } from "./design-tokens-loader";
 
 // Load JSON file from product/design-system at build time
 const designSystemFile = import.meta.glob("/product/design-system/design-system.json", {
@@ -82,9 +83,11 @@ function loadLegacyTypographyTokens(): TypographyTokens | null {
 
 /**
  * Check if design system has been defined
+ * (agent-authored design-system.json, legacy files, or imported design tokens)
  */
 export function hasDesignSystem(): boolean {
   return (
+    hasDesignTokens() ||
     "/product/design-system/design-system.json" in designSystemFile ||
     "/product/design-system/colors.json" in legacyFiles ||
     "/product/design-system/typography.json" in legacyFiles

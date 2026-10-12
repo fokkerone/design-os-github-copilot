@@ -25,6 +25,8 @@ Please create these first, then run `/clickdummy` again."
 
 Also check for optional design tokens (`product/design-system/design-system.json`). If missing, show a brief note but continue — the screen designs should already have their own styling.
 
+> **Token separation:** The clickdummy is product code. It must not import Design OS UI (`@/components/*`) or use Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, ...); data loaders from `@/lib/product-loader` and `@/lib/section-loader` are fine. See "Token separation" in agents.md.
+
 ## Step 2: Inventory Sections
 
 Read `product/product-roadmap.md` to get the complete list of sections.

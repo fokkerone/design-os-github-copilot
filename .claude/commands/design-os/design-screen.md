@@ -161,6 +161,14 @@ export function InvoiceList({
 
 ### Applying Design Tokens
 
+**If `product/design-system/DESIGN.md` exists (imported design tokens — takes precedence):**
+
+- It is the source of truth. Read sections 2 (rules), 3 (color), 4 (typography), 6 (radius) and 7 (shadows).
+- Use only token values listed there: palette steps (e.g. `zinc-500`), the radius and shadow scale, the type scale. No arbitrary values (`bg-[#…]`, `p-[13px]`).
+- Map semantic roles from section 3.1 to the palette step with the same value where one exists, and note the semantic token in a comment (e.g. `{/* token: primary */}`) so the export can switch to `bg-primary` with `tokens.css`.
+- Light and dark values come from the Light/Dark columns; use `dark:` variants accordingly.
+- Never use Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, `border-border`, `bg-card`, ...) and never import from `@/components/` — in the preview they resolve to the Design OS theme, not the product. `npm run test:tokens` fails on both (see "Token separation" in agents.md).
+
 **If `product/design-system/design-system.json` exists:**
 - Use the primary color for buttons, links, and key accents
 - Use the secondary color for tags, highlights, secondary elements

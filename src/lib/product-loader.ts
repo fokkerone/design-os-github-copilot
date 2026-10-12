@@ -6,6 +6,7 @@ import type { ProductOverview, Problem, ProductData } from "@/types/product";
 import { parseProductRoadmap } from "./model/roadmap.ts";
 import { loadDataShape, hasDataShape } from "./data-shape-loader";
 import { loadDesignSystem, hasDesignSystem } from "./design-system-loader";
+import { loadDesignTokens } from "./design-tokens-loader";
 import { loadShellInfo, hasShell } from "./shell-loader";
 
 export { parseProductRoadmap };
@@ -119,6 +120,7 @@ export function loadProductData(): ProductData {
     roadmap: roadmapContent ? parseProductRoadmap(roadmapContent) : null,
     dataShape: loadDataShape(),
     designSystem: loadDesignSystem(),
+    designTokens: loadDesignTokens(),
     shell: loadShellInfo(),
   };
 }

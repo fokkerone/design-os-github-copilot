@@ -15,7 +15,7 @@ Refer to @agents.md for the full Design OS context, file structure, and conventi
 
 You are helping the user define the complete visual identity for their product. This includes:
 
-** important notes: follow the given UI Design system structure and file requirements closely to DESIGN.md Do not deviate from the specified format or content requirements. just use the provided structure and guidelines from DESIGN.md**
+**Important:** If `product/design-system/DESIGN.md` exists, it was generated from imported design tokens and is the source of truth for colors, typography, spacing, radius and shadows. Do not deviate from it; see Step 1b.
 
 - **Colors** — Primary, secondary, and neutral palettes (required)
 - **Typography** — Heading, body, and mono fonts (required)
@@ -35,6 +35,32 @@ If it doesn't exist:
 "Before defining your design system, you'll need to establish your product vision. Please use the `@00-product-vision` agent first."
 
 Stop here if the prerequisite is missing.
+
+## Step 1b: Check for Imported Design Tokens (DTCG)
+
+Check if `product/design-system/import/tokens.json` exists. This is the **token import path** — a Figma/DTCG export that replaces the interview for colors, typography, spacing, radius and shadows.
+
+```
+product/design-system/import/        # inputs (never edited by agents)
+├── tokens.json   (required)  W3C DTCG tokens, e.g. Figma variables export
+├── DESIGN.md     (optional)  Figma style export: gradients, text styles, effects, components
+└── skill.md      (optional)  typeui guidance: mission, rules, accessibility, tone
+        │  npm run tokens:build   (Style Dictionary, deterministic + idempotent)
+        ▼
+product/design-system/
+├── tokens/tokens.css    Tailwind v4 theme: :root/.dark + @theme, colors in OKLCH
+├── tokens/tokens.json   normalized model the Design OS app renders (schema designos-tokens/v1)
+└── DESIGN.md            merged guide: tokens + DESIGN.md + skill.md + import report
+```
+
+If `import/tokens.json` exists:
+
+1. Run `npm run tokens:build` (or `npm run tokens:check` to verify the outputs are current). Never hand-edit the generated files — fix the inputs and rebuild. Same inputs always produce byte-identical outputs.
+2. Read `product/design-system/DESIGN.md` and summarize for the user: semantic colors, fonts, the warnings from section 12 (import report).
+3. Ask whether they also want to define brand personality, voice and UI style preferences. Only those go into `design-system.json`; colors and typography come from the import. Do not duplicate token values in `design-system.json` or `design-system.md`.
+4. Continue with Step 8 (confirm). The Design page in the app shows the imported system at `/design`.
+
+If `import/` does not exist, continue with Step 2 (interview path).
 
 ## Step 2: Check for Existing Design System
 

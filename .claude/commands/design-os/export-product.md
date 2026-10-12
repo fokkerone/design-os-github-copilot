@@ -91,6 +91,14 @@ Create `product-plan/product-overview.md` with: product name, summary, personas 
 
 ## Step 4b: Copy Design System Documentation (if exists)
 
+If `product/design-system/tokens/tokens.css` exists (imported design tokens), first run `npm run tokens:check` (stop and ask the user to run `npm run tokens:build` if it fails), then copy:
+
+- `product/design-system/DESIGN.md` → `product-plan/design-system/DESIGN.md`
+- `product/design-system/tokens/tokens.css` → `product-plan/design-system/tokens.css`
+- `product/design-system/tokens/tokens.json` → `product-plan/design-system/tokens.json`
+
+and tell the implementation agent to `@import "./tokens.css"` after `@import "tailwindcss"` and to use the semantic utilities (`bg-primary`, `text-muted-foreground`, …) from DESIGN.md.
+
 If `product/design-system/design-system.md` exists, copy it to `product-plan/design-system.md`.
 
 The design system documentation provides implementers with:

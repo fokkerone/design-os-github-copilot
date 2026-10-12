@@ -16,3 +16,4 @@ Step-by-step guides for working with Design OS. These pages ship with the reposi
 | [[how-to/project-brain]] | How the wiki (project brain) collects, compiles and answers from your planning knowledge | 2026-10-09 |
 | [[how-to/user-flows]] | Why user flows, how to create one, and how to use it in sections, screens and the export | 2026-10-12 |
 | [[how-to/personas]] | Why personas, how to create one, and how to link, use and validate it | 2026-10-12 |
+| [[how-to/design-tokens]] | Import DTCG design tokens from Figma into a Tailwind v4 theme and a merged DESIGN.md | 2026-10-12 |
