@@ -12,12 +12,20 @@ import {
   getDesignResourceFiles,
 } from "@/lib/design-system-loader";
 import {
+  loadDesignTokensState,
+  loadDesignGuide,
+  type DesignTokensState,
+} from "@/lib/design-tokens-loader";
+import { DesignTokensView } from "@/components/design-tokens";
+import {
   ChevronRight,
   Layout,
   FileImage,
   FileText,
   Type,
   FolderOpen,
+  AlertTriangle,
+  Upload,
 } from "lucide-react";
 
 // Map Tailwind color names to actual color values for preview
@@ -110,10 +118,14 @@ export function DesignPage() {
   const productData = useMemo(() => loadProductData(), []);
   const designSystem = productData.designSystem;
   const shell = productData.shell;
-
-  const hasDesignSystemValue = !!(
+  const tokensState = useMemo(() => loadDesignTokensState(), []);
+  const designGuide = useMemo(() => loadDesignGuide(), []);
+  const hasAgentDesignSystem = !!(
     designSystem?.colors || designSystem?.typography
   );
+
+  const hasDesignSystemValue =
+    hasAgentDesignSystem || tokensState.status === "ok";
   const hasShell = !!shell?.spec;
   const allStepsComplete = hasDesignSystemValue && hasShell;
 
@@ -142,13 +154,26 @@ export function DesignPage() {
 
         {/* Step 1: Design System */}
         <StepIndicator step={1} status={stepStatuses[0]}>
-          {!designSystem?.colors && !designSystem?.typography ? (
-            <DesignSystemEmptyState hasResources={hasResources} />
+          {tokensState.status === "ok" && (
+            <DesignTokensView tokens={tokensState.tokens} guide={designGuide} />
+          )}
+          {tokensState.status !== "ok" && tokensState.status !== "missing" && (
+            <TokenImportNotice state={tokensState} />
+          )}
+          {tokensState.status === "missing" && tokensState.pendingImport && (
+            <TokenImportNotice state={tokensState} />
+          )}
+          {!hasAgentDesignSystem ? (
+            tokensState.status === "ok" ? null : (
+              <DesignSystemEmptyState hasResources={hasResources} />
+            )
           ) : (
-            <Card className='border-stone-200 dark:border-stone-700 shadow-sm'>
+            <Card
+              className={`border-stone-200 dark:border-stone-700 shadow-sm ${tokensState.status === "ok" ? "mt-6" : ""}`}
+            >
               <CardHeader className='pb-4'>
                 <CardTitle className='text-lg font-semibold text-stone-900 dark:text-stone-100'>
-                  Design System
+                  {tokensState.status === "ok" ? "Brand Identity" : "Design System"}
                 </CardTitle>
               </CardHeader>
               <CardContent className='space-y-6'>
@@ -553,6 +578,39 @@ function ColorPalette({ colors }: { colors: object }) {
 }
 
 /**
+ * Shown when token import files exist but the model is missing or invalid
+ */
+function TokenImportNotice({ state }: { state: DesignTokensState }) {
+  const invalid = state.status === "invalid";
+  return (
+    <Card className='mb-6 border-amber-300 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/30 shadow-sm'>
+      <CardContent className='py-4'>
+        <div className='flex items-start gap-3'>
+          <AlertTriangle className='w-4 h-4 mt-0.5 text-amber-600 shrink-0' />
+          <div className='space-y-1 text-sm'>
+            <p className='font-medium text-stone-900 dark:text-stone-100'>
+              {invalid
+                ? "Design tokens could not be loaded"
+                : "Design tokens are waiting to be imported"}
+            </p>
+            <p className='text-stone-600 dark:text-stone-400'>
+              {state.status === "invalid"
+                ? `product/design-system/tokens/tokens.json: ${state.reason}. `
+                : "product/design-system/import/tokens.json exists, but no token model has been generated yet. "}
+              Run{" "}
+              <code className='font-mono text-xs bg-white/70 dark:bg-stone-800 px-1.5 py-0.5 rounded'>
+                npm run tokens:build
+              </code>{" "}
+              and reload.
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
  * Custom empty state for design system that includes the resource hint
  */
 function DesignSystemEmptyState({ hasResources }: { hasResources: boolean }) {
@@ -588,6 +646,34 @@ function DesignSystemEmptyState({ hasResources }: { hasResources: boolean }) {
               <p className='text-sm text-stone-600 dark:text-stone-300 italic'>
                 "Help me define my design system"
               </p>
+            </div>
+          </div>
+
+          {/* Token import hint */}
+          <div className='mt-4 w-full'>
+            <div className='bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-md px-4 py-3'>
+              <div className='flex items-start gap-3'>
+                <Upload className='w-4 h-4 text-stone-400 dark:text-stone-500 mt-0.5 shrink-0' />
+                <div className='space-y-1.5 text-left'>
+                  <p className='text-xs font-medium text-stone-600 dark:text-stone-300'>
+                    Or import design tokens (DTCG)
+                  </p>
+                  <p className='text-xs text-stone-500 dark:text-stone-400'>
+                    Put <code className='font-mono'>tokens.json</code>, optional{" "}
+                    <code className='font-mono'>DESIGN.md</code> and{" "}
+                    <code className='font-mono'>skill.md</code> into
+                  </p>
+                  <code className='inline-block text-xs font-mono text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-1.5 py-0.5 rounded'>
+                    product/design-system/import/
+                  </code>
+                  <p className='text-xs text-stone-500 dark:text-stone-400'>
+                    then run{" "}
+                    <code className='font-mono text-stone-700 dark:text-stone-300'>
+                      npm run tokens:build
+                    </code>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 

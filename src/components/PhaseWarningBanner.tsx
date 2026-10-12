@@ -18,7 +18,7 @@ function getStorageKey(productName: string): string {
 export function PhaseWarningBanner() {
   const productData = useMemo(() => loadProductData(), [])
   const hasDataShape = !!productData.dataShape
-  const hasDesignSystem = !!(productData.designSystem?.colors || productData.designSystem?.typography)
+  const hasDesignSystem = !!(productData.designSystem?.colors || productData.designSystem?.typography || productData.designTokens)
   const hasShell = !!productData.shell?.spec
   const hasDesign = hasDesignSystem || hasShell
 

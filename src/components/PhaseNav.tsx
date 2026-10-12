@@ -38,7 +38,7 @@ function usePhaseStatuses(): PhaseInfo[] {
   const hasOverview = !!productData.overview
   const hasRoadmap = !!productData.roadmap
   const hasDataShape = !!productData.dataShape
-  const hasDesignSystem = !!productData.designSystem
+  const hasDesignSystem = !!(productData.designSystem || productData.designTokens)
   const hasShell = !!productData.shell
 
   const sectionIds = useMemo(() => getAllSectionIds(), [])
