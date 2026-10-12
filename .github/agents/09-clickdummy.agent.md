@@ -13,7 +13,7 @@ Refer to @agents.md for the full Design OS context, file structure, and conventi
 
 # Clickdummy Assembly
 
-You are helping the user assemble a **clickdummy** — a fully navigable prototype that wraps all designed sections in the application shell with working inter-section navigation. The clickdummy is served at `/clickdummy/preview` alongside the Design OS planning UI and is meant to be shared with stakeholders (POs, UI/UX designers) for feedback.
+You are helping the user assemble a **clickdummy** — a fully navigable prototype that wraps all designed sections in the application shell with working inter-section navigation, and lets every user flow be walked step by step through its screens. The clickdummy is served at `/clickdummy/preview` alongside the Design OS planning UI and is meant to be shared with stakeholders (POs, UI/UX designers) for feedback.
 
 **Scope:** This agent ONLY assembles clickdummies from **existing** screen designs. It does NOT create screen designs, specifications, or sample data. If sections are missing designs, it tells the user which agents to use and stops.
 
@@ -64,6 +64,19 @@ Present a status table to the user:
 
 _(adjust based on actual findings)_"
 
+### User flows
+
+Run `npm run -s context` (see the `designos-context` skill, `.claude/skills/designos-context/SKILL.md`). If flows exist in `product/flows/`, show a second table:
+
+| Flow | Sections | Steps with a screen | Open steps |
+| ---- | -------- | ------------------- | ---------- |
+| Submit meter reading | Account → Meter Readings | 4 of 6 | S4 → `ReadingReview` (missing), S6 (no screen assigned) |
+
+- The flows define how users move between screens. The clickdummy follows them; it does not invent an order from the list of screens.
+- An incomplete flow does **not** stop the assembly. Its open steps stay visible as gaps in the clickdummy. Never let another screen stand in for a missing one.
+- Show every entry under **Conflicts** to the user and ask how to proceed. Do not resolve them, and do not edit flows, personas or specs from here.
+- The section specs are binding: the clickdummy contains what the specs and the existing screen designs cover, nothing more.
+
 ## Step 3: Report Missing & Stop if Needed
 
 If **any** sections from the roadmap lack screen designs, report what's needed and **stop**.
@@ -85,6 +98,19 @@ Then finish with:
 "Once all sections have screen designs, run `@09-clickdummy` again to assemble the clickdummy."
 
 **Stop here. Do not proceed to assembly.**
+
+## Step 3b: Update Instead of Rebuilding
+
+If `src/clickdummy/ClickdummyApp.tsx` already exists, **do not regenerate it**.
+
+The clickdummy reads sections, screen designs and user flows at runtime. A new screen design, a new flow or a changed flow step appears in it without any change to the file. So first check what actually needs to change:
+
+- **New section in the roadmap:** add its icon to `iconMap`. Nothing else.
+- **New or changed flow, new screen design:** nothing to do. Open `/clickdummy/preview`, walk the flow and report the result.
+- **The file predates flow support** (it does not import `useFlowWalk`): add the flow walk as shown in Step 4b, keeping everything else, including the user's own changes.
+- **The user asks for a specific change:** make that change only.
+
+Tell the user what you changed and what you left alone. Rebuild from scratch only when the user asks for it explicitly.
 
 ## Step 4: Assemble the Clickdummy
 
@@ -128,6 +154,8 @@ import { AppShell } from "@/shell/components/AppShell";
 import type { NavItem } from "@/shell/components/MainNav";
 import { loadProductData } from "@/lib/product-loader";
 import { getSectionScreenDesigns, loadScreenDesignComponent } from "@/lib/section-loader";
+import { useFlowWalk } from "@/lib/clickdummy-flows";
+import { FlowWalkBar, FlowStepGap } from "@/components/FlowWalkBar";
 // Import Lucide icons matching the roadmap sections:
 import { Circle } from "lucide-react";
 // e.g., import { LayoutDashboard, CalendarDays, Users, BookOpen } from 'lucide-react'
@@ -138,6 +166,16 @@ export default function ClickdummyApp() {
 
   const [activeSectionId, setActiveSectionId] = useState(() => sections[0]?.id ?? "");
 
+  // User flows: while a flow is walked, its current step decides which screen is shown.
+  // With ?flow=<flow-id> in the URL the clickdummy is locked to that one flow.
+  const walk = useFlowWalk();
+  const stopWalk = walk.stop;
+  const shownSectionId = walk.screen?.sectionId ?? walk.step?.sectionId ?? activeSectionId;
+  const shownScreenName = walk.active
+    ? (walk.screen?.name ?? null)
+    : (getSectionScreenDesigns(activeSectionId)[0]?.name ?? null);
+  const visibleSections = walk.locked ? sections.filter((s) => walk.sectionIds.includes(s.id)) : sections;
+
   // Map section IDs to Lucide icons — fill in based on actual roadmap sections
   const iconMap: Record<string, NavItem["icon"]> = {
     // 'dashboard': LayoutDashboard,
@@ -146,40 +184,44 @@ export default function ClickdummyApp() {
     // 'knowledge-base': BookOpen,
   };
 
-  const navigationItems: NavItem[] = sections.map((section) => ({
+  const navigationItems: NavItem[] = visibleSections.map((section) => ({
     label: section.title,
     href: `/${section.id}`,
     icon: iconMap[section.id] || Circle,
-    isActive: section.id === activeSectionId,
+    isActive: section.id === shownSectionId,
   }));
 
   const handleNavigate = useCallback(
     (href: string) => {
       const sectionId = href.startsWith("/") ? href.slice(1) : href;
       const matched = sections.find((s) => s.id === sectionId);
-      if (matched) setActiveSectionId(matched.id);
+      if (!matched) return;
+      // Navigating by hand leaves the flow walk (a locked clickdummy stays in its flow)
+      stopWalk();
+      setActiveSectionId(matched.id);
     },
-    [sections],
+    [sections, stopWalk],
   );
 
-  // Lazily load the active section's first screen design preview wrapper
+  // Lazily load the screen design to show: the flow step's screen, or the section's first one
   const ActiveComponent = useMemo(() => {
-    const screenDesigns = getSectionScreenDesigns(activeSectionId);
-    if (screenDesigns.length === 0) return null;
-    const loader = loadScreenDesignComponent(activeSectionId, screenDesigns[0].name);
+    if (!shownScreenName) return null;
+    const loader = loadScreenDesignComponent(shownSectionId, shownScreenName);
     if (!loader) return null;
     return lazy(async () => {
       try {
         const mod = await loader();
         if (mod?.default) return mod;
-        return { default: () => <FallbackContent sectionId={activeSectionId} /> };
+        return { default: () => <FallbackContent sectionId={shownSectionId} /> };
       } catch {
-        return { default: () => <FallbackContent sectionId={activeSectionId} /> };
+        return { default: () => <FallbackContent sectionId={shownSectionId} /> };
       }
     });
-  }, [activeSectionId]);
+  }, [shownSectionId, shownScreenName]);
 
   return (
+    <>
+    <FlowWalkBar walk={walk} />
     <AppShell
       navigationItems={navigationItems}
       user={{ name: "Demo User" }}
@@ -187,9 +229,16 @@ export default function ClickdummyApp() {
       onLogout={() => console.log("Logout")}
     >
       <Suspense fallback={<LoadingSkeleton />}>
-        {ActiveComponent ? <ActiveComponent /> : <FallbackContent sectionId={activeSectionId} />}
+        {ActiveComponent ? (
+          <ActiveComponent />
+        ) : walk.active ? (
+          <FlowStepGap walk={walk} />
+        ) : (
+          <FallbackContent sectionId={shownSectionId} />
+        )}
       </Suspense>
     </AppShell>
+    </>
   );
 }
 
@@ -231,6 +280,10 @@ function FallbackContent({ sectionId }: { sectionId: string }) {
 3. **Lazy loading** — Use `React.lazy()` wrapping the loader from `loadScreenDesignComponent()`. The loader returns `() => Promise<{ default: ComponentType }>`.
 4. **Icon mapping** — Read the roadmap sections and pick appropriate Lucide icons. Use `Circle` as a fallback for unknown sections.
 5. **Shell pattern** — Follow the exact same pattern as `src/shell/ShellPreview.tsx` for constructing `navigationItems` and handling `onNavigate`.
+
+6. **Flows at runtime** — Use `useFlowWalk()` from `@/lib/clickdummy-flows` and render `FlowWalkBar` and `FlowStepGap` from `@/components/FlowWalkBar`. Do NOT copy flow steps, screen names or transitions into the file: they are derived from `product/flows/` on every load, so the clickdummy stays current when flows and screens change.
+7. **Gaps stay visible** — A flow step without a screen design renders `FlowStepGap`. Never substitute another screen.
+8. **One flow on its own** — `/clickdummy/preview?flow=<flow-id>` locks the clickdummy to that flow: only its steps and its sections are reachable. Keep this working; it is how a single flow is demoed.
 
 ### 4c: Register the Route
 
@@ -288,6 +341,8 @@ After creating the files:
    - Clicking a nav item switches the content area to that section's screen design
    - Screen designs render correctly inside the shell
    - Mobile responsive: sidebar becomes a hamburger menu on small screens
+   - If flows exist: the flow control at the bottom lists them; walking a flow moves through its steps in order, also across sections; a decision offers one button per branch; a step without a screen design shows the gap notice
+   - `/clickdummy/preview?flow=<flow-id>` shows only that flow
 5. Report any issues found.
 
 ## Step 6: Report to User
@@ -301,6 +356,13 @@ It includes **[N] sections** with working navigation:
 - ✅ [Section 1]
 - ✅ [Section 2]
 - ✅ [Section 3]
+
+[If flows exist]:
+**User flows** (walk them with the control at the bottom of the clickdummy):
+- [Flow title]: [N] of [M] steps have a screen design. Open: [S4 → ScreenName, S6 → no screen assigned]
+- Share one flow on its own: `http://localhost:3000/clickdummy/preview?flow=[flow-id]`
+
+[If conflicts were reported]: **Open conflicts** between flows, specs and screens: [list]. I left them as they are.
 
 **For stakeholder demos:** Share this URL or run `npm run dev` to serve locally.
 

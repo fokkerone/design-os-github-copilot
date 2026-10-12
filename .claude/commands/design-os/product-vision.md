@@ -97,7 +97,7 @@ After creating the file, present a summary and point to the next step:
 
 Review the file and let me know if you'd like to adjust anything. When you're happy with it, run `/product-roadmap` to define your product sections."
 
-If no personas exist yet, add: "Want to make the target users concrete? `/design-os:persona` creates a proto-persona from what we discussed, before or after the roadmap."
+If no personas exist yet, ask with the `AskUserQuestion` tool whether to make the target user concrete now: **Create a proto-persona now** (runs the `designos-persona` skill in `inline` mode, pre-filled from this conversation) / **Later** (mention `/design-os:persona` once). Personas written this way are what the roadmap, the user flows, the section specs and the screen designs are later checked against.
 
 **Stop here.** Do not proceed to create any other files.
 

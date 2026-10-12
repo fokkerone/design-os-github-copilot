@@ -44,7 +44,12 @@ function LinkedFlowItem({ text, flowId }: LinkedFlowItemProps) {
             {flow ? (
               <>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium text-stone-900 dark:text-stone-100">{flow.title}</span>
+                  <Link
+                    to={`/flows/${flowId}`}
+                    className="text-sm font-medium text-stone-900 dark:text-stone-100 hover:underline underline-offset-2"
+                  >
+                    {flow.title}
+                  </Link>
                   <span className="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">{flow.status}</span>
                 </div>
                 {flow.overview && (
@@ -95,7 +100,16 @@ function LinkedPersonaItem({ text, personaId }: LinkedPersonaItemProps) {
       <UserRound className="w-3.5 h-3.5 text-lime-600 dark:text-lime-400 mt-0.5 shrink-0" strokeWidth={1.75} />
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <span className="text-sm text-stone-700 dark:text-stone-300">{text}</span>
+          {persona ? (
+            <Link
+              to={`/personas/${personaId}`}
+              className="text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 hover:underline underline-offset-2"
+            >
+              {text}
+            </Link>
+          ) : (
+            <span className="text-sm text-stone-700 dark:text-stone-300">{text}</span>
+          )}
           {persona && (
             <span className="text-xs text-stone-500 dark:text-stone-400">
               {[persona.priority, persona.kind, `${persona.confidence} confidence`].filter(Boolean).join(' · ')}

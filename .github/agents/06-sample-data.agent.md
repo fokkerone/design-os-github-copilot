@@ -72,6 +72,16 @@ Read and analyze `product/sections/[section-id]/spec.md` to understand:
 - What sample values would be realistic and helpful for design?
 - What actions can be taken on each entity? (These become callback props)
 
+**Load personas and user flows.** Follow the `designos-context` skill (`.claude/skills/designos-context/SKILL.md`): run `npm run -s context -- [section-id]` and apply its rules. Tell the user in two or three lines which personas and flows belong to this section, and show any conflicts before going on. Then use the report:
+
+- **Flow steps in this section**: the data must let every step be shown. A step that reviews a submitted value needs a record that has one.
+- **Edge cases** (`E1…`): include at least one record or value that produces each edge case that returns to a step in this section (a rejected value, an expired item, an empty list, a blocked account). Name the edge case in `_meta` so the screen design can find it.
+- **Rules** (`R1…`): the sample values must respect them, apart from the records that exist to show a rule being broken.
+- **Personas**: let their context decide what realistic means: wording, language, volumes, the kind of names and amounts they would see.
+- **The spec is binding**: flows and personas shape the sample values. They do not add entities or fields the spec does not call for. If a flow needs data the spec does not cover, tell the user and point to the `@05-shape-section` agent.
+
+If the section has no flow and no persona, continue as before.
+
 **If a global data shape exists:** Cross-reference the spec with the data shape. Use the same entity names and ensure consistency.
 
 **Do NOT generate the files yet.** First, ask the user clarifying questions about the data shape for this section. Example questions:
@@ -237,6 +247,8 @@ Review the files and let me know if you'd like any adjustments. When you're read
 - Include edge cases: empty arrays, long text, different statuses
 - Keep field names clear and TypeScript-friendly (camelCase)
 - The data structure should directly map to the spec's user flows
+- When flows are linked, every edge case that returns to a step in this section has sample data that produces it
+- Never edit a flow, persona or spec file from this command
 - Always generate types.ts alongside data.json
 - Callback props should cover all actions mentioned in the spec
 - **Use entity names from the global data shape for consistency across sections**

@@ -71,6 +71,7 @@ flowchart TD
 - Run `/design-os:wiki-capture` if the session produced decisions that are not in the artifact.
 
 ## Related
+- [[how-to/step-by-step]] — every step in detail
 - [[how-to/personas]] — personas in detail
 - [[how-to/user-flows]] — user flows in detail
 - [[how-to/project-brain]] — the wiki

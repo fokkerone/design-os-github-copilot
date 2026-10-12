@@ -2,15 +2,36 @@
 title: Personas
 summary: Create personas and proto-personas in a guided session, link them to sections and flows, and raise their confidence as evidence comes in.
 tags: [how-to, personas]
-sources: [.claude/skills/designos-persona/SKILL.md, wiki/_templates/persona.md]
+sources: [.claude/skills/designos-persona/SKILL.md, .claude/skills/designos-context/SKILL.md, wiki/_templates/persona.md]
 created: 2026-10-09
-updated: 2026-10-09
+updated: 2026-10-12
 ---
 
 # Personas
 
 ## Summary
 A persona is a shared, testable picture of who the product is for and how they think. `/design-os:persona` (Copilot: `@persona`) builds one in a guided session and stores it in `product/personas/` and in the wiki. The template combines Lean UX proto-personas, NN/g persona types, Cooper's goal-directed design, Jobs to be Done, Indi Young's thinking styles and inclusive design.
+
+## Why
+- **One shared answer to "who is this for?"** Without it, every section is designed for a different imagined user, usually the designer.
+- **Decisions get a reason.** "Don't hide the total behind a tap" is an opinion. "Ana double-checks every amount before she submits (P2)" is a requirement.
+- **Assumptions become visible.** A proto-persona says openly what the team believes but has not checked, and how to check it. That is cheaper than discovering it after launch.
+- **Less repetition.** Product vision, user flows and shape section read existing personas and stop asking who the user is.
+- **It reaches the developers.** The export ships personas with the handoff, so the implementation agent knows who the UI is for.
+
+## Quick start
+
+```text
+/design-os:persona                                   # asks for everything, picks the mode itself
+/design-os:persona proto tenants who submit readings # no research yet: assumptions, labeled as such
+/design-os:persona research property managers        # based on interviews in wiki/raw/ or wiki/research/
+/design-os:persona validate cautious-first-timer     # new evidence arrived
+/design-os:persona update cautious-first-timer       # change a persona
+```
+
+In GitHub Copilot, select the `@persona` agent and type the same text without the command. Every question is multiple choice with a recommended answer; nothing is written before you confirm the review step.
+
+Start with one **primary** persona. Add a secondary or a negative persona ("not for them") only when it changes a design decision.
 
 ## Principles
 - **Behavior over demographics.** No photos, no invented age or hobbies, unless they change behavior.
@@ -42,6 +63,35 @@ Any time after the product overview exists:
 9. **Wiki.** The persona is compiled into `wiki/personas/<persona-id>.md` automatically.
 10. **Link.** Section specs get a bullet under `## Personas` ending in `(persona: <persona-id>)`; flows list the persona in their `personas:` frontmatter. The app shows linked personas in the section's spec card.
 11. **Optional artifact.** Publish a persona card where stakeholders can mark which assumptions they have seen evidence for (Claude Code only).
+
+## What you get
+
+| Where | What |
+|-------|------|
+| `product/personas/<persona-id>.md` | The source. Edit it only through `/design-os:persona update` or `validate`. |
+| `wiki/personas/<persona-id>.md` | The compiled wiki page, with links to flows and research |
+| `product/sections/<section-id>/spec.md` | One bullet per linked persona under `## Personas` |
+| `product/flows/<flow-id>.md` | The persona id in the `personas:` frontmatter |
+
+## Using a persona afterwards
+
+1. **Read it.** In Design OS, the **Product** page lists all personas. A persona's own page (`/personas/<persona-id>`) shows the job story, pain points, design implications and evidence, and the sections, flows and screens that address it. Section pages show who they are designed for; screen design pages show who the screen is for.
+2. **Link it to a section.** The persona command asks which sections and flows it belongs to. `/shape-section` offers existing personas and can create one inline. The link is one line in the spec:
+   ```markdown
+   ## Personas
+   - Ana — The cautious first-timer (persona: cautious-first-timer)
+   ```
+3. **Design a flow for it.** `/design-os:userflow` offers the persona as the primary user and takes over its context of use, pain points and accessibility constraints.
+4. **Use the design implications.** `/shape-section` proposes UI requirements from the persona's pain points and "Do / Don't" rules and marks where each one comes from, e.g. `(from: cautious-first-timer P1)`. `/sample-data` and `/design-screen` load the personas of the section themselves: screens follow every "Do", avoid every "Don't", and take the context of use and accessibility constraints into account.
+5. **Validate it.** Put interview notes, survey results or support tickets into `wiki/raw/`, run `/design-os:wiki-ingest --pending`, then `/design-os:persona validate <persona-id>`. Evidence levels and confidence are updated.
+6. **Hand it over.** `/export-product` copies personas to `product-plan/personas/`.
+7. **Ask about it.** `/design-os:wiki-query what do we still assume about Ana?`
+
+## Common questions
+- **Proto or research?** `proto` when you have no user research: fast, honest about being assumptions. `research` when interviews or data exist. A proto-persona becomes a research persona through `validate`.
+- **How many?** One primary persona per product is enough to start. More than three or four usually means they are segments, not personas.
+- **Persona first or flow first?** Persona first is easier: the flow takes over its context. Both orders work.
+- **A persona turned out wrong.** Run `validate` and mark the assumptions as disproven, or set it to `retired` with `update`. Linked specs and flows keep the id, so you see where it was used.
 
 ## Evidence and confidence
 

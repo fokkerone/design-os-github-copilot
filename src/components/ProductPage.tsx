@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/AppLayout'
 import { EmptyState } from '@/components/EmptyState'
 import { ProductOverviewCard } from '@/components/ProductOverviewCard'
 import { SectionsCard } from '@/components/SectionsCard'
+import { PersonasCard } from '@/components/PersonasCard'
 import { StepIndicator, type StepStatus } from '@/components/StepIndicator'
 import { NextPhaseButton } from '@/components/NextPhaseButton'
 
@@ -64,7 +65,11 @@ export function ProductPage() {
         <div id="step-overview">
           <StepIndicator step={1} status={stepStatuses[0]}>
             {productData.overview ? (
-              <ProductOverviewCard overview={productData.overview} />
+              <div className="space-y-6">
+                <ProductOverviewCard overview={productData.overview} />
+                {/* Personas: who the product is for. Optional, any time after the overview. */}
+                <PersonasCard />
+              </div>
             ) : (
               <EmptyState type="overview" />
             )}

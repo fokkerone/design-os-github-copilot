@@ -7,6 +7,8 @@ import { EmptyState } from '@/components/EmptyState'
 import { PhaseWarningBanner } from '@/components/PhaseWarningBanner'
 import { SpecCard } from '@/components/SpecCard'
 import { DataCard } from '@/components/DataCard'
+import { SectionContextCard } from '@/components/SectionContextCard'
+import { getProjectModel } from '@/lib/project-model'
 import { StepIndicator, type StepStatus } from '@/components/StepIndicator'
 import { loadProductData } from '@/lib/product-loader'
 import { loadSectionData } from '@/lib/section-loader'
@@ -41,6 +43,17 @@ function areRequiredStepsComplete(sectionData: ReturnType<typeof loadSectionData
   const hasData = !!sectionData?.data
   const hasScreenDesigns = !!(sectionData?.screenDesigns && sectionData.screenDesigns.length > 0)
   return hasSpec && hasData && hasScreenDesigns
+}
+
+/** The flow steps a screen design covers, e.g. "Submit meter reading S1, S3" */
+function ScreenFlowSteps({ sectionId, screenDesignName }: { sectionId: string; screenDesignName: string }) {
+  const usages = getProjectModel().flowsForScreen(sectionId, screenDesignName)
+  if (usages.length === 0) return null
+  return (
+    <span className="text-xs text-stone-500 dark:text-stone-400 truncate block">
+      {usages.map((usage) => `${usage.flow.title} ${usage.steps.map((step) => step.id).join(', ')}`).join(' · ')}
+    </span>
+  )
 }
 
 export function SectionPage() {
@@ -97,7 +110,11 @@ export function SectionPage() {
 
         {/* Step 1: Section Overview (Spec) */}
         <StepIndicator step={1} status={stepStatuses[0]}>
-          <SpecCard spec={sectionData?.specParsed || null} sectionTitle="Section Overview" sectionName={section.title} />
+          <div className="space-y-6">
+            <SpecCard spec={sectionData?.specParsed || null} sectionTitle="Section Overview" sectionName={section.title} />
+            {/* Who the section is for and which flow steps run through it */}
+            <SectionContextCard sectionId={section.id} hasSpec={!!sectionData?.specParsed} />
+          </div>
         </StepIndicator>
 
         {/* Step 2: Sample Data */}
@@ -131,9 +148,12 @@ export function SectionPage() {
                           <div className="w-8 h-8 rounded-md bg-stone-200 dark:bg-stone-700 flex items-center justify-center shrink-0">
                             <Layout className="w-4 h-4 text-stone-600 dark:text-stone-300" strokeWidth={1.5} />
                           </div>
-                          <span className="font-medium text-stone-900 dark:text-stone-100 truncate">
-                            {screenDesign.name}
-                          </span>
+                          <div className="min-w-0">
+                            <span className="font-medium text-stone-900 dark:text-stone-100 truncate block">
+                              {screenDesign.name}
+                            </span>
+                            <ScreenFlowSteps sectionId={section.id} screenDesignName={screenDesign.name} />
+                          </div>
                         </div>
                         <ChevronRight className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0" strokeWidth={1.5} />
                       </Link>

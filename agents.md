@@ -161,6 +161,22 @@ Generate the complete export package with all components, types, and handoff doc
 | `/design-os:userflow` | Design a user flow, then ingest it into `wiki/flows/` |
 | `/design-os:persona` | Create or validate a persona, then ingest it into `wiki/personas/` |
 
+### Personas and user flows as shared context
+
+Personas and user flows are not passive documents. Every command from Sample Data onwards loads the ones that belong to its section, screen or flow through the `designos-context` skill (`.claude/skills/designos-context/SKILL.md`), which runs:
+
+| Command | Purpose |
+|---------|---------|
+| `npm run context` | All personas and flows, flow coverage, all issues |
+| `npm run context -- <section-id>` | Personas, flows and screens of one section |
+| `npm run context -- <section-id> --screen <Name>` | Where a screen sits in its flows: steps covered, step before and after |
+| `npm run context -- --flow <flow-id>` | One flow across its sections, with transitions |
+
+- **The section spec is binding.** Flows and personas shape how something is designed, never what is in scope.
+- **Relations are never invented.** A flow step is covered when its `Section / Screen` column names a screen design that exists. Missing relations are reported as missing.
+- **Conflicts are shown, not resolved.** When flow, persona, spec and screens disagree, the user decides, and the file is changed by the command that owns it.
+- **Coverage is computed, never stored.** The app (`/flows/<flow-id>`, `/personas/<persona-id>`, section and screen pages) and the commands use the same model in `src/lib/model/`. Tests: `npm test`.
+
 Skills (the schema) live in `.claude/skills/designos-wiki-*`, `designos-cross-linker` and `designos-tag-taxonomy`. Every wiki page is created from a template in `wiki/_templates/`. Every diagram is Mermaid (syntax reference: the `mermaid-diagrams` skill) and must pass `npm run validate:mermaid`.
 
 ---

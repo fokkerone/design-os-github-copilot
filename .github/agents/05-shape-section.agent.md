@@ -129,6 +129,20 @@ Collect the candidates from `wiki/personas/Home.md` and the frontmatter of `wiki
 
 For each selected persona, the spec gets one bullet under `## Personas`: `- <Persona name> — <archetype> (persona: <persona-id>)`. Use the persona's pain points and design implications as input for the UI requirements: propose them in Step 4's questions instead of asking from scratch.
 
+## Step 4d: Derive UI Requirements from Flows and Personas
+
+Skip this step if no flow and no persona was linked in Steps 4b and 4c.
+
+Follow the `designos-context` skill (`.claude/skills/designos-context/SKILL.md`): run `npm run -s context -- [section-id]`. The flows and personas chosen above may not be in the spec yet, so also read the files of the ones just selected. Then propose UI requirements instead of asking from scratch (multiSelect, the user picks):
+
+- one per **flow step in this section** that needs something visible on screen
+- one per **edge case** that returns to a step in this section: the state the UI has to show
+- one per persona **Do / Don't** design implication that applies to this section
+
+End each derived requirement with its origin, so it stays traceable: `(from: <flow-id> S3)`, `(from: <flow-id> E2)`, `(from: <persona-id> P1)`. Requirements that come from the conversation carry no marker.
+
+If a linked flow has steps in this section that the conversation so far has not covered, or the flow lists this section but the user did not link it, **say so and ask**. Do not widen or narrow the scope on your own. The report's **Conflicts** are shown to the user, never resolved silently.
+
 ## Step 5: Ask About Shell Configuration
 
 If a shell design has been created for this project (check if `src/shell/components/AppShell.tsx` exists), ask the user about shell usage:
@@ -211,6 +225,8 @@ Review the spec and let me know if you'd like to adjust anything. When you're ha
 - Ask follow-up questions when answers are vague
 - Focus on UX and UI - don't discuss backend, database, or API details
 - Keep the spec concise - only include what was discussed, no bloat
+- The spec is the binding plan for the section: sample data, screen designs and the clickdummy are held to it. Derived UI requirements end with their origin, e.g. `(from: checkout E2)`
+- After writing the spec, run `npm run -s context -- [section-id]` and report conflicts between the spec, its flows and its personas to the user
 - The format must match exactly for the app to parse it correctly
 - If the user requests changes after reviewing, update the file immediately
 - After the spec is written, suggest that the user run the wiki ingest (`.claude/skills/designos-wiki-ingest/SKILL.md`) for the new spec so the project brain picks up the section and its flow links

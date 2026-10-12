@@ -4,6 +4,7 @@ import { ArrowLeft, Maximize2, GripVertical, Layout, Smartphone, Tablet, Monitor
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { RenderComponent } from '@/components/RenderComponent'
+import { ScreenContextBar } from '@/components/ScreenContextBar'
 import { loadScreenDesignComponent, sectionUsesShell } from '@/lib/section-loader'
 import { loadAppShell, hasShellComponents, loadShellInfo } from '@/lib/shell-loader'
 import { loadProductData } from '@/lib/product-loader'
@@ -143,6 +144,9 @@ export function ScreenDesignPage() {
           </div>
         </div>
       </header>
+
+      {/* Flow steps this screen covers, who it is for, and the steps around it */}
+      {sectionId && screenDesignName && <ScreenContextBar sectionId={sectionId} screenDesignName={screenDesignName} />}
 
       {/* Preview area with resizable container */}
       <div

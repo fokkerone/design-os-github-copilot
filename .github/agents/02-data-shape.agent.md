@@ -59,6 +59,7 @@ Read:
 
 1. `product/product-overview.md` to understand what the product does
 2. `product/product-roadmap.md` to understand the planned sections
+3. `product/flows/*.md`, if any exist: the step tables and rules name the things users act on. Offer them as entity candidates and use the same names.
 
 If either file is missing, let the user know:
 

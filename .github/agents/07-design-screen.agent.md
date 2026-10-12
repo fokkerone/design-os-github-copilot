@@ -94,6 +94,21 @@ Identify what views are needed based on the spec. Common patterns:
 - Detail view (showing a single item)
 - Form/create view (for adding/editing)
 
+## Step 3b: Load Personas and User Flows
+
+Follow the `designos-context` skill (`.claude/skills/designos-context/SKILL.md`) for this section: run `npm run -s context -- [section-id]` and apply its rules.
+
+From the report, note:
+
+- **Who the section is for**: the linked personas with their pain points, Do / Don't design implications, context of use (devices, environment) and accessibility constraints.
+- **Which flows run through this section**: their rules, their steps in this section, the edge cases, and which steps already have a screen design.
+- **Which screen designs already exist** in `src/sections/[section-id]/` and the sub-components in `src/sections/[section-id]/components/`. Read the existing ones before you design a new screen, so you reuse components and stay consistent.
+- **Conflicts**: show every one to the user before going on, and ask how to proceed. Do not resolve them yourself.
+
+Tell the user in two or three lines what you found (see the skill, Step 2). If the section has no persona and no flow, say so in one line and continue as before.
+
+**The spec is binding.** `spec.md` is the plan for this section. A flow step or a persona never justifies a screen, feature or dependency that the spec does not cover. If a flow needs something the spec leaves out, tell the user and point to the `@05-shape-section` agent; do not build it.
+
 ## Step 4: Clarify the Screen Design Scope
 
 If the spec implies multiple views, ask which view to build first:
@@ -106,6 +121,17 @@ If the spec implies multiple views, ask which view to build first:
 Which view should I create first?"
 
 If there's only one obvious view, proceed directly.
+
+**If user flows run through this section**, offer the views along the flow instead of in an arbitrary order: flow steps in this section that have no screen design yet come first, each with the screen name the step uses.
+
+Once the view is chosen, run `npm run -s context -- [section-id] --screen [ViewName]` and establish the screen's place in its flows:
+
+- **Steps it covers.** If the report names them, confirm them. If no step names this screen, ask which steps of which flow it should cover (multi-select), or whether it is outside every flow. Do not assume a relation.
+- **Where the user comes from and where they go next**: the step before and the step after, with their screens, also when they are in another section. These become the screen's entry state and its callback props.
+- **Edge cases that return to these steps**: each one is a state this screen has to show.
+- **Who it is for**: the personas of those flows, then the personas of the section.
+
+**Name the preview wrapper exactly as the flow step names the screen** (`Section / Screen` column). That is what marks the step as covered in Design OS. If another name is better, tell the user to change the step with the `@userflow` agent (`update <flow-id>`) afterwards.
 
 ## Step 5: Read the Frontend Design Skill
 
@@ -211,6 +237,11 @@ export function InvoiceList({
 ### What to Include
 
 - Implement ALL user flows and UI requirements from the spec
+- For every flow step this screen covers: the user action and the system response from the step table, and the rules (`R1…`) the step lists
+- A visible state for every edge case that returns to one of those steps (error, empty, loading, blocked), reachable through the sample data or a prop
+- A callback prop for every transition out of the screen: to the next step, back to the previous one, and for each branch of a decision (for example `onSubmit`, `onBack`, `onSignInRequired`)
+- The linked personas' design implications: follow every "Do", avoid every "Don't". Let their context of use decide priorities (for example phone first, one-handed, poor light) and respect their accessibility constraints
+- Existing sub-components of this section where they fit, instead of new ones that do the same
 - Use the prop data (not hardcoded values)
 - Include realistic UI states (hover, active, etc.)
 - Use the callback props for all interactive elements
@@ -219,7 +250,8 @@ export function InvoiceList({
 ### What NOT to Include
 
 - No `import data from` statements - data comes via props
-- No features not specified in the spec
+- No features not specified in the spec, even if a flow or a persona suggests them
+- No flow steps this screen does not cover: the previous and next steps are context, not content
 - No routing logic - callbacks handle navigation intent
 - No navigation elements (shell handles navigation)
 
@@ -289,6 +321,10 @@ Let the user know:
 
 [If design tokens exist]: I've applied your color palette ([primary], [secondary], [neutral]) and typography choices.
 
+[If the screen covers flow steps]: This screen covers **[S3, S4]** of the flow **[Flow title]** for **[Persona name]**. It shows the states for **[E1, E2]**. The flow now has [N] of [M] steps with a screen design; still open: **[S5 → ScreenName, S6 → no screen assigned]**.
+
+[If the screen is not named by any flow step]: No flow step names this screen. To add it to a flow, run the `@userflow` agent (`update <flow-id>`).
+
 **Next steps:**
 
 - Use the `@08-screenshot-design` agent to capture a screenshot of this screen design for documentation
@@ -298,6 +334,11 @@ Let the user know:
 ## Important Notes
 
 - ALWAYS read the `frontend-design` skill before creating screen designs
+- ALWAYS load the persona and flow context (`designos-context` skill) before clarifying the scope
+- The section spec is binding: flows and personas inform how a screen is designed, never what is in scope
+- Never edit a flow, persona or spec file from this command, and never claim a flow step is covered unless the step names this screen
+- Show conflicts between flow, spec and screens to the user instead of resolving them
+- After creating the files, run `npm run -s context -- [section-id]` again to report the coverage from the files, not from memory
 - Components MUST be props-based - never import data.json in exportable components
 - The preview wrapper is the ONLY file that imports data.json
 - Use TypeScript interfaces from types.ts for all props

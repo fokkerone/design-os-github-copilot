@@ -19,7 +19,7 @@ npm install
 npm run dev
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173`). The app shows every planning step as a card and updates live while the agent writes files. The **Wiki** button in the header opens the project brain.
+Open `http://localhost:3000`. The app shows every planning step as a card and updates live while the agent writes files. The **Wiki** button in the header opens the project brain.
 
 ## 2. Pick your agent
 
@@ -51,11 +51,15 @@ The full list is in [[how-to/planning-flow]].
 
 ## 5. Your first session
 
+The full walkthrough with every command is the [[how-to/step-by-step]] guide. The short version:
+
+
 1. Run `/product-vision` (or `@00-product-vision`) and describe your product in your own words.
 2. Run `/design-os:persona` to make your primary user concrete.
 3. Continue with `/product-roadmap`. From here, follow [[how-to/planning-flow]].
 
 ## Related
+- [[how-to/step-by-step]] — the complete walkthrough
 - [[how-to/planning-flow]] — every step in order
 - [[how-to/project-brain]] — how the wiki works
 - `agents.md` — the full directive for agents

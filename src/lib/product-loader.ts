@@ -2,17 +2,14 @@
  * Product data loading and markdown parsing utilities
  */
 
-import type {
-  ProductOverview,
-  ProductRoadmap,
-  Problem,
-  Section,
-  ProductData,
-} from "@/types/product";
+import type { ProductOverview, Problem, ProductData } from "@/types/product";
+import { parseProductRoadmap } from "./model/roadmap.ts";
 import { loadDataShape, hasDataShape } from "./data-shape-loader";
 import { loadDesignSystem, hasDesignSystem } from "./design-system-loader";
 import { loadDesignTokens } from "./design-tokens-loader";
 import { loadShellInfo, hasShell } from "./shell-loader";
+
+export { parseProductRoadmap };
 
 // Load markdown files from /product/ directory at build time
 const productFiles = import.meta.glob("/product/*.md", {
@@ -32,18 +29,6 @@ const exportZipFiles = import.meta.glob("/product-plan.zip", {
 const clickdummyFiles = import.meta.glob("/src/clickdummy/ClickdummyApp.tsx", {
   eager: true,
 }) as Record<string, unknown>;
-
-/**
- * Slugify a string for use as an ID
- * Converts " & " to "-and-" to maintain semantic meaning
- */
-function slugify(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/\s+&\s+/g, "-and-") // Convert " & " to "-and-" first
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 /**
  * Parse product-overview.md content into ProductOverview structure
@@ -118,60 +103,6 @@ export function parseProductOverview(md: string): ProductOverview | null {
     }
 
     return { name, description, problems, features };
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Parse product-roadmap.md content into ProductRoadmap structure
- *
- * Expected format:
- * # Product Roadmap
- *
- * ## Sections
- *
- * ### 1. [Section Title]
- * [One sentence description]
- *
- * ### 2. [Section Title]
- * [One sentence description]
- */
-export function parseProductRoadmap(md: string): ProductRoadmap | null {
-  if (!md || !md.trim()) return null;
-
-  try {
-    const sections: Section[] = [];
-
-    // Normalize line endings (Windows CRLF → LF)
-    const normalizedMd = md.replace(/\r\n/g, "\n");
-
-    // Match sections with pattern ### N. Title
-    const sectionMatches = [
-      ...normalizedMd.matchAll(/### (\d+)\.\s*(.+)\n+([\s\S]*?)(?=\n### |\n## |\n#[^#]|$)/g),
-    ];
-
-    for (const match of sectionMatches) {
-      const order = parseInt(match[1], 10);
-      const title = match[2].trim();
-      const description = match[3].trim();
-
-      sections.push({
-        id: slugify(title),
-        title,
-        description,
-        order,
-      });
-    }
-
-    // Sort by order
-    sections.sort((a, b) => a.order - b.order);
-
-    if (sections.length === 0) {
-      return null;
-    }
-
-    return { sections };
   } catch {
     return null;
   }
