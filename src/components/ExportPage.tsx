@@ -24,7 +24,7 @@ export function ExportPage() {
   const hasOverview = !!productData.overview
   const hasRoadmap = !!productData.roadmap
   const hasDataShape = !!productData.dataShape
-  const hasDesignSystem = !!productData.designSystem
+  const hasDesignSystem = !!(productData.designSystem || productData.designTokens)
   const hasShell = !!productData.shell
   const hasSections = sectionStats.sectionsWithScreenDesigns > 0
 

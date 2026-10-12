@@ -15,7 +15,14 @@ interface AppLayoutProps {
   backLabel?: string
   /** Whether to show the phase nav (default: true) */
   showPhaseNav?: boolean
+  /** Content width: "default" (768px, reading pages) or "wide" (1280px, token/data-heavy pages) */
+  width?: 'default' | 'wide'
 }
+
+const contentWidth = {
+  default: 'max-w-3xl',
+  wide: 'max-w-7xl',
+} as const
 
 export function AppLayout({
   children,
@@ -23,6 +30,7 @@ export function AppLayout({
   backTo,
   backLabel = 'Back',
   showPhaseNav = true,
+  width = 'default',
 }: AppLayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
@@ -37,7 +45,7 @@ export function AppLayout({
         <div className="px-4 sm:px-6 py-3">
           {isSubPage ? (
             /* Sub-page header with back button */
-            <div className="max-w-3xl mx-auto flex items-center gap-4">
+            <div className={`${contentWidth[width]} mx-auto flex items-center gap-4`}>
               <Button
                 variant="ghost"
                 size="sm"
@@ -96,7 +104,7 @@ export function AppLayout({
       </header>
 
       {/* Main content */}
-      <main className="flex-1 max-w-3xl mx-auto px-6 py-12 w-full">
+      <main className={`flex-1 ${contentWidth[width]} mx-auto px-6 py-12 w-full`}>
         {children}
       </main>
 

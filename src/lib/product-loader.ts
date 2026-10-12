@@ -11,6 +11,7 @@ import type {
 } from "@/types/product";
 import { loadDataShape, hasDataShape } from "./data-shape-loader";
 import { loadDesignSystem, hasDesignSystem } from "./design-system-loader";
+import { loadDesignTokens } from "./design-tokens-loader";
 import { loadShellInfo, hasShell } from "./shell-loader";
 
 // Load markdown files from /product/ directory at build time
@@ -188,6 +189,7 @@ export function loadProductData(): ProductData {
     roadmap: roadmapContent ? parseProductRoadmap(roadmapContent) : null,
     dataShape: loadDataShape(),
     designSystem: loadDesignSystem(),
+    designTokens: loadDesignTokens(),
     shell: loadShellInfo(),
   };
 }

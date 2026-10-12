@@ -38,6 +38,8 @@ If design tokens are missing, show a warning but continue:
 
 ## Step 1b: Check for Brand Identity in Design System
 
+If `product/design-system/DESIGN.md` exists (generated from imported design tokens), it is the source of truth for colors, typography, radius and shadows — follow it and use only the token values listed there. Use palette steps (e.g. `teal-600`), never Design OS semantic utilities like `bg-primary` or imports from `@/components/` (see "Token separation" in agents.md).
+
 Check if `product/design-system/design-system.json` exists and contains personality, voice, or uiStyle fields.
 
 If these optional brand identity fields exist, use them to inform design decisions:
