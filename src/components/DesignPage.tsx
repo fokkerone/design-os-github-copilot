@@ -140,7 +140,7 @@ export function DesignPage() {
   const categories = categorizeResources(resourceFiles);
 
   return (
-    <AppLayout>
+    <AppLayout width='wide'>
       <div className='space-y-6'>
         {/* Page intro */}
         <div className='mb-8'>
