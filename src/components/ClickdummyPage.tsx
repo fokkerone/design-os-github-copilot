@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Check, AlertTriangle, Play, MousePointer2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AppLayout } from '@/components/AppLayout'
+import { AgentPrompt } from '@/components/AgentPrompt'
 import { loadProductData, hasClickdummy } from '@/lib/product-loader'
 import { getAllSectionIds, getSectionScreenDesigns } from '@/lib/section-loader'
 
@@ -96,26 +97,9 @@ export function ClickdummyPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-stone-600 dark:text-stone-400">
-                Use the following Copilot agent to assemble all your screen designs into a navigable prototype:
+                Use the following agent to assemble all your screen designs into a navigable prototype:
               </p>
-              <div className="bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-3 space-y-2">
-                <div>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mb-0.5">
-                    Select Copilot agent:
-                  </p>
-                  <code className="text-sm font-mono text-stone-800 dark:text-stone-200">
-                    @clickdummy
-                  </code>
-                </div>
-                <div className="border-t border-stone-200 dark:border-stone-700 pt-2">
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mb-0.5">
-                    Then say:
-                  </p>
-                  <code className="text-sm font-mono text-stone-800 dark:text-stone-200">
-                    Assemble the clickdummy
-                  </code>
-                </div>
-              </div>
+              <AgentPrompt step="clickdummy" prompt="Assemble the clickdummy" />
             </CardContent>
           </Card>
         )}

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { CopyButton } from '@/components/CopyButton'
+import { AgentPrompt } from '@/components/AgentPrompt'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AppLayout } from '@/components/AppLayout'
 import { EmptyState } from '@/components/EmptyState'
@@ -180,27 +180,7 @@ export function SectionPage() {
                   <p className="text-sm text-stone-500 dark:text-stone-400 mb-4">
                     Capture screenshots of your screen designs for documentation
                   </p>
-                  <div className="bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-2.5 w-full space-y-2">
-                    <div>
-                      <p className="text-xs text-stone-500 dark:text-stone-400 mb-0.5">
-                        Select Copilot agent:
-                      </p>
-                      <code className="text-sm font-mono text-stone-700 dark:text-stone-300">
-                        @screenshot-design
-                      </code>
-                    </div>
-                    <div className="border-t border-stone-200 dark:border-stone-700 pt-2">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <p className="text-xs text-stone-500 dark:text-stone-400">
-                          Then say:
-                        </p>
-                        <CopyButton text={`Capture a screenshot of the ${section.title} screen design`} />
-                      </div>
-                      <p className="text-sm text-stone-600 dark:text-stone-300 italic">
-                        "Capture a screenshot of the {section.title} screen design"
-                      </p>
-                    </div>
-                  </div>
+                  <AgentPrompt step="screenshot-design" prompt={`Capture a screenshot of the ${section.title} screen design`} compact />
                 </div>
               </CardContent>
             </Card>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AppLayout } from "@/components/AppLayout";
+import { AgentPrompt, StepName } from "@/components/AgentPrompt";
 import { EmptyState } from "@/components/EmptyState";
 import { StepIndicator, type StepStatus } from "@/components/StepIndicator";
 import { NextPhaseButton } from "@/components/NextPhaseButton";
@@ -385,11 +386,7 @@ export function DesignPage() {
                 {/* Edit hint */}
                 <div className='bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-2.5'>
                   <p className='text-xs text-stone-500 dark:text-stone-400'>
-                    Use the{" "}
-                    <code className='font-mono text-stone-700 dark:text-stone-300'>
-                      @design-system
-                    </code>{" "}
-                    agent to update
+                    Use <StepName step='design-system' /> to update
                   </p>
                 </div>
               </CardContent>
@@ -481,11 +478,7 @@ export function DesignPage() {
                 {/* Edit hint */}
                 <div className='bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-2.5'>
                   <p className='text-xs text-stone-500 dark:text-stone-400'>
-                    Use the{" "}
-                    <code className='font-mono text-stone-700 dark:text-stone-300'>
-                      @design-shell
-                    </code>{" "}
-                    agent to update
+                    Use <StepName step='design-shell' /> to update
                   </p>
                 </div>
               </CardContent>
@@ -630,24 +623,11 @@ function DesignSystemEmptyState({ hasResources }: { hasResources: boolean }) {
           <p className='text-sm text-stone-500 dark:text-stone-400 mb-4'>
             Define colors, typography, and brand identity for your product
           </p>
-          <div className='bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-2.5 w-full space-y-2'>
-            <div>
-              <p className='text-xs text-stone-500 dark:text-stone-400 mb-0.5'>
-                Select Copilot agent:
-              </p>
-              <code className='text-sm font-mono text-stone-700 dark:text-stone-300'>
-                @design-system
-              </code>
-            </div>
-            <div className='border-t border-stone-200 dark:border-stone-700 pt-2'>
-              <p className='text-xs text-stone-500 dark:text-stone-400 mb-0.5'>
-                Then say:
-              </p>
-              <p className='text-sm text-stone-600 dark:text-stone-300 italic'>
-                "Help me define my design system"
-              </p>
-            </div>
-          </div>
+          <AgentPrompt
+            step='design-system'
+            prompt='Help me define my design system'
+            compact
+          />
 
           {/* Token import hint */}
           <div className='mt-4 w-full'>

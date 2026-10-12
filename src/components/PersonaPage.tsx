@@ -290,10 +290,10 @@ export function PersonaPage() {
         <div className="space-y-3">
           <CommandHint
             label="New evidence arrived? Update the evidence levels"
-            command={`/design-os:persona validate ${persona.id}`}
-            agent="@persona"
+            step="persona"
+            args={`validate ${persona.id}`}
           />
-          <CommandHint label="Design a flow for this persona" command="/design-os:userflow" agent="@userflow" />
+          <CommandHint label="Design a flow for this persona" step="userflow" />
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-mono text-xs text-stone-400 dark:text-stone-500">product/personas/{persona.id}.md</p>
             {getWikiPage(`personas/${persona.id}`) && (

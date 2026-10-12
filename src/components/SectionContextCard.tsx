@@ -42,8 +42,8 @@ export function SectionContextCard({ sectionId, hasSpec }: SectionContextCardPro
             This section is not linked to a persona or a user flow yet. Both are optional. They tell the screen designs who
             the section is for and how the user moves through it.
           </p>
-          <CommandHint label="Say who this section is for" command="/design-os:persona" agent="@persona" />
-          <CommandHint label="Design a flow through this section" command="/design-os:userflow" agent="@userflow" />
+          <CommandHint label="Say who this section is for" step="persona" />
+          <CommandHint label="Design a flow through this section" step="userflow" />
         </CardContent>
       </Card>
     )

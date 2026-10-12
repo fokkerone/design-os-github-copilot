@@ -3,9 +3,10 @@ import { Copy, Check } from 'lucide-react'
 
 interface CopyButtonProps {
   text: string
+  title?: string
 }
 
-export function CopyButton({ text }: CopyButtonProps) {
+export function CopyButton({ text, title = 'Copy to clipboard' }: CopyButtonProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -18,7 +19,7 @@ export function CopyButton({ text }: CopyButtonProps) {
     <button
       onClick={handleCopy}
       className="inline-flex items-center gap-1 text-xs text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300 transition-colors"
-      title="Copy to clipboard"
+      title={title}
     >
       {copied ? (
         <>

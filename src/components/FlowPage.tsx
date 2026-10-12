@@ -83,8 +83,7 @@ export function FlowPage() {
             {open.length > 0 && (
               <CommandHint
                 label="Design a missing screen. Name it as the step does."
-                command="/design-screen"
-                agent="@07-design-screen"
+                step="design-screen"
               />
             )}
           </CardContent>
@@ -227,7 +226,7 @@ export function FlowPage() {
 
         {/* Source and commands */}
         <div className="space-y-3">
-          <CommandHint label="Change this flow" command={`/design-os:userflow update ${flow.id}`} agent="@userflow" />
+          <CommandHint label="Change this flow" step="userflow" args={`update ${flow.id}`} />
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-mono text-xs text-stone-400 dark:text-stone-500">product/flows/{flow.id}.md</p>
             {getWikiPage(`flows/${flow.id}`) && (
