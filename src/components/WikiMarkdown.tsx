@@ -1,12 +1,13 @@
 import { useMemo, type MouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { MermaidDiagram } from '@/components/MermaidDiagram'
-import { resolveWikiLink } from '@/lib/wiki-loader'
+import { createSlugger, createWikiMarked, transformInline } from '@/lib/wiki-markdown'
 
 interface WikiMarkdownProps {
   markdown: string
+  /** Give headings anchor ids so a table of contents can link to them. Use once per page. */
+  anchors?: boolean
 }
 
 type Block = { type: 'markdown'; content: string } | { type: 'mermaid'; content: string }
@@ -18,9 +19,6 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     node.setAttribute('rel', 'noopener noreferrer')
   }
 })
-
-const escapeHtml = (text: string) =>
-  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 /** Split markdown into Mermaid diagrams and everything else */
 function splitBlocks(markdown: string): Block[] {
@@ -35,27 +33,8 @@ function splitBlocks(markdown: string): Block[] {
   return blocks
 }
 
-/** Replace [[wikilinks]] and ^[provenance] markers, leaving code untouched */
-function transformInline(text: string): string {
-  return text
-    .split(/(```[\s\S]*?```|`[^`\n]*`)/g)
-    .map((part, index) => {
-      if (index % 2 === 1) return part
-      return part
-        .replace(/\[\[([^\]|\\]+?)(?:\\?\|([^\]]+))?\]\]/g, (_, target: string, alias?: string) => {
-          const label = escapeHtml((alias || target.split('/').pop() || target).trim())
-          const resolved = resolveWikiLink(target)
-          return resolved
-            ? `<a href="/wiki/${resolved}" data-wiki="${resolved}" class="wiki-link">${label}</a>`
-            : `<span class="wiki-link-broken" title="No wiki page for ${escapeHtml(target)}">${label}</span>`
-        })
-        .replace(/\^\[(inferred|ambiguous)\]/g, '<span class="wiki-provenance">$1</span>')
-    })
-    .join('')
-}
-
-function renderMarkdown(markdown: string): string {
-  const html = marked.parse(transformInline(markdown), { gfm: true, async: false }) as string
+function renderMarkdown(markdown: string, marked: ReturnType<typeof createWikiMarked>): string {
+  const html = marked.parse(transformInline(markdown), { async: false })
   return DOMPurify.sanitize(html)
     .replace(/<table>/g, '<div class="wiki-table"><table>')
     .replace(/<\/table>/g, '</table></div>')
@@ -64,6 +43,7 @@ function renderMarkdown(markdown: string): string {
 const proseClasses = [
   'text-[15px] leading-relaxed text-stone-700 dark:text-stone-300',
   '[&>*+*]:mt-4',
+  '[&_h1]:scroll-mt-20 [&_h2]:scroll-mt-20 [&_h3]:scroll-mt-20 [&_h4]:scroll-mt-20',
   '[&_h1]:text-xl [&_h1]:font-semibold [&_h1]:text-stone-900 dark:[&_h1]:text-stone-100',
   '[&_h2]:mt-10 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-stone-900 dark:[&_h2]:text-stone-100',
   '[&_h3]:mt-6 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-stone-900 dark:[&_h3]:text-stone-100',
@@ -85,15 +65,15 @@ const proseClasses = [
 ].join(' ')
 
 /** Renders a wiki page body: markdown, [[wikilinks]] and Mermaid diagrams */
-export function WikiMarkdown({ markdown }: WikiMarkdownProps) {
+export function WikiMarkdown({ markdown, anchors = false }: WikiMarkdownProps) {
   const navigate = useNavigate()
-  const blocks = useMemo(
-    () =>
-      splitBlocks(markdown).map((block) =>
-        block.type === 'markdown' ? { ...block, html: renderMarkdown(block.content) } : { ...block, html: '' }
-      ),
-    [markdown]
-  )
+  const blocks = useMemo(() => {
+    // One marked instance for all blocks keeps heading ids unique over the whole page
+    const marked = createWikiMarked(anchors ? createSlugger() : undefined)
+    return splitBlocks(markdown).map((block) =>
+      block.type === 'markdown' ? { ...block, html: renderMarkdown(block.content, marked) } : { ...block, html: '' }
+    )
+  }, [markdown, anchors])
 
   function handleClick(event: MouseEvent<HTMLDivElement>) {
     const link = (event.target as HTMLElement).closest('a[data-wiki]')

@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen, Search } from 'lucide-react'
-import { AppLayout } from '@/components/AppLayout'
+import { WikiLayout } from '@/components/WikiLayout'
 import { Input } from '@/components/ui/input'
+import type { WikiHeading } from '@/lib/wiki-markdown'
 import { getWikiDomains, getWikiLog, getWikiPage, hasWikiContent, type WikiPage as WikiPageData } from '@/lib/wiki-loader'
 
 const LOG_KIND_STYLES: Record<string, string> = {
@@ -70,8 +71,20 @@ export function WikiPage() {
     .map(({ domain, pages }) => ({ domain, pages: pages.filter((page) => matches(page, query)) }))
     .filter(({ pages }) => pages.length > 0)
 
+  // Sections of this page that the table of contents links to
+  const toc: WikiHeading[] = [
+    ...(hasWikiContent() && filtered.length > 0
+      ? filtered.map(({ domain }) => ({
+          id: `domain-${domain}`,
+          text: domain.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
+          depth: 2,
+        }))
+      : []),
+    ...(log.length > 0 ? [{ id: 'wiki-activity', text: 'Recent activity', depth: 2 }] : []),
+  ]
+
   return (
-    <AppLayout>
+    <WikiLayout currentPath="" toc={toc}>
       <div className="space-y-10">
         <div>
           <h1 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 mb-2">Project brain</h1>
@@ -172,6 +185,6 @@ export function WikiPage() {
           </nav>
         )}
       </div>
-    </AppLayout>
+    </WikiLayout>
   )
 }

@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { AppLayout } from '@/components/AppLayout'
+import { WikiLayout } from '@/components/WikiLayout'
 import { WikiMarkdown } from '@/components/WikiMarkdown'
 import { getWikiPage, type FrontmatterValue } from '@/lib/wiki-loader'
+import { extractWikiHeadings } from '@/lib/wiki-markdown'
 
 function list(value: FrontmatterValue | undefined): string[] {
   if (Array.isArray(value)) return value
@@ -38,14 +39,13 @@ export function WikiArticlePage() {
   const path = useParams()['*'] || 'Home'
   const page = getWikiPage(path)
 
-  // Following a wikilink opens the next page at the top, not at the previous scroll position
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [path])
+  // The page title is shown above; drop the duplicate H1 from the body
+  const body = useMemo(() => page?.body.replace(/^\s*#\s+.+\n/, '') ?? '', [page])
+  const toc = useMemo(() => extractWikiHeadings(body), [body])
 
   if (!page) {
     return (
-      <AppLayout backTo="/wiki" backLabel="Wiki" title="Page not found">
+      <WikiLayout currentPath={path} backTo="/wiki" backLabel="Wiki" title="Page not found">
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold text-stone-900 dark:text-stone-100">Page not found</h1>
           <p className="text-stone-600 dark:text-stone-400">
@@ -56,7 +56,7 @@ export function WikiArticlePage() {
             Back to the wiki
           </Link>
         </div>
-      </AppLayout>
+      </WikiLayout>
     )
   }
 
@@ -73,11 +73,9 @@ export function WikiArticlePage() {
   const sources = list(fm.sources)
   const artifacts = list(fm.artifacts)
   const domainHome = page.domain && !page.isIndex ? getWikiPage(`${page.domain}/Home`) : null
-  // The page title is shown above; drop the duplicate H1 from the body
-  const body = page.body.replace(/^\s*#\s+.+\n/, '')
 
   return (
-    <AppLayout backTo="/wiki" backLabel="Wiki" title={page.title}>
+    <WikiLayout currentPath={path} toc={toc} backTo="/wiki" backLabel="Wiki" title={page.title}>
       <article className="space-y-8">
         <header className="space-y-2">
           {domainHome ? (
@@ -153,12 +151,12 @@ export function WikiArticlePage() {
           </dl>
         )}
 
-        <WikiMarkdown markdown={body} />
+        <WikiMarkdown markdown={body} anchors />
 
         <p className="text-xs text-stone-400 dark:text-stone-500">
           <code className="font-mono">wiki/{page.path}.md</code> · Maintained by the wiki commands
         </p>
       </article>
-    </AppLayout>
+    </WikiLayout>
   )
 }
