@@ -5,6 +5,8 @@ import { AppLayout } from '@/components/AppLayout'
 import { EmptyState } from '@/components/EmptyState'
 import { PhaseWarningBanner } from '@/components/PhaseWarningBanner'
 import { NextPhaseButton } from '@/components/NextPhaseButton'
+import { FlowsCard } from '@/components/FlowsCard'
+import { getProjectModel } from '@/lib/project-model'
 import { loadProductData } from '@/lib/product-loader'
 import { getSectionScreenDesigns, getSectionScreenshots, hasSectionSpec, hasSectionData } from '@/lib/section-loader'
 import { ChevronRight, Check, Circle } from 'lucide-react'
@@ -73,6 +75,9 @@ export function SectionsPage() {
         {/* Warning banner for incomplete prerequisite phases */}
         <PhaseWarningBanner />
 
+        {/* User flows: they cross sections, so they are listed once, above them */}
+        {sections.length > 0 && <FlowsCard />}
+
         {/* Sections list */}
         {sections.length === 0 ? (
           <EmptyState type="roadmap" />
@@ -120,7 +125,7 @@ export function SectionsPage() {
                             </p>
 
                             {/* Progress indicators */}
-                            <div className="flex items-center gap-3 mt-2">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
                               <ProgressDot label="Spec" done={progress?.hasSpec} />
                               <ProgressDot label="Data" done={progress?.hasData} />
                               <ProgressDot
@@ -132,6 +137,7 @@ export function SectionsPage() {
                                 done={progress?.hasScreenshots}
                                 optional
                               />
+                              <SectionLinks sectionId={section.id} />
                             </div>
                           </div>
                         </div>
@@ -152,6 +158,29 @@ export function SectionsPage() {
         )}
       </div>
     </AppLayout>
+  )
+}
+
+/** Linked personas, flows and open flow steps of a section. Renders nothing when there are none. */
+function SectionLinks({ sectionId }: { sectionId: string }) {
+  const model = getProjectModel()
+  const personas = model.personasForSection(sectionId).length
+  const flows = model.flowsForSection(sectionId)
+  const open = flows
+    .flatMap((flow) => model.resolveSteps(flow.id))
+    .filter((step) => (step.target?.sectionId ?? step.sectionId) === sectionId && step.status !== 'mapped').length
+  if (personas === 0 && flows.length === 0) return null
+
+  return (
+    <span className="text-xs text-stone-500 dark:text-stone-400">
+      {[
+        personas > 0 && `${personas} persona${personas === 1 ? '' : 's'}`,
+        flows.length > 0 && `${flows.length} flow${flows.length === 1 ? '' : 's'}`,
+        open > 0 && `${open} flow step${open === 1 ? '' : 's'} without screen`,
+      ]
+        .filter(Boolean)
+        .join(' · ')}
+    </span>
   )
 }
 

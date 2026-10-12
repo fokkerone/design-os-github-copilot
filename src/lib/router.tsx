@@ -8,6 +8,8 @@ import { ScreenDesignPage, ScreenDesignFullscreen } from '@/components/ScreenDes
 import { ShellDesignPage, ShellDesignFullscreen } from '@/components/ShellDesignPage'
 import { ClickdummyPage } from '@/components/ClickdummyPage'
 import { ExportPage } from '@/components/ExportPage'
+import { PersonaPage } from '@/components/PersonaPage'
+import { FlowPage } from '@/components/FlowPage'
 import { WikiPage } from '@/components/WikiPage'
 import { WikiArticlePage } from '@/components/WikiArticlePage'
 
@@ -39,6 +41,14 @@ export const router = createBrowserRouter([
   {
     path: '/sections/:sectionId/screen-designs/:screenDesignName/fullscreen',
     element: <ScreenDesignFullscreen />,
+  },
+  {
+    path: '/personas/:personaId',
+    element: <PersonaPage />,
+  },
+  {
+    path: '/flows/:flowId',
+    element: <FlowPage />,
   },
   {
     path: '/shell/design',

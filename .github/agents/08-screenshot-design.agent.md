@@ -38,6 +38,8 @@ Present the available screen designs as options, grouped by section:
 - [Section Name] / [ScreenDesignName]
 - [Section Name] / [ScreenDesignName]
 
+**Along a user flow.** If flows exist (`product/flows/`), also offer: "All screens of a flow, in step order". For the chosen flow run `npm run -s context -- --flow <flow-id>` (see the `designos-context` skill) and capture each step that has a screen design, in step order. Save each as `product/sections/[section-id]/flow-[flow-id]-[step-id]-[screen-design-name].png` in the section the screen belongs to. Steps without a screen design are skipped and listed in the confirmation; never substitute another screen.
+
 ## Step 2: Start the Dev Server
 
 Start the dev server yourself by running `npm run dev` in the background so you can continue with the screenshot capture.

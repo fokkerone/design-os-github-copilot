@@ -98,6 +98,14 @@ Review the sections and let me know if you'd like to adjust anything. When you'r
 
 ---
 
+## Personas and User Flows
+
+Before proposing sections, run `npm run -s context` (see the `designos-context` skill, `.claude/skills/designos-context/SKILL.md`). Skip this part if there are no personas and no flows.
+
+- **Personas exist:** check that the job story of every primary persona is served by at least one proposed section. Name the persona next to the section when you present the roadmap ("Meter Readings: Ana's job"). If a job story has no section, say so and ask whether a section is missing or the persona is out of scope.
+- **Flows exist:** every section a flow lists must be in the roadmap. When you update a roadmap, never rename or remove a section that a flow, persona or spec refers to without telling the user which files refer to it.
+- **After the roadmap is written:** suggest two to five user flows that are worth designing next, preferring flows that cross sections, one line each ("Submit a meter reading: Account → Meter Readings"). Do not create them. Point to the `@userflow` agent.
+
 ## Important Notes
 
 - **Always ask clarifying questions before generating** — never auto-generate from the product overview alone

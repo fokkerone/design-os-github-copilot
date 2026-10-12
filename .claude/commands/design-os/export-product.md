@@ -279,6 +279,8 @@ Copy any `.png` files from:
 
 If `product/flows/` contains `.md` files, copy each one unchanged to `product-plan/flows/[flow-id].md`. Then create `product-plan/flows/README.md` with a table listing each flow (title, status, sections, step count, edge-case count) and a note that every flow contains a Mermaid diagram, a step table, rules, and edge cases. These serve as acceptance criteria for implementation.
 
+Run `npm run -s context` (see the `designos-context` skill, `.claude/skills/designos-context/SKILL.md`) and add to `product-plan/flows/README.md`, per flow: the coverage ("4 of 6 steps have a screen design"), a table of steps with the screen design that covers each one, and the steps that have none. State plainly that steps without a screen design are **not designed**: the implementation team must not assume a design exists for them. List the report's conflicts under "Open points" instead of resolving them.
+
 In `tests.md` for a section with linked flows, add one test group per linked flow covering its happy path and each edge case (E1…En).
 
 ## Step 14c: Copy Personas (if exist)

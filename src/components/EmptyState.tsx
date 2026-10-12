@@ -1,8 +1,8 @@
-import { FileText, Map, ClipboardList, Database, Layout, Package, Boxes, Palette, PanelLeft } from 'lucide-react'
+import { FileText, Map, ClipboardList, Database, Layout, Package, Boxes, Palette, PanelLeft, UserRound, GitBranch } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { CopyButton } from '@/components/CopyButton'
 
-type EmptyStateType = 'overview' | 'roadmap' | 'spec' | 'data' | 'screen-designs' | 'data-shape' | 'design-system' | 'shell' | 'export'
+type EmptyStateType = 'overview' | 'roadmap' | 'spec' | 'data' | 'screen-designs' | 'data-shape' | 'design-system' | 'shell' | 'export' | 'personas' | 'flows'
 
 interface EmptyStateProps {
   type: EmptyStateType
@@ -71,6 +71,20 @@ const config: Record<EmptyStateType, {
     agent: '@design-shell',
     starter: 'Design the application shell',
     description: 'Design the navigation and layout',
+  },
+  personas: {
+    icon: UserRound,
+    title: 'No personas yet',
+    agent: '@persona',
+    starter: 'Create a proto-persona for my product',
+    description: 'Say who the product is for: job story, goals, pain points and what they mean for the design',
+  },
+  flows: {
+    icon: GitBranch,
+    title: 'No user flows yet',
+    agent: '@userflow',
+    starter: 'Design the most important user flow of my product',
+    description: 'Describe how a user reaches a goal step by step, across sections, including what can go wrong',
   },
   export: {
     icon: Package,

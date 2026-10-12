@@ -1,7 +1,7 @@
 ---
 title: Wiki Home
 tags: [index, home]
-updated: 2026-10-06
+updated: 2026-10-09
 ---
 
 # Project Brain
@@ -27,10 +27,11 @@ All diagrams are **Mermaid**. Check them with `npm run validate:mermaid`.
 New here? Start with the guides that ship with Design OS: [[how-to/Home|How To]].
 
 1. [[how-to/getting-started]] — run the app, pick Claude Code or Copilot
-2. [[how-to/planning-flow]] — every planning step in order
-3. [[how-to/project-brain]] — how this wiki works
-4. [[how-to/user-flows]] — design user flows
-5. [[how-to/personas]] — create and validate personas
+2. [[how-to/step-by-step]] — the complete walkthrough, command by command
+3. [[how-to/planning-flow]] — the planning flow at a glance
+4. [[how-to/project-brain]] — how this wiki works
+5. [[how-to/user-flows]] — design user flows
+6. [[how-to/personas]] — create and validate personas
 
 ## Domains
 
@@ -42,6 +43,8 @@ _(created automatically by `/design-os:wiki-ingest`; vocabulary in [[_meta/taxon
 ## Recent Updates
 
 _(last 10, full history in [[log]])_
+
+- 2026-10-09: [[how-to/Home|How To]] — step-by-step guides for Design OS, the wiki, user flows and personas
 
 ## Wiki Operations
 
@@ -56,4 +59,11 @@ _(last 10, full history in [[log]])_
 | `/design-os:wiki-lint` | Health check: orphans, broken links, contradictions, drift |
 | `/design-os:wiki-cross-link` | Insert missing `[[wikilinks]]` |
 | `/design-os:wiki-taxonomy` | Audit and normalize tags and domains |
-| `/design-os:wiki-rebuild` | Archive, rebuild, restore |
+| `/design-os:wiki-rebuild` | Archive, rebuild, restore (keeps `how-to/`) |
+
+## Planning Commands That Write to the Wiki
+
+| Command | Purpose |
+|---------|---------|
+| `/design-os:persona` | Create or validate a persona → `personas/` ([[how-to/personas]]) |
+| `/design-os:userflow` | Design a user flow → `flows/` ([[how-to/user-flows]]) |

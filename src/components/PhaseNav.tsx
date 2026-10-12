@@ -52,13 +52,13 @@ function usePhaseStatuses(): PhaseInfo[] {
   // The wiki is not a planning phase, so no phase is current there
   let currentPhaseId: Phase | null = currentPath.startsWith('/wiki') ? null : 'product'
 
-  if (currentPath === '/' || currentPath === '/product') {
+  if (currentPath === '/' || currentPath === '/product' || currentPath.startsWith('/personas/')) {
     currentPhaseId = 'product'
   } else if (currentPath === '/data-shape') {
     currentPhaseId = 'data-shape'
   } else if (currentPath === '/design' || currentPath === '/design-system' || currentPath.startsWith('/shell')) {
     currentPhaseId = 'design'
-  } else if (currentPath === '/sections' || currentPath.startsWith('/sections/')) {
+  } else if (currentPath === '/sections' || currentPath.startsWith('/sections/') || currentPath.startsWith('/flows/')) {
     currentPhaseId = 'sections'
   } else if (currentPath === '/clickdummy') {
     currentPhaseId = 'clickdummy'

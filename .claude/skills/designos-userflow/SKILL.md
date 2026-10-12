@@ -170,6 +170,8 @@ Map every step to `section-id` + screen design (`src/sections/<section-id>/<Scre
 
 Group Mermaid nodes into `subgraph` blocks per section.
 
+Write the screen design's file name into the `Section / Screen` column exactly as it is in `src/sections/<section-id>/`: Design OS and the other commands compute the flow's coverage from that column and the files that exist (`npm run -s context -- --flow <flow-id>`, see the `designos-context` skill). For a screen that does not exist yet, write the name it should get.
+
 ## Step 10 — Review and write
 
 Show a compact summary: Ask, rules, step count, edge-case count, sections touched, gaps. Ask: Write flow (Recommended) / Change something. On confirmation, write `product/flows/<flow-id>.md` (format below). Never overwrite an existing flow file without the user choosing `update`.

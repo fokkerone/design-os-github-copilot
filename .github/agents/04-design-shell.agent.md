@@ -69,6 +69,15 @@ When presenting shell options, reference the brand guide:
 - [Navigation style recommendation]
 - [Visual treatment recommendation]"
 
+## Step 1c: Check for Personas and User Flows
+
+Run `npm run -s context` (see the `designos-context` skill, `.claude/skills/designos-context/SKILL.md`). Skip this step if there are no personas and no flows.
+
+- **Personas:** let the context of use of the primary persona (devices, environment, frequency) and its accessibility constraints inform the layout you recommend, and say so: "Ana uses her phone, one-handed, once a year, so I recommend bottom navigation with few entries."
+- **Flows:** flows that cross sections show which sections users move between most. Keep those one step apart in the navigation.
+
+These are inputs for your recommendation. The user decides.
+
 ## Step 2: Analyze Product Structure
 
 Review the roadmap sections and present navigation options:
