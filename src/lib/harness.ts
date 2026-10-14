@@ -132,3 +132,27 @@ export function buildStepMessage(step: StepId, prompt?: string): string {
   const head = `Follow the instructions in ${stepCommandFile(step)}.`
   return prompt ? `${head}\n\n${prompt}` : head
 }
+
+const EXTRA_COMMANDS = ['wiki-ingest', 'wiki-capture', 'wiki-query', 'wiki-status', 'wiki-lint', 'wiki-rebuild', 'wiki-cross-link', 'wiki-taxonomy']
+
+/**
+ * OpenCode does not parse slash commands out of a prompt, the agent would only guess.
+ * A typed `/design-os:<step> request` (or Copilot's `@00-product-vision`) becomes the message
+ * that points the agent to the command file. Anything else is returned unchanged.
+ */
+export function expandSlashCommand(text: string): string {
+  const match = text.trim().match(/^(?:\/design-os:([\w-]+)|@([\w-]+))(?:\s+([\s\S]*))?$/)
+  if (!match) return text
+  const rest = match[3]?.trim()
+  let step: StepId | undefined
+  if (match[1]) {
+    step = STEP_IDS.find((id) => STEPS[id].claude === `/design-os:${match[1]}`)
+    if (!step && EXTRA_COMMANDS.includes(match[1])) {
+      const head = `Follow the instructions in .claude/commands/design-os/${match[1]}.md.`
+      return rest ? `${head}\n\n${rest}` : head
+    }
+  } else {
+    step = STEP_IDS.find((id) => STEPS[id].copilot === `@${match[2]}`)
+  }
+  return step ? buildStepMessage(step, rest) : text
+}

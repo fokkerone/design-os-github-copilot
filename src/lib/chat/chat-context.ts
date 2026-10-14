@@ -1,9 +1,11 @@
 import { createContext, useContext } from 'react'
 import type { ModelOption, ModelRef } from '@/lib/chat/models'
+import type { AgentActivity } from '@/lib/chat/activity'
 import type { OpenCodeStatus } from '@/lib/chat/opencode'
 
 export interface ChatContextValue {
   status: OpenCodeStatus
+  activity: AgentActivity
   options: ModelOption[]
   model: ModelRef | undefined
   setModel: (model: ModelRef | undefined) => void

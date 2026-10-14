@@ -156,6 +156,20 @@ Generate the complete export package with all components, types, and handoff doc
 
 ---
 
+## The Design OS App: Layout and Agent Chat
+
+The app has a left main navigation (Prototype with Vision, Roadmap, Sections, Prototype and Export; Personas; User Flows; Design System; Tech Stack; Wiki). Right of it the content splits: the agent chat on the left, the page of the current step on the right (collapsible and expandable in the header). Data Shape is a tab of Roadmap, the Shell a tab of Design System. Old routes (`/sections`, `/design`, `/clickdummy`, ...) redirect (`src/lib/navigation.ts`); all routes live in `src/lib/paths.ts` and `src/lib/routes.tsx`.
+
+The chat is [assistant-ui](https://www.assistant-ui.com/) with the OpenCode runtime (`@assistant-ui/react-opencode`):
+
+- `npm run dev` starts `opencode serve --port 4096` (Vite plugin, `scripts/opencode-dev.mjs`; set `DESIGNOS_NO_OPENCODE=1` to skip) and proxies `/opencode` to it, so the browser needs no CORS and never sees API keys.
+- Models come from the user's `~/.config/opencode/opencode.json` (e.g. the Azure `rwe-factory-*` providers). The chat lists them via `/config/providers`; "Default" uses the server default.
+- "Start with agent" on a page sends `Follow the instructions in .claude/commands/design-os/<step>.md.` plus the prompt into the chat (`buildStepMessage` in `src/lib/harness.ts`). The agent writes files in `product/`; the loaders pick them up through HMR.
+- Without OpenCode the chat shows the command to start it. Pages outside a chat fall back to copy-and-paste commands.
+- Chat tests run against a fake OpenCode server (`tests/helpers/fake-opencode.ts`). Component tests use jsdom (`// @vitest-environment jsdom`), model tests run in node.
+
+---
+
 ## Project Brain (`wiki/`)
 
 `wiki/` is a Karpathy-style LLM wiki and Obsidian vault: the persistent memory behind the planning flow. Read it in the Design OS app at `/wiki` (header button "Wiki"), or open the folder in Obsidian. Sources (`wiki/raw/` plus the `product/` artifacts) are compiled into domain pages (`wiki/<domain>/`). The agent maintains the wiki; the user reads it and asks questions.

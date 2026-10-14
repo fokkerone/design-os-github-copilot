@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Maximize2, Minimize2, PanelRight } from 'lucide-react'
+import { Maximize2, MessageSquare, Minimize2, PanelRight } from 'lucide-react'
+import type { AgentActivity } from '@/lib/chat/activity'
 
 /** open: chat and step side by side, expanded: step fills the area, hidden: chat only */
 export type PanelMode = 'open' | 'expanded' | 'hidden'
@@ -12,6 +13,8 @@ interface SplitLayoutProps {
   /** The step page */
   children: React.ReactNode
   panelMode?: PanelMode
+  /** What the agent does, shown by the chat icon in the header */
+  chatActivity?: AgentActivity
   onPanelModeChange?: (mode: PanelMode) => void
 }
 
@@ -21,7 +24,7 @@ const border = 'border-stone-200 dark:border-rwe-neutral-800'
  * Chat on the left, the page of the current step on the right (layout of the reference app).
  * The chat stays mounted in every mode, so a running conversation survives navigation and expanding.
  */
-export function SplitLayout({ title, chat, children, panelMode, onPanelModeChange }: SplitLayoutProps) {
+export function SplitLayout({ title, chat, children, panelMode, onPanelModeChange, chatActivity = 'idle' }: SplitLayoutProps) {
   const [internal, setInternal] = useState<PanelMode>('open')
   const requested = panelMode ?? internal
   const hasChat = chat !== undefined
@@ -37,6 +40,16 @@ export function SplitLayout({ title, chat, children, panelMode, onPanelModeChang
         <h1 className="min-w-0 truncate px-2 text-[14px] text-rwe-neutral-900 dark:text-rwe-neutral-50">{title}</h1>
         {hasChat && (
           <div className="ml-auto flex items-center gap-1">
+            <HeaderButton
+              label={chatActivity === 'working' ? 'Chat, agent is working' : chatActivity === 'waiting' ? 'Chat, waiting for your answer' : 'Chat'}
+              onClick={() => mode === 'expanded' && setMode('open')}
+              busy={chatActivity !== 'idle'}
+            >
+              <MessageSquare
+                className={`size-4 ${chatActivity !== 'idle' ? 'animate-pulse text-brand-blue-500 dark:text-energy-green-500' : ''}`}
+                strokeWidth={1.75}
+              />
+            </HeaderButton>
             {mode !== 'hidden' && (
               <HeaderButton
                 label={mode === 'expanded' ? 'Collapse step panel' : 'Expand step panel'}
@@ -91,12 +104,13 @@ export function SplitLayout({ title, chat, children, panelMode, onPanelModeChang
   )
 }
 
-function HeaderButton({ label, onClick, pressed, children }: { label: string; onClick: () => void; pressed?: boolean; children: React.ReactNode }) {
+function HeaderButton({ label, onClick, pressed, busy, children }: { label: string; onClick: () => void; pressed?: boolean; busy?: boolean; children: React.ReactNode }) {
   return (
     <button
       type="button"
       aria-label={label}
       aria-pressed={pressed}
+      data-busy={busy ? 'true' : undefined}
       onClick={onClick}
       className="flex size-8 items-center justify-center rounded-md text-stone-500 hover:bg-rwe-sand-500 hover:text-rwe-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus dark:text-rwe-neutral-300 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-50"
     >

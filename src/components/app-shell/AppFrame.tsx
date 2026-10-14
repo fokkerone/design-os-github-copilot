@@ -7,6 +7,7 @@ import { ChatProvider } from '@/components/chat/ChatProvider'
 import { buildNavigation, legacyRedirect, type NavFacts, type NavItem } from '@/lib/navigation'
 import { loadNavFacts } from '@/lib/navigation-facts'
 import { useShellTheme } from '@/lib/shell-theme'
+import { useChat } from '@/lib/chat/chat-context'
 import { paths } from '@/lib/paths'
 
 function activeTitle(items: NavItem[]): string {
@@ -36,13 +37,21 @@ export function AppFrame({ facts, chat }: AppFrameProps) {
 
   const frame = (
     <AppShell navigation={navigation} theme={theme} onThemeChange={setTheme}>
-      <SplitLayout title={activeTitle(navigation)} chat={chat ?? <ChatPanel />}>
-        <Outlet />
-      </SplitLayout>
+      <FramedSplit title={activeTitle(navigation)} chat={chat ?? <ChatPanel />} />
     </AppShell>
   )
   // One OpenCode runtime for chat and pages. An overriding chat (tests) brings its own.
   return chat ? frame : <ChatProvider>{frame}</ChatProvider>
+}
+
+/** Reads the agent activity from the chat of the provider above, for the header indicator */
+function FramedSplit({ title, chat }: { title: string; chat: ReactNode }) {
+  const activity = useChat()?.activity ?? 'idle'
+  return (
+    <SplitLayout title={title} chat={chat} chatActivity={activity}>
+      <Outlet />
+    </SplitLayout>
+  )
 }
 
 /** Catch-all: old routes redirect to their new place, everything else is a 404 */

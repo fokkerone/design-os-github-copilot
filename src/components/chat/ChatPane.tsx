@@ -6,9 +6,13 @@ import {
   MessagePartPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
+  useAui,
   useAuiState,
 } from '@assistant-ui/react'
+import { expandSlashCommand } from '@/lib/harness'
+import { ACTIVITY_LABEL, useAgentActivity } from '@/lib/chat/activity'
 import { ChatMarkdown } from './ChatMarkdown'
+import { ToolCall } from './ToolCall'
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
 const muted = 'text-stone-500 dark:text-rwe-neutral-400'
@@ -60,19 +64,27 @@ function UserMessage() {
 }
 
 function AssistantMessage() {
+  const live = useAuiState((s) => s.message.isLast)
+  const activity = useAgentActivity()
+  const working = live && activity !== 'idle'
   return (
     <MessagePrimitive.Root className="flex gap-3">
-      <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rwe-sand-500 dark:bg-rwe-neutral-800" aria-hidden>
-        <Bot className={`size-3.5 ${muted}`} />
+      <span
+        data-working={working ? 'true' : undefined}
+        className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rwe-sand-500 dark:bg-rwe-neutral-800"
+        aria-hidden
+      >
+        <Bot className={`size-3.5 ${working ? 'animate-pulse text-brand-blue-500 dark:text-energy-green-500' : muted}`} />
       </span>
       <div className="min-w-0 flex-1">
         <MessagePrimitive.Parts>
           {({ part }) => {
             if (part.type === 'text') return <AssistantText />
-            if (part.type === 'tool-call') return part.toolUI ?? null
+            if (part.type === 'tool-call') return part.toolUI ?? <ToolCall {...part} />
             return null
           }}
         </MessagePrimitive.Parts>
+        {working && <ActivityNote activity={activity} />}
         <MessagePrimitive.Error>
           <ErrorPrimitive.Root
             role="alert"
@@ -86,14 +98,31 @@ function AssistantMessage() {
   )
 }
 
+function ActivityNote({ activity }: { activity: 'working' | 'waiting' | 'idle' }) {
+  return (
+    <p role="status" aria-label={ACTIVITY_LABEL[activity]} className={`mt-1 flex items-center gap-1.5 text-[12px] ${muted}`}>
+      <span className="size-1.5 animate-pulse rounded-full bg-brand-blue-500 dark:bg-energy-green-500" aria-hidden />
+      {ACTIVITY_LABEL[activity]}…
+    </p>
+  )
+}
+
 function AssistantText() {
   const text = useAuiState((s) => ('text' in s.part ? (s.part.text as string) : ''))
   return <ChatMarkdown text={text} />
 }
 
 function Composer({ extras }: { extras?: React.ReactNode }) {
+  const aui = useAui()
   return (
-    <ComposerPrimitive.Root className="rounded-lg border border-stone-200 bg-rwe-sand-25 px-3.5 pb-2.5 pt-3 transition-colors focus-within:border-stone-300 dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950/60 dark:focus-within:border-rwe-neutral-700">
+    <ComposerPrimitive.Root
+      // OpenCode does not parse slash commands from a prompt: expand them into the step instruction first
+      onSubmit={() => {
+        const text = aui.composer().getState().text
+        const expanded = expandSlashCommand(text)
+        if (expanded !== text) aui.composer().setText(expanded)
+      }}
+      className="rounded-lg border border-stone-200 bg-rwe-sand-25 px-3.5 pb-2.5 pt-3 transition-colors focus-within:border-stone-300 dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950/60 dark:focus-within:border-rwe-neutral-700">
       <ComposerPrimitive.Input
         aria-label="Message the agent"
         placeholder="Reply to the agent…"

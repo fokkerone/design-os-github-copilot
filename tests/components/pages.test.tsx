@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { VisionPage } from '@/components/VisionPage'
@@ -13,7 +13,24 @@ import { ShellDesignPage } from '@/components/ShellDesignPage'
 import { ClickdummyPage } from '@/components/ClickdummyPage'
 import { PageTabs } from '@/components/PageTabs'
 
-// The repo has no product/ folder, so every page shows its empty state
+// These tests describe an empty project. The loaders read the real product/ folder (which fills up
+// while you work with the agent), so they are replaced here.
+vi.mock('@/lib/product-loader', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/product-loader')>()),
+  loadProductData: () => ({ overview: null, roadmap: null, dataShape: null, designSystem: null, designTokens: null, shell: null }),
+  hasClickdummy: () => false,
+  hasExportZip: () => false,
+}))
+vi.mock('@/lib/techstack-loader', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/techstack-loader')>()),
+  hasTechstack: () => false,
+}))
+vi.mock('@/lib/project-model', async (importOriginal) => {
+  const real = await importOriginal<typeof import('@/lib/project-model')>()
+  const empty = { personas: [], flows: [], issues: [], flowsForPersona: () => [], sectionsForPersona: () => [], issuesForPersona: () => [], flowsForSection: () => [], personasForSection: () => [] }
+  return { ...real, getProjectModel: () => empty }
+})
+
 const at = (path: string, ui: React.ReactNode) => render(<MemoryRouter initialEntries={[path]}>{ui}</MemoryRouter>)
 
 beforeAll(() => {

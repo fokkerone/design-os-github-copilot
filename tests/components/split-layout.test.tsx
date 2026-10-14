@@ -65,6 +65,34 @@ describe('SplitLayout', () => {
     expect(screen.queryByText('step content')).not.toBeInTheDocument()
   })
 
+  it('shows a chat indicator in the header that pulses while the agent works', () => {
+    const { rerender } = setup({ chatActivity: 'idle' })
+    const idle = screen.getByRole('button', { name: 'Chat' })
+    expect(idle).not.toHaveAttribute('data-busy')
+    rerender(
+      <SplitLayout title="Vision" chat={<p>chat content</p>} chatActivity="working">
+        <p>step content</p>
+      </SplitLayout>,
+    )
+    const busy = screen.getByRole('button', { name: 'Chat, agent is working' })
+    expect(busy).toHaveAttribute('data-busy', 'true')
+    expect(busy.querySelector('svg')!.getAttribute('class')).toContain('animate-pulse')
+    rerender(
+      <SplitLayout title="Vision" chat={<p>chat content</p>} chatActivity="waiting">
+        <p>step content</p>
+      </SplitLayout>,
+    )
+    expect(screen.getByRole('button', { name: 'Chat, waiting for your answer' })).toHaveAttribute('data-busy', 'true')
+  })
+
+  it('brings the chat back from the expanded step with the chat indicator', async () => {
+    setup()
+    await userEvent.click(screen.getByRole('button', { name: /expand step/i }))
+    expect(chatArea().className).toContain('hidden')
+    await userEvent.click(screen.getByRole('button', { name: 'Chat' }))
+    expect(chatArea().className).not.toMatch(/(^|\s)hidden(\s|$)/)
+  })
+
   it('is a no-chat layout when no chat is given', () => {
     render(<SplitLayout title="x"><p>only step</p></SplitLayout>)
     expect(screen.getByText('only step')).toBeInTheDocument()

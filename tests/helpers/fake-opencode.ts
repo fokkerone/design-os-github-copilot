@@ -10,6 +10,8 @@ export interface ScriptedReply {
   chunks: string[]
   /** Wait between chunks (ms), lets tests observe streaming */
   delayMs?: number
+  /** The agent asks the user first (the `question` tool) and streams its chunks after the answer */
+  question?: { question: string; header?: string; options?: { label: string; description?: string }[] }[]
 }
 
 interface Msg {
@@ -30,6 +32,9 @@ export class FakeOpenCode {
   aborts: string[] = []
   /** Routes the fake does not implement, the adapter asked for them */
   unhandled: string[] = []
+  /** Answers received for questions, one entry per reply (rejected: null) */
+  answers: (string[][] | null)[] = []
+  private pending = new Map<string, { sessionID: string; resume: () => void; reject: () => void; info: Record<string, unknown>; part: Record<string, unknown>; input: unknown }>()
   sessions = new Map<string, Record<string, unknown>>()
   messages = new Map<string, Msg[]>()
   private clients = new Set<ServerResponse>()
@@ -114,7 +119,30 @@ export class FakeOpenCode {
       return this.json(res, [...this.sessions.values()])
     }
     if (path === '/session/status') return this.json(res, {})
-    if (path === '/permission' || path === '/question') return this.json(res, [])
+    if (path === '/permission') return this.json(res, [])
+    if (path === '/question') {
+      return this.json(res, [...this.pending].map(([qid, p]) => ({ id: qid, ...p.info, sessionID: p.sessionID })))
+    }
+    const qm = path.match(/^\/question\/([^/]+)\/(reply|reject)$/)
+    if (qm && req.method === 'POST') {
+      const entry = this.pending.get(qm[1])
+      if (!entry) return this.json(res, { name: 'NotFoundError' }, 404)
+      const body = await this.body(req)
+      this.pending.delete(qm[1])
+      if (qm[2] === 'reply') {
+        const answers = body.answers as string[][]
+        this.answers.push(answers)
+        this.emit('question.replied', { sessionID: entry.sessionID, requestID: qm[1], answers })
+        Object.assign(entry.part, { state: { status: 'completed', input: entry.input, output: 'User has answered your questions', metadata: { answers }, title: 'Asked 1 question', time: { start: Date.now(), end: Date.now() } } })
+        this.emit('message.part.updated', { sessionID: entry.sessionID, part: { ...entry.part }, time: Date.now() })
+        entry.resume()
+      } else {
+        this.answers.push(null)
+        this.emit('question.rejected', { sessionID: entry.sessionID, requestID: qm[1] })
+        entry.reject()
+      }
+      return this.json(res, true)
+    }
     if (path === '/config/providers') {
       const model = (id: string) => [id, { id, name: id }] as const
       return this.json(res, {
@@ -146,7 +174,7 @@ export class FakeOpenCode {
         const text = ((body.parts as { text?: string }[]) ?? []).map((p) => p.text ?? '').join('')
         this.prompts.push({ sessionID, text, model: body.model as never, agent: body.agent as string | undefined })
         res.writeHead(204).end()
-        this.answer(sessionID, text)
+        void this.whenListening().then(() => this.answer(sessionID, text))
         return
       }
       if (action === 'abort' && req.method === 'POST') {
@@ -159,6 +187,12 @@ export class FakeOpenCode {
 
     this.unhandled.push(`${req.method} ${path}`)
     this.json(res, { name: 'NotFoundError', message: `fake: ${req.method} ${path}` }, 404)
+  }
+
+  /** The real server has its event stream open long before a prompt; wait for the client to subscribe */
+  private async whenListening(timeoutMs = 3000) {
+    const end = Date.now() + timeoutMs
+    while (this.clients.size === 0 && Date.now() < end) await new Promise((r) => setTimeout(r, 10))
   }
 
   private stopTimers() {
@@ -195,6 +229,7 @@ export class FakeOpenCode {
     asst.parts.push(textPart)
     this.emit('message.part.updated', { sessionID, part: { ...textPart }, time: now + 2 })
 
+    const stream = () => {
     let i = 0
     const step = () => {
       if (i < script.chunks.length) {
@@ -212,5 +247,28 @@ export class FakeOpenCode {
       this.emit('session.idle', { sessionID })
     }
     this.timers.add(setTimeout(step, 0))
+    }
+
+    if (!script.question) return stream()
+
+    const callID = id('call')
+    const toolPart: Record<string, unknown> = { id: id('prt'), sessionID, messageID: asstID, type: 'tool', tool: 'question', callID, state: { status: 'pending', input: {}, raw: '' } }
+    asst.parts.unshift(toolPart)
+    this.emit('message.part.updated', { sessionID, part: { ...toolPart }, time: now + 2 })
+    const input = { questions: script.question }
+    const qid = id('que')
+    const info = { questions: script.question, tool: { messageID: asstID, callID } }
+    this.pending.set(qid, {
+      sessionID, info, part: toolPart, input,
+      resume: stream,
+      reject: () => {
+        Object.assign(toolPart, { state: { status: 'error', input, error: 'The user dismissed this question', time: { start: now, end: Date.now() } } })
+        this.emit('message.part.updated', { sessionID, part: { ...toolPart }, time: Date.now() })
+        this.emit('session.idle', { sessionID })
+      },
+    })
+    this.emit('question.asked', { id: qid, sessionID, ...info })
+    Object.assign(toolPart, { state: { status: 'running', input, time: { start: now + 3 } } })
+    this.emit('message.part.updated', { sessionID, part: { ...toolPart }, time: now + 3 })
   }
 }

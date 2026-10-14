@@ -3,6 +3,7 @@ import { AssistantRuntimeProvider, useAui } from '@assistant-ui/react'
 import { createOpencodeClient, useOpenCodeRuntime } from '@assistant-ui/react-opencode'
 import { OPENCODE_PROXY_PATH, resolveBaseUrl, useOpenCodeStatus } from '@/lib/chat/opencode'
 import { loadModelChoice, modelKey, parseProviders, saveModelChoice, type ModelOption, type ModelRef } from '@/lib/chat/models'
+import { useAgentActivity } from '@/lib/chat/activity'
 import { ChatContext, type ChatContextValue } from '@/lib/chat/chat-context'
 
 /**
@@ -49,9 +50,10 @@ export function ChatProvider({ baseUrl = OPENCODE_PROXY_PATH, children }: { base
   )
 }
 
-function Bridge({ state, children }: { state: Omit<ChatContextValue, 'send'>; children: ReactNode }) {
+function Bridge({ state, children }: { state: Omit<ChatContextValue, 'send' | 'activity'>; children: ReactNode }) {
   const aui = useAui()
+  const activity = useAgentActivity()
   const send = useCallback((text: string) => aui.thread().append(text), [aui])
-  const value = useMemo(() => ({ ...state, send }), [state.status, state.options, state.model, state.setModel, send]) // eslint-disable-line react-hooks/exhaustive-deps
+  const value = useMemo(() => ({ ...state, activity, send }), [activity, state.status, state.options, state.model, state.setModel, send]) // eslint-disable-line react-hooks/exhaustive-deps
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
 }
