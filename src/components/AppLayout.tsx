@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Layers, ArrowLeft, BookOpen } from 'lucide-react'
 import { PhaseNav } from './PhaseNav'
 import { ThemeToggle } from './ThemeToggle'
 import { Button } from '@/components/ui/button'
+import { useInShell } from '@/components/app-shell/InShell'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -34,6 +35,33 @@ export function AppLayout({
 }: AppLayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
+  const inShell = useInShell()
+
+  // Inside the app shell the sidebar, header and step panel are the chrome: render the page only
+  if (inShell) {
+    return (
+      <div className="animate-fade-in px-4 py-6 sm:px-6">
+        {backTo && (
+          <div className="mb-6 flex items-center gap-3 text-sm">
+            <Link
+              to={backTo}
+              className="-ml-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
+            >
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+              {backLabel}
+            </Link>
+            {title && (
+              <>
+                <span className="h-4 w-px bg-stone-200 dark:bg-stone-700" />
+                <span className="truncate font-medium text-stone-900 dark:text-stone-100">{title}</span>
+              </>
+            )}
+          </div>
+        )}
+        {children}
+      </div>
+    )
+  }
 
   // Determine if this is a sub-page (has back navigation)
   const isSubPage = !!backTo
