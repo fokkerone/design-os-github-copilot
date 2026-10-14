@@ -1,0 +1,212 @@
+/*
+  App chrome theme: the Volta palette used by the Design OS shell (sidebar, chat, step panel).
+  Source: RWE Volta from the reference app. Product tokens never come from here:
+  they live in product/design-system/ and are applied only in the exported codebase.
+  Palettes whose names clash with Tailwind built-ins carry an rwe- prefix.
+*/
+@theme {
+  /* brand-blue (DESIGN.md) */
+  --color-brand-blue-25: #f3f5f8;
+  --color-brand-blue-50: #e8ecf1;
+  --color-brand-blue-100: #d1d9e3;
+  --color-brand-blue-200: #a4b4c8;
+  --color-brand-blue-300: #778ead;
+  --color-brand-blue-400: #4a6992;
+  --color-brand-blue-500: #1d4477;
+  --color-brand-blue-600: #17365f;
+  --color-brand-blue-700: #112847;
+  --color-brand-blue-800: #0b1b2f;
+  --color-brand-blue-900: #050d17;
+
+  /* energy-blue (DESIGN.md) */
+  --color-energy-blue-25: #f2fbfe;
+  --color-energy-blue-50: #e5f7fd;
+  --color-energy-blue-100: #cceffb;
+  --color-energy-blue-200: #99dff7;
+  --color-energy-blue-300: #66d0f3;
+  --color-energy-blue-400: #33c0ef;
+  --color-energy-blue-500: #00b1eb;
+  --color-energy-blue-600: #008dbc;
+  --color-energy-blue-700: #006a8d;
+  --color-energy-blue-800: #00465e;
+  --color-energy-blue-900: #00232f;
+
+  /* energy-green (DESIGN.md) */
+  --color-energy-green-25: #f5fdfc;
+  --color-energy-green-50: #ecfbf9;
+  --color-energy-green-100: #d9f7f3;
+  --color-energy-green-200: #b3efe7;
+  --color-energy-green-300: #8de7db;
+  --color-energy-green-400: #67dfcf;
+  --color-energy-green-500: #41d8c3;
+  --color-energy-green-600: #34ac9c;
+  --color-energy-green-700: #278175;
+  --color-energy-green-800: #1a564e;
+  --color-energy-green-900: #0d2b27;
+
+  /* gradient-green (DESIGN.md) */
+  --color-gradient-green-25: #f2fafa;
+  --color-gradient-green-50: #e5f5f5;
+  --color-gradient-green-100: #ccecec;
+  --color-gradient-green-200: #99dad9;
+  --color-gradient-green-300: #66c7c6;
+  --color-gradient-green-400: #33b5b3;
+  --color-gradient-green-500: #00a3a0;
+  --color-gradient-green-600: #008280;
+  --color-gradient-green-700: #006160;
+  --color-gradient-green-800: #004140;
+  --color-gradient-green-900: #002020;
+
+  /* sand (DESIGN.md) */
+  --color-rwe-sand-25: #fffffb;
+  --color-rwe-sand-50: #fcfcf8;
+  --color-rwe-sand-100: #f9f9f5;
+  --color-rwe-sand-200: #f5f5f1;
+  --color-rwe-sand-300: #f2f2ee;
+  --color-rwe-sand-400: #ebebe7;
+  --color-rwe-sand-500: #e8e8e4;
+  --color-rwe-sand-600: #c4c4c0;
+  --color-rwe-sand-700: #aeaeaa;
+  --color-rwe-sand-800: #9b9b98;
+  --color-rwe-sand-900: #838380;
+
+  /* light-grey (DESIGN.md) */
+  --color-rwe-light-grey-25: #f1f7fc;
+  --color-rwe-light-grey-50: #e7e9eb;
+  --color-rwe-light-grey-100: #dddfe1;
+  --color-rwe-light-grey-200: #d3d5d7;
+  --color-rwe-light-grey-300: #caccce;
+  --color-rwe-light-grey-400: #bdbfc1;
+  --color-rwe-light-grey-500: #adafb1;
+  --color-rwe-light-grey-600: #8e9092;
+  --color-rwe-light-grey-700: #747577;
+  --color-rwe-light-grey-800: #5a5c5e;
+  --color-rwe-light-grey-900: #424345;
+
+  /* dark-grey (DESIGN.md) */
+  --color-rwe-dark-grey-25: #eef1fa;
+  --color-rwe-dark-grey-50: #d4d7df;
+  --color-rwe-dark-grey-100: #b7bac2;
+  --color-rwe-dark-grey-200: #9ea1a9;
+  --color-rwe-dark-grey-300: #868990;
+  --color-rwe-dark-grey-400: #686c73;
+  --color-rwe-dark-grey-500: #52555c;
+  --color-rwe-dark-grey-600: #45474e;
+  --color-rwe-dark-grey-700: #32353c;
+  --color-rwe-dark-grey-800: #26292f;
+  --color-rwe-dark-grey-900: #1a1d23;
+
+  /* red (DESIGN.md) */
+  --color-rwe-red-25: #ffece9;
+  --color-rwe-red-50: #ffd0cb;
+  --color-rwe-red-100: #ffaea8;
+  --color-rwe-red-200: #ff928d;
+  --color-rwe-red-300: #ff6c6b;
+  --color-rwe-red-400: #fd4c51;
+  --color-rwe-red-500: #e7343f;
+  --color-rwe-red-600: #b20015;
+  --color-rwe-red-700: #90000d;
+  --color-rwe-red-800: #660004;
+  --color-rwe-red-900: #430001;
+
+  /* dark-red (DESIGN.md) */
+  --color-rwe-dark-red-25: #ffeeed;
+  --color-rwe-dark-red-50: #ffdcda;
+  --color-rwe-dark-red-100: #ffb4b3;
+  --color-rwe-dark-red-200: #ff898a;
+  --color-rwe-dark-red-300: #f66067;
+  --color-rwe-dark-red-400: #d6424d;
+  --color-rwe-dark-red-500: #b61f34;
+  --color-rwe-dark-red-600: #97001b;
+  --color-rwe-dark-red-700: #820008;
+  --color-rwe-dark-red-800: #660000;
+  --color-rwe-dark-red-900: #440000;
+
+  /* yellow (DESIGN.md) */
+  --color-rwe-yellow-25: #fffbc7;
+  --color-rwe-yellow-50: #fff3ab;
+  --color-rwe-yellow-100: #ffec8e;
+  --color-rwe-yellow-200: #ffe46c;
+  --color-rwe-yellow-300: #ffdb3e;
+  --color-rwe-yellow-400: #ffd420;
+  --color-rwe-yellow-500: #ffcc00;
+  --color-rwe-yellow-600: #e4b200;
+  --color-rwe-yellow-700: #bf9300;
+  --color-rwe-yellow-800: #916e00;
+  --color-rwe-yellow-900: #6b5000;
+
+  /* orange (DESIGN.md) */
+  --color-rwe-orange-25: #fff7e8;
+  --color-rwe-orange-50: #ffead3;
+  --color-rwe-orange-100: #ffe2c6;
+  --color-rwe-orange-200: #ffcca0;
+  --color-rwe-orange-300: #ffb476;
+  --color-rwe-orange-400: #ff9b40;
+  --color-rwe-orange-500: #f27f00;
+  --color-rwe-orange-600: #da6900;
+  --color-rwe-orange-700: #bd5700;
+  --color-rwe-orange-800: #a04700;
+  --color-rwe-orange-900: #8c1c00;
+
+  /* green (DESIGN.md) */
+  --color-rwe-green-25: #e0fff3;
+  --color-rwe-green-50: #c5ffe6;
+  --color-rwe-green-100: #a4ffd6;
+  --color-rwe-green-200: #8debc0;
+  --color-rwe-green-300: #7ddbb0;
+  --color-rwe-green-400: #6ac89e;
+  --color-rwe-green-500: #5ab88f;
+  --color-rwe-green-600: #3b9c74;
+  --color-rwe-green-700: #00744f;
+  --color-rwe-green-800: #005130;
+  --color-rwe-green-900: #00361d;
+
+  /* dark-green (DESIGN.md) */
+  --color-rwe-dark-green-25: #a8f4fb;
+  --color-rwe-dark-green-50: #8bd6dd;
+  --color-rwe-dark-green-100: #6eb9c0;
+  --color-rwe-dark-green-200: #8debc0;
+  --color-rwe-dark-green-300: #55a0a7;
+  --color-rwe-dark-green-400: #3b878e;
+  --color-rwe-dark-green-500: #27757c;
+  --color-rwe-dark-green-600: #005e65;
+  --color-rwe-dark-green-700: #004a51;
+  --color-rwe-dark-green-800: #002c32;
+  --color-rwe-dark-green-900: #001f23;
+
+  /* Effects: focus colors (DESIGN.md effect styles) */
+  --color-rwe-focus: #47eae8;
+  --color-rwe-focus-error: #79a90040;
+
+  /* Black alphas: Volta effect-style shadow colors (DESIGN.md) */
+  --color-rwe-black-a-5: #0000000d;
+  --color-rwe-black-a-8: #00000014;
+  --color-rwe-black-a-10: #0000001a;
+  --color-rwe-black-a-12: #0000001f;
+  --color-rwe-black-a-20: #00000033;
+  --color-rwe-black-a-25: #00000040;
+
+  /* Legacy (pre-Volta-semantics): kept so existing screens keep rendering. Prefer the volta-* tokens. */
+  --color-rwe-dark-100: #e6ebf2;
+  --color-rwe-dark-300: #9fb0c6;
+  --color-rwe-dark-600: #2a4470;
+  --color-rwe-dark-700: #1d3560;
+  --color-rwe-dark-800: #152a4a;
+  --color-rwe-dark-900: #0b2545;
+  --color-rwe-dark-950: #0b1b33;
+  --color-rwe-dark-green: #3fd3b0;
+  --color-rwe-dark-link: #8fb4eb;
+
+  --color-rwe-neutral-50: #f5f5f5;
+  --color-rwe-neutral-100: #e5e5e5;
+  --color-rwe-neutral-200: #cccccc;
+  --color-rwe-neutral-300: #a3a3a3;
+  --color-rwe-neutral-400: #737373;
+  --color-rwe-neutral-500: #525252;
+  --color-rwe-neutral-600: #3d3d3d;
+  --color-rwe-neutral-700: #2b2b2b;
+  --color-rwe-neutral-800: #1f1f1f;
+  --color-rwe-neutral-900: #141414;
+  --color-rwe-neutral-950: #0a0a0a;
+  --color-rwe-neutral-black: #000000;
+}

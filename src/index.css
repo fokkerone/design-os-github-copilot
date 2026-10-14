@@ -1,10 +1,13 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./app-theme.css";
 
 @source "../src/shell";
 @source "../src/sections";
 
-@custom-variant dark (&:is(.dark *));
+/* dark: applies inside .dark unless a nearer .light scope opts out, so the app shell can
+   switch to light even while the page runs in dark mode. */
+@custom-variant dark (&:is(.dark *):not(:is(.light *)));
 
 /*
   Design OS - Refined Utility Design System

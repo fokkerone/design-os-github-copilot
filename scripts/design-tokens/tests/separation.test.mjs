@@ -131,3 +131,43 @@ test('product UI primitives (src/ui) use palette steps and import no Design OS U
     assert.equal(SEMANTIC.exec(source), null, `${rel(file)} must use palette steps, not semantic utilities`)
   }
 })
+
+// --- App chrome look: the Design OS shell uses the Volta palette (same look as the reference app) ---
+
+test('the app chrome theme (src/app-theme.css) defines the Volta palette and is imported by index.css', () => {
+  const themePath = join(root, 'src/app-theme.css')
+  assert.ok(existsSync(themePath), 'src/app-theme.css must exist')
+  const theme = code(themePath)
+  for (const token of [
+    '--color-brand-blue-500',
+    '--color-energy-green-500',
+    '--color-rwe-sand-50',
+    '--color-rwe-sand-200',
+    '--color-rwe-sand-500',
+    '--color-rwe-neutral-700',
+    '--color-rwe-neutral-900',
+    '--color-rwe-neutral-950',
+    '--color-rwe-focus',
+    '--color-rwe-black-a-25',
+  ]) {
+    assert.match(theme, new RegExp(token + '\\s*:'), `${token} must be defined`)
+  }
+  assert.match(code(join(root, 'src/index.css')), /@import\s+["']\.\/app-theme\.css["']/, 'index.css must import app-theme.css')
+})
+
+test('the app chrome theme stays separate from the product tokens', () => {
+  const theme = code(join(root, 'src/app-theme.css'))
+  assert.doesNotMatch(theme, /product\//, 'app-theme.css must not reference product/')
+  assert.doesNotMatch(theme, /--box-shadow-|-alpha-\d/, 'app-theme.css must not contain generated product variables')
+})
+
+test('the dark variant lets a nearer .light scope opt out (shell can differ from the page theme)', () => {
+  assert.match(
+    code(join(root, 'src/index.css')),
+    /@custom-variant dark \(&:is\(\.dark \*\):not\(:is\(\.light \*\)\)\)/,
+  )
+})
+
+test('Inter is loaded for the app chrome', () => {
+  assert.match(readFileSync(join(root, 'index.html'), 'utf8'), /family=Inter/)
+})
