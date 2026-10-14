@@ -66,7 +66,7 @@ export function ScreenDesignPage() {
   const previewWidth = `${widthPercent}%`
 
   return (
-    <div className="h-screen bg-stone-100 dark:bg-rwe-neutral-900 animate-fade-in flex flex-col overflow-hidden">
+    <div className="h-full min-h-[480px] bg-stone-100 dark:bg-rwe-neutral-900 animate-fade-in flex flex-col overflow-hidden">
       {/* Header */}
       <header className="border-b border-stone-200 dark:border-rwe-neutral-800 bg-rwe-sand-25 dark:bg-rwe-neutral-950 shrink-0 z-50">
         <div className="px-4 py-2 flex items-center gap-4">

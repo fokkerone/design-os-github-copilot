@@ -27,7 +27,7 @@ Your design system already lives in Figma (variables, styles) or another tool th
    | `product/design-system/tokens/tokens.json` | Normalized model (`designos-tokens/v1`); the only file the app reads |
    | `product/design-system/DESIGN.md` | Merged guide: tokens + DESIGN.md + skill.md + import report |
 
-4. **Review.** Open `/design`. Tabs: Color, Typography, Spacing & layout, Effects, Guidelines, Import report. Toggle OKLCH / HEX, click any value to copy it. Semantic colors show light and dark side by side with the WCAG contrast of each foreground pair.
+4. **Review.** Open `/design-system`. Tabs: Color, Typography, Spacing & layout, Effects, Guidelines, Import report. Toggle OKLCH / HEX, click any value to copy it. Semantic colors show light and dark side by side with the WCAG contrast of each foreground pair.
 5. **Fix at the source.** The Import report lists warnings (for example a dark value without a light value). Fix them in Figma or `tokens.json`, export again and rebuild. If the inputs change without a rebuild, the Design page shows "Out of date".
 6. **Verify.** `npm run tokens:check` fails if any output is stale (use it in CI). `npm run test:tokens` runs the contract tests (golden files, key-order independence, line endings, idempotence, Tailwind compile).
 

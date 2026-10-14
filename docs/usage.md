@@ -47,7 +47,7 @@ Once all sections are designed, assemble a clickdummy for stakeholder feedback:
 
 1. **Clickdummy** (`@10-clickdummy`) — Assemble a navigable prototype with all sections
 
-Share `/clickdummy` with stakeholders (POs, UI/UX designers) to gather feedback. Iterate on designs as needed before final export.
+Share `/prototype/preview` with stakeholders (POs, UI/UX designers) to gather feedback. Iterate on designs as needed before final export.
 
 ### Phase 4: Export
 

@@ -54,7 +54,7 @@ After starting the server, wait a few seconds for it to be ready before navigati
 
 Use the Playwright MCP tool to navigate to the screen design and capture a screenshot.
 
-The screen design URL pattern is: `http://localhost:3000/sections/[section-id]/screen-designs/[screen-design-name]`
+The screen design URL pattern is: `http://localhost:3000/prototype/sections/[section-id]/screen-designs/[screen-design-name]/fullscreen` (use the `/fullscreen` URL: it renders only the screen design, without the app shell, chat and step panel)
 
 1. First, use `browser_navigate` to go to the screen design URL
 2. Wait for the page to fully load
