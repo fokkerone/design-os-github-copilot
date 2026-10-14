@@ -16,7 +16,7 @@ function WikiLinks({ domain, ids }: { domain: string; ids: string[] }) {
     <span className="flex flex-wrap gap-x-3 gap-y-1">
       {ids.map((id) =>
         getWikiPage(`${domain}/${id}`) ? (
-          <Link key={id} to={`/wiki/${domain}/${id}`} className="underline decoration-stone-300 dark:decoration-stone-600 underline-offset-2 hover:decoration-stone-500">
+          <Link key={id} to={`/wiki/${domain}/${id}`} className="underline decoration-stone-300 dark:decoration-rwe-neutral-600 underline-offset-2 hover:decoration-stone-500">
             {id}
           </Link>
         ) : (
@@ -30,8 +30,8 @@ function WikiLinks({ domain, ids }: { domain: string; ids: string[] }) {
 function Property({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-2 text-sm">
-      <dt className="text-stone-500 dark:text-stone-400">{label}</dt>
-      <dd className="text-stone-800 dark:text-stone-200 min-w-0 break-words">{children}</dd>
+      <dt className="text-stone-500 dark:text-rwe-neutral-400">{label}</dt>
+      <dd className="text-stone-800 dark:text-rwe-neutral-200 min-w-0 break-words">{children}</dd>
     </div>
   )
 }
@@ -48,12 +48,12 @@ export function WikiArticlePage() {
     return (
       <WikiLayout currentPath={path} backTo="/wiki" backLabel="Wiki" title="Page not found">
         <div className="space-y-2">
-          <h1 className="text-2xl font-semibold text-stone-900 dark:text-stone-100">Page not found</h1>
-          <p className="text-stone-600 dark:text-stone-400">
+          <h1 className="text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100">Page not found</h1>
+          <p className="text-stone-600 dark:text-rwe-neutral-400">
             There is no page at <code className="font-mono text-sm">wiki/{path}.md</code>. It may have been renamed
             or not compiled yet.
           </p>
-          <Link to="/wiki" className="inline-block text-sm text-stone-900 dark:text-stone-100 underline decoration-lime-500 decoration-2 underline-offset-2">
+          <Link to="/wiki" className="inline-block text-sm text-stone-900 dark:text-rwe-neutral-100 underline decoration-brand-blue-500 decoration-2 underline-offset-2">
             Back to the wiki
           </Link>
         </div>
@@ -80,21 +80,21 @@ export function WikiArticlePage() {
       <article className="space-y-8">
         <header className="space-y-2">
           {domainHome ? (
-            <Link to={`/wiki/${domainHome.path}`} className="text-sm text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100 capitalize">
+            <Link to={`/wiki/${domainHome.path}`} className="text-sm text-stone-500 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:text-rwe-neutral-100 capitalize">
               {page.domain.replace(/-/g, ' ')}
             </Link>
           ) : (
-            page.domain && <span className="text-sm text-stone-500 dark:text-stone-400 capitalize">{page.domain.replace(/-/g, ' ')}</span>
+            page.domain && <span className="text-sm text-stone-500 dark:text-rwe-neutral-400 capitalize">{page.domain.replace(/-/g, ' ')}</span>
           )}
-          <h1 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 text-balance">{page.title}</h1>
-          {page.summary && <p className="text-stone-600 dark:text-stone-400 leading-relaxed">{page.summary}</p>}
+          <h1 className="text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 text-balance">{page.title}</h1>
+          {page.summary && <p className="text-stone-600 dark:text-rwe-neutral-400 leading-relaxed">{page.summary}</p>}
         </header>
 
         {(page.updated || page.tags.length > 0 || status || persona || sections.length > 0 || flows.length > 0 || personas.length > 0 || sources.length > 0 || artifacts.length > 0) && (
-          <dl className="divide-y divide-stone-200 dark:divide-stone-800 border-y border-stone-200 dark:border-stone-800">
+          <dl className="divide-y divide-stone-200 dark:divide-rwe-neutral-800 border-y border-stone-200 dark:border-rwe-neutral-800">
             {status && (
               <Property label="Status">
-                <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-lime-100 text-lime-800 dark:bg-lime-900/40 dark:text-lime-300">{status}</span>
+                <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-brand-blue-100 text-brand-blue-800 dark:bg-energy-green-900/40 dark:text-energy-green-300">{status}</span>
               </Property>
             )}
             {persona && <Property label="Persona">{persona}</Property>}
@@ -112,7 +112,7 @@ export function WikiArticlePage() {
               <Property label="Sections">
                 <span className="flex flex-wrap gap-x-3 gap-y-1">
                   {sections.map((id) => (
-                    <Link key={id} to={paths.section(id)} className="underline decoration-stone-300 dark:decoration-stone-600 underline-offset-2 hover:decoration-stone-500">
+                    <Link key={id} to={paths.section(id)} className="underline decoration-stone-300 dark:decoration-rwe-neutral-600 underline-offset-2 hover:decoration-stone-500">
                       {id}
                     </Link>
                   ))}
@@ -123,7 +123,7 @@ export function WikiArticlePage() {
               <Property label="Tags">
                 <span className="flex flex-wrap gap-x-2 gap-y-1">
                   {page.tags.map((tag) => (
-                    <span key={tag} className="text-stone-600 dark:text-stone-400">#{tag}</span>
+                    <span key={tag} className="text-stone-600 dark:text-rwe-neutral-400">#{tag}</span>
                   ))}
                 </span>
               </Property>
@@ -133,7 +133,7 @@ export function WikiArticlePage() {
               <Property label="Sources">
                 <span className="flex flex-col gap-1">
                   {sources.map((source) => (
-                    <code key={source} className="font-mono text-xs text-stone-600 dark:text-stone-400 break-all">{source}</code>
+                    <code key={source} className="font-mono text-xs text-stone-600 dark:text-rwe-neutral-400 break-all">{source}</code>
                   ))}
                 </span>
               </Property>
@@ -142,7 +142,7 @@ export function WikiArticlePage() {
               <Property label="Artifacts">
                 <span className="flex flex-col gap-1">
                   {artifacts.map((url) => (
-                    <a key={url} href={url} target="_blank" rel="noopener noreferrer" className="break-all underline decoration-lime-500 decoration-2 underline-offset-2">
+                    <a key={url} href={url} target="_blank" rel="noopener noreferrer" className="break-all underline decoration-brand-blue-500 decoration-2 underline-offset-2">
                       {url.replace(/^https?:\/\//, '')}
                     </a>
                   ))}
@@ -154,7 +154,7 @@ export function WikiArticlePage() {
 
         <WikiMarkdown markdown={body} anchors />
 
-        <p className="text-xs text-stone-400 dark:text-stone-500">
+        <p className="text-xs text-stone-400 dark:text-rwe-neutral-500">
           <code className="font-mono">wiki/{page.path}.md</code> · Maintained by the wiki commands
         </p>
       </article>

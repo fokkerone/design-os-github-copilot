@@ -17,15 +17,15 @@ export function FlowsCard() {
   }
 
   return (
-    <Card className="border-stone-200 dark:border-stone-700 shadow-sm">
+    <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold text-stone-900 dark:text-stone-100">
+        <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">
           User Flows
-          <span className="ml-2 text-sm font-normal text-stone-500 dark:text-stone-400">({model.flows.length})</span>
+          <span className="ml-2 text-sm font-normal text-stone-500 dark:text-rwe-neutral-400">({model.flows.length})</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <ul className="divide-y divide-stone-200 dark:divide-stone-700">
+        <ul className="divide-y divide-stone-200 dark:divide-rwe-neutral-700">
           {model.flows.map((flow) => {
             const sections = model.sectionsForFlow(flow.id)
             const personas = model.personas.filter((persona) => model.flowsForPersona(persona.id).includes(flow))
@@ -35,15 +35,15 @@ export function FlowsCard() {
               <li key={flow.id}>
                 <Link
                   to={`/flows/${flow.id}`}
-                  className="flex items-start justify-between gap-4 px-6 py-4 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                  className="flex items-start justify-between gap-4 px-6 py-4 hover:bg-stone-50 dark:hover:bg-rwe-neutral-800/50 transition-colors"
                 >
                   <div className="flex items-start gap-4 min-w-0 flex-1">
-                    <div className="w-8 h-8 rounded-md bg-stone-200 dark:bg-stone-700 flex items-center justify-center shrink-0">
-                      <GitBranch className="w-4 h-4 text-stone-600 dark:text-stone-300" strokeWidth={1.5} />
+                    <div className="w-8 h-8 rounded-md bg-stone-200 dark:bg-rwe-neutral-700 flex items-center justify-center shrink-0">
+                      <GitBranch className="w-4 h-4 text-stone-600 dark:text-rwe-neutral-300" strokeWidth={1.5} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-medium text-stone-900 dark:text-stone-100 truncate">{flow.title}</h3>
-                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                      <h3 className="font-medium text-stone-900 dark:text-rwe-neutral-100 truncate">{flow.title}</h3>
+                      <p className="text-xs text-stone-500 dark:text-rwe-neutral-400 mt-0.5">
                         {[
                           flow.status,
                           sections.length > 0 ? sections.map(sectionTitle).join(' → ') : 'no section',
@@ -61,7 +61,7 @@ export function FlowsCard() {
                       </div>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0 mt-1" strokeWidth={1.5} />
+                  <ChevronRight className="w-4 h-4 text-stone-400 dark:text-rwe-neutral-500 shrink-0 mt-1" strokeWidth={1.5} />
                 </Link>
               </li>
             )

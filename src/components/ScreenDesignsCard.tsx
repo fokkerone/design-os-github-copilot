@@ -18,29 +18,29 @@ export function ScreenDesignsCard({ screenDesigns, sectionId, sectionName }: Scr
   }
 
   return (
-    <Card className="border-stone-200 dark:border-stone-700 shadow-sm">
+    <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-stone-900 dark:text-stone-100">
+        <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">
           Screen Designs
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <ul className="divide-y divide-stone-200 dark:divide-stone-700">
+        <ul className="divide-y divide-stone-200 dark:divide-rwe-neutral-700">
           {screenDesigns.map((screenDesign) => (
             <li key={screenDesign.name}>
               <Link
                 to={paths.screen(sectionId, screenDesign.name)}
-                className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-stone-50 dark:hover:bg-rwe-neutral-800/50 transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-md bg-stone-200 dark:bg-stone-700 flex items-center justify-center shrink-0">
-                    <Layout className="w-4 h-4 text-stone-600 dark:text-stone-300" strokeWidth={1.5} />
+                  <div className="w-8 h-8 rounded-md bg-stone-200 dark:bg-rwe-neutral-700 flex items-center justify-center shrink-0">
+                    <Layout className="w-4 h-4 text-stone-600 dark:text-rwe-neutral-300" strokeWidth={1.5} />
                   </div>
-                  <span className="font-medium text-stone-900 dark:text-stone-100 truncate">
+                  <span className="font-medium text-stone-900 dark:text-rwe-neutral-100 truncate">
                     {screenDesign.name}
                   </span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0" strokeWidth={1.5} />
+                <ChevronRight className="w-4 h-4 text-stone-400 dark:text-rwe-neutral-500 shrink-0" strokeWidth={1.5} />
               </Link>
             </li>
           ))}

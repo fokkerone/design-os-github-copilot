@@ -18,7 +18,7 @@ export function TechstackCard() {
     return (
       <div className="space-y-3">
         <EmptyState type="techstack" />
-        <p className="text-sm text-stone-500 dark:text-stone-400">
+        <p className="text-sm text-stone-500 dark:text-rwe-neutral-400">
           Until you decide, the defaults apply: shadcn/ui, lucide-react, Tailwind CSS v4.
         </p>
       </div>
@@ -30,14 +30,14 @@ export function TechstackCard() {
   const undecided = stack.resolved.filter((decision) => !decision.decided)
 
   return (
-    <Card className="border-stone-200 dark:border-stone-700 shadow-sm">
+    <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-stone-900 dark:text-stone-100">
-          <Layers className="w-5 h-5 text-stone-500 dark:text-stone-400" strokeWidth={1.5} />
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">
+          <Layers className="w-5 h-5 text-stone-500 dark:text-rwe-neutral-400" strokeWidth={1.5} />
           Tech Stack
-          <span className="text-sm font-normal text-stone-500 dark:text-stone-400">({stack.status})</span>
+          <span className="text-sm font-normal text-stone-500 dark:text-rwe-neutral-400">({stack.status})</span>
         </CardTitle>
-        {stack.summary && <p className="text-sm text-stone-600 dark:text-stone-400 mt-1">{stack.summary}</p>}
+        {stack.summary && <p className="text-sm text-stone-600 dark:text-rwe-neutral-400 mt-1">{stack.summary}</p>}
       </CardHeader>
       <CardContent className="space-y-5">
         {GROUP_ORDER.map((group) => {
@@ -45,17 +45,17 @@ export function TechstackCard() {
           if (rows.length === 0) return null
           return (
             <div key={group}>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400 mb-2">
                 {TECHSTACK_GROUPS[group]}
               </h3>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
                 {rows.map((row) => (
                   <div key={row.area} className="flex items-baseline justify-between gap-3 text-sm">
-                    <dt className="text-stone-500 dark:text-stone-400">{row.label}</dt>
-                    <dd className="text-stone-900 dark:text-stone-100 text-right">
+                    <dt className="text-stone-500 dark:text-rwe-neutral-400">{row.label}</dt>
+                    <dd className="text-stone-900 dark:text-rwe-neutral-100 text-right">
                       {row.choice}
                       {row.source !== 'chosen' && (
-                        <span className="ml-1.5 text-xs text-stone-400 dark:text-stone-500">{row.source}</span>
+                        <span className="ml-1.5 text-xs text-stone-400 dark:text-rwe-neutral-500">{row.source}</span>
                       )}
                     </dd>
                   </div>
@@ -67,14 +67,14 @@ export function TechstackCard() {
 
         {stack.registries.length > 0 && (
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400 mb-2">
               Registries and repos ({stack.registries.length})
             </h3>
             <ul className="space-y-1 text-sm">
               {stack.registries.map((registry) => (
-                <li key={registry.name} className="text-stone-700 dark:text-stone-300">
+                <li key={registry.name} className="text-stone-700 dark:text-rwe-neutral-300">
                   <span className="font-medium">{registry.name}</span>
-                  <span className="text-stone-500 dark:text-stone-400">
+                  <span className="text-stone-500 dark:text-rwe-neutral-400">
                     {' '}
                     · {registry.kind || 'other'}
                     {registry.usedFor ? ` · ${registry.usedFor}` : ''}
@@ -87,17 +87,17 @@ export function TechstackCard() {
 
         {stack.packages.length > 0 && (
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400 mb-2">
               Packages ({stack.packages.length})
             </h3>
-            <p className="text-sm text-stone-700 dark:text-stone-300 font-mono">
+            <p className="text-sm text-stone-700 dark:text-rwe-neutral-300 font-mono">
               {stack.packages.map((entry) => entry.name).join(', ')}
             </p>
           </div>
         )}
 
         {undecided.length > 0 && (
-          <p className="text-xs text-stone-500 dark:text-stone-400">
+          <p className="text-xs text-stone-500 dark:text-rwe-neutral-400">
             Undecided, no dependency added: {undecided.map((decision) => decision.label.toLowerCase()).join(', ')}
           </p>
         )}
@@ -110,10 +110,10 @@ export function TechstackCard() {
           </ul>
         )}
 
-        <div className="bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-3">
-          <p className="text-sm text-stone-600 dark:text-stone-400">
+        <div className="bg-stone-100 dark:bg-rwe-neutral-800 rounded-md px-4 py-3">
+          <p className="text-sm text-stone-600 dark:text-rwe-neutral-400">
             To change the stack, use <StepName step="techstack" /> or edit{' '}
-            <code className="font-mono text-stone-800 dark:text-stone-200">product/techstack/techstack.md</code>
+            <code className="font-mono text-stone-800 dark:text-rwe-neutral-200">product/techstack/techstack.md</code>
           </p>
         </div>
       </CardContent>

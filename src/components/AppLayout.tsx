@@ -22,15 +22,15 @@ export function AppLayout({ children, backTo, backLabel = 'Back', title }: AppLa
         <div className="mb-6 flex items-center gap-3 text-sm">
           <Link
             to={backTo}
-            className="-ml-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
+            className="-ml-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-stone-600 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:text-rwe-neutral-100"
           >
             <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
             {backLabel}
           </Link>
           {title && (
             <>
-              <span className="h-4 w-px bg-stone-200 dark:bg-stone-700" />
-              <span className="truncate font-medium text-stone-900 dark:text-stone-100">{title}</span>
+              <span className="h-4 w-px bg-stone-200 dark:bg-rwe-neutral-700" />
+              <span className="truncate font-medium text-stone-900 dark:text-rwe-neutral-100">{title}</span>
             </>
           )}
         </div>

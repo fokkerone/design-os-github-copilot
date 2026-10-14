@@ -16,7 +16,7 @@ import { paths } from '@/lib/paths'
 const STEP_STATUS: Record<StepStatus, { label: string; className: string }> = {
   mapped: {
     label: 'Screen exists',
-    className: 'bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300',
+    className: 'bg-brand-blue-100 text-brand-blue-800 dark:bg-energy-green-900/30 dark:text-energy-green-300',
   },
   'screen-missing': {
     label: 'Screen missing',
@@ -24,7 +24,7 @@ const STEP_STATUS: Record<StepStatus, { label: string; className: string }> = {
   },
   unassigned: {
     label: 'No screen assigned',
-    className: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+    className: 'bg-stone-100 text-stone-600 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-400',
   },
   'unknown-section': {
     label: 'Unknown section',
@@ -51,7 +51,7 @@ export function StepScreen({ step }: { step: ResolvedStep }) {
     return (
       <Link
         to={paths.screen(step.target.sectionId, step.target.name)}
-        className="inline-flex items-center gap-1.5 text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 underline decoration-stone-300 dark:decoration-stone-600 underline-offset-2"
+        className="inline-flex items-center gap-1.5 text-sm text-stone-700 dark:text-rwe-neutral-300 hover:text-stone-900 dark:hover:text-rwe-neutral-100 underline decoration-stone-300 dark:decoration-rwe-neutral-600 underline-offset-2"
       >
         <Layout className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
         <span className="font-mono text-xs">
@@ -61,26 +61,26 @@ export function StepScreen({ step }: { step: ResolvedStep }) {
     )
   }
   const wanted = [step.sectionId, step.screen].filter(Boolean).join('/')
-  return <span className="font-mono text-xs text-stone-400 dark:text-stone-500">{wanted || '—'}</span>
+  return <span className="font-mono text-xs text-stone-400 dark:text-rwe-neutral-500">{wanted || '—'}</span>
 }
 
 export function CoverageBar({ coverage, compact = false }: { coverage: FlowCoverage; compact?: boolean }) {
   if (coverage.total === 0) {
-    return <span className="text-xs text-stone-500 dark:text-stone-400">No steps defined</span>
+    return <span className="text-xs text-stone-500 dark:text-rwe-neutral-400">No steps defined</span>
   }
   return (
     <div className={compact ? 'flex items-center gap-2' : 'space-y-1.5'}>
       <div
-        className={`h-1.5 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden ${compact ? 'w-16 shrink-0' : 'w-full'}`}
+        className={`h-1.5 rounded-full bg-stone-200 dark:bg-rwe-neutral-700 overflow-hidden ${compact ? 'w-16 shrink-0' : 'w-full'}`}
         role="progressbar"
         aria-valuenow={coverage.percent}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label="Flow steps with a screen design"
       >
-        <div className="h-full bg-lime-500 dark:bg-lime-400" style={{ width: `${coverage.percent}%` }} />
+        <div className="h-full bg-brand-blue-500 dark:bg-energy-green-400" style={{ width: `${coverage.percent}%` }} />
       </div>
-      <p className="text-xs text-stone-500 dark:text-stone-400 whitespace-nowrap">
+      <p className="text-xs text-stone-500 dark:text-rwe-neutral-400 whitespace-nowrap">
         {coverage.mapped} of {coverage.total} steps have a screen
         {!compact && ` (${coverage.percent}%)`}
         {!compact && coverage.open > 0 && ` · ${coverage.open} open`}
@@ -94,10 +94,10 @@ export function PersonaChip({ persona }: { persona: Persona }) {
   return (
     <Link
       to={`/personas/${persona.id}`}
-      className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 dark:border-stone-700 px-2.5 py-1 text-xs text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+      className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 dark:border-rwe-neutral-700 px-2.5 py-1 text-xs text-stone-700 dark:text-rwe-neutral-300 hover:bg-stone-50 dark:hover:bg-rwe-neutral-800/50 transition-colors"
       title={persona.archetype}
     >
-      <UserRound className="w-3 h-3 text-lime-600 dark:text-lime-400" strokeWidth={1.75} />
+      <UserRound className="w-3 h-3 text-brand-blue-600 dark:text-energy-green-400" strokeWidth={1.75} />
       {persona.name}
     </Link>
   )
@@ -107,11 +107,11 @@ export function FlowChip({ flow, detail }: { flow: Flow; detail?: string }) {
   return (
     <Link
       to={`/flows/${flow.id}`}
-      className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 dark:border-stone-700 px-2.5 py-1 text-xs text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+      className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 dark:border-rwe-neutral-700 px-2.5 py-1 text-xs text-stone-700 dark:text-rwe-neutral-300 hover:bg-stone-50 dark:hover:bg-rwe-neutral-800/50 transition-colors"
     >
-      <GitBranch className="w-3 h-3 text-lime-600 dark:text-lime-400" strokeWidth={1.75} />
+      <GitBranch className="w-3 h-3 text-brand-blue-600 dark:text-energy-green-400" strokeWidth={1.75} />
       {flow.title}
-      {detail && <span className="font-mono text-stone-400 dark:text-stone-500">{detail}</span>}
+      {detail && <span className="font-mono text-stone-400 dark:text-rwe-neutral-500">{detail}</span>}
     </Link>
   )
 }
@@ -120,7 +120,7 @@ export function SectionChip({ sectionId, title }: { sectionId: string; title: st
   return (
     <Link
       to={paths.section(sectionId)}
-      className="inline-flex items-center rounded-full bg-stone-100 dark:bg-stone-800 px-2.5 py-1 text-xs text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+      className="inline-flex items-center rounded-full bg-stone-100 dark:bg-rwe-neutral-800 px-2.5 py-1 text-xs text-stone-700 dark:text-rwe-neutral-300 hover:bg-stone-200 dark:hover:bg-rwe-neutral-700 transition-colors"
     >
       {title}
     </Link>
@@ -154,14 +154,14 @@ export function IssueList({ issues }: { issues: ProjectIssue[] }) {
         </div>
       )}
       {gaps.length > 0 && (
-        <div className="rounded-md border border-stone-200 dark:border-stone-700 p-3">
-          <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-2">
+        <div className="rounded-md border border-stone-200 dark:border-rwe-neutral-700 p-3">
+          <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400 mb-2">
             <CircleDashed className="w-3.5 h-3.5" strokeWidth={1.75} />
             Open ({gaps.length})
           </p>
           <ul className="space-y-1.5">
             {gaps.map((issue, index) => (
-              <li key={index} className="text-sm text-stone-700 dark:text-stone-300">
+              <li key={index} className="text-sm text-stone-700 dark:text-rwe-neutral-300">
                 {issue.message}
               </li>
             ))}
@@ -177,10 +177,10 @@ export function CommandHint({ label, step, args }: { label: string; step: StepId
   const chat = useChat()
   const command = buildPrompt(step, 'opencode', args)
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-md bg-stone-100 dark:bg-stone-800 px-3 py-2">
+    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-md bg-stone-100 dark:bg-rwe-neutral-800 px-3 py-2">
       <div className="min-w-0">
-        <p className="text-xs text-stone-500 dark:text-stone-400">{label}</p>
-        <code className="text-sm font-mono text-stone-700 dark:text-stone-300 break-all">{command}</code>
+        <p className="text-xs text-stone-500 dark:text-rwe-neutral-400">{label}</p>
+        <code className="text-sm font-mono text-stone-700 dark:text-rwe-neutral-300 break-all">{command}</code>
       </div>
       <div className="flex items-center gap-3">
         {chat && (

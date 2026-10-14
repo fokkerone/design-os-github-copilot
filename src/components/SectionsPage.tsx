@@ -59,14 +59,14 @@ export function SectionsPage() {
       <div className="space-y-6">
         {/* Page intro */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 mb-2">
+          <h1 className="text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-2">
             Sections
           </h1>
-          <p className="text-stone-600 dark:text-stone-400">
+          <p className="text-stone-600 dark:text-rwe-neutral-400">
             Design each section of your product with specifications, sample data, and screen designs.
           </p>
           {sections.length > 0 && (
-            <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">
+            <p className="text-sm text-stone-500 dark:text-rwe-neutral-400 mt-2">
               {completedSections} of {sections.length} sections completed
             </p>
           )}
@@ -79,14 +79,14 @@ export function SectionsPage() {
         {sections.length === 0 ? (
           <EmptyState type="roadmap" />
         ) : (
-          <Card className="border-stone-200 dark:border-stone-700 shadow-sm">
+          <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold text-stone-900 dark:text-stone-100">
+              <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">
                 All Sections
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <ul className="divide-y divide-stone-200 dark:divide-stone-700">
+              <ul className="divide-y divide-stone-200 dark:divide-rwe-neutral-700">
                 {sections.map((section) => {
                   const progress = sectionProgressMap[section.id]
                   const isComplete = progress?.hasSpec && progress?.hasData && progress?.hasScreenDesigns
@@ -95,18 +95,18 @@ export function SectionsPage() {
                     <li key={section.id}>
                       <button
                         onClick={() => navigate(paths.section(section.id))}
-                        className="w-full px-6 py-4 flex items-center justify-between gap-4 text-left hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between gap-4 text-left hover:bg-stone-50 dark:hover:bg-rwe-neutral-800/50 transition-colors"
                       >
                         <div className="flex items-start gap-4 min-w-0">
                           {/* Status indicator */}
                           <div className="shrink-0 mt-0.5">
                             {isComplete ? (
-                              <div className="w-6 h-6 rounded-full bg-lime-100 dark:bg-lime-900/30 flex items-center justify-center">
-                                <Check className="w-3.5 h-3.5 text-lime-600 dark:text-lime-400" strokeWidth={2.5} />
+                              <div className="w-6 h-6 rounded-full bg-brand-blue-100 dark:bg-energy-green-900/30 flex items-center justify-center">
+                                <Check className="w-3.5 h-3.5 text-brand-blue-600 dark:text-energy-green-400" strokeWidth={2.5} />
                               </div>
                             ) : (
-                              <div className="w-6 h-6 rounded-full bg-stone-200 dark:bg-stone-700 flex items-center justify-center">
-                                <span className="text-xs font-medium text-stone-600 dark:text-stone-400">
+                              <div className="w-6 h-6 rounded-full bg-stone-200 dark:bg-rwe-neutral-700 flex items-center justify-center">
+                                <span className="text-xs font-medium text-stone-600 dark:text-rwe-neutral-400">
                                   {section.order}
                                 </span>
                               </div>
@@ -114,10 +114,10 @@ export function SectionsPage() {
                           </div>
 
                           <div className="min-w-0 flex-1">
-                            <h3 className="font-medium text-stone-900 dark:text-stone-100 truncate">
+                            <h3 className="font-medium text-stone-900 dark:text-rwe-neutral-100 truncate">
                               {section.title}
                             </h3>
-                            <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5 line-clamp-1">
+                            <p className="text-sm text-stone-500 dark:text-rwe-neutral-400 mt-0.5 line-clamp-1">
                               {section.description}
                             </p>
 
@@ -139,7 +139,7 @@ export function SectionsPage() {
                           </div>
                         </div>
 
-                        <ChevronRight className="w-4 h-4 text-stone-400 dark:text-stone-500 flex-shrink-0" strokeWidth={1.5} />
+                        <ChevronRight className="w-4 h-4 text-stone-400 dark:text-rwe-neutral-500 flex-shrink-0" strokeWidth={1.5} />
                       </button>
                     </li>
                   )
@@ -169,7 +169,7 @@ function SectionLinks({ sectionId }: { sectionId: string }) {
   if (personas === 0 && flows.length === 0) return null
 
   return (
-    <span className="text-xs text-stone-500 dark:text-stone-400">
+    <span className="text-xs text-stone-500 dark:text-rwe-neutral-400">
       {[
         personas > 0 && `${personas} persona${personas === 1 ? '' : 's'}`,
         flows.length > 0 && `${flows.length} flow${flows.length === 1 ? '' : 's'}`,
@@ -191,13 +191,13 @@ function ProgressDot({ label, done, optional }: ProgressDotProps) {
   return (
     <span className={`flex items-center gap-1 text-xs ${
       done
-        ? 'text-stone-700 dark:text-stone-300'
+        ? 'text-stone-700 dark:text-rwe-neutral-300'
         : optional
-          ? 'text-stone-300 dark:text-stone-600'
-          : 'text-stone-400 dark:text-stone-500'
+          ? 'text-stone-300 dark:text-rwe-neutral-600'
+          : 'text-stone-400 dark:text-rwe-neutral-500'
     }`}>
       {done ? (
-        <Check className="w-3 h-3 text-lime-600 dark:text-lime-400" strokeWidth={2.5} />
+        <Check className="w-3 h-3 text-brand-blue-600 dark:text-energy-green-400" strokeWidth={2.5} />
       ) : (
         <Circle className={`w-3 h-3 ${optional ? 'opacity-50' : ''}`} strokeWidth={1.5} />
       )}

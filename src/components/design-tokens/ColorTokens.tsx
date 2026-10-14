@@ -98,14 +98,14 @@ export function SemanticColors({ tokens }: { tokens: ModalColorToken[] }) {
         {groups.map((group) => (
           <div key={group.name} className="space-y-2">
             {groups.length > 1 && (
-              <p className="text-xs font-medium capitalize text-stone-600 dark:text-stone-300">{group.name}</p>
+              <p className="text-xs font-medium capitalize text-stone-600 dark:text-rwe-neutral-300">{group.name}</p>
             )}
-            <div className="hidden sm:grid grid-cols-[14rem_1fr_1fr] gap-4 text-[11px] uppercase tracking-wide text-stone-400 dark:text-stone-500">
+            <div className="hidden sm:grid grid-cols-[14rem_1fr_1fr] gap-4 text-[11px] uppercase tracking-wide text-stone-400 dark:text-rwe-neutral-500">
               <span>Token</span>
               <span>Light</span>
               <span>Dark</span>
             </div>
-            <div className="divide-y divide-stone-100 dark:divide-stone-800">
+            <div className="divide-y divide-stone-100 dark:divide-rwe-neutral-800">
               {group.pairs.map(({ base, foreground }) => {
                 const missingLight = !base.light || (foreground && !foreground.light)
                 return (
@@ -114,7 +114,7 @@ export function SemanticColors({ tokens }: { tokens: ModalColorToken[] }) {
                     className="grid grid-cols-2 sm:grid-cols-[14rem_1fr_1fr] gap-x-4 gap-y-2 py-3"
                   >
                     <div className="col-span-2 sm:col-span-1 min-w-0 space-y-1">
-                      <p className="flex items-center gap-1.5 text-sm font-medium text-stone-900 dark:text-stone-100">
+                      <p className="flex items-center gap-1.5 text-sm font-medium text-stone-900 dark:text-rwe-neutral-100">
                         {base.name}
                         {missingLight && (
                           <AlertTriangle
@@ -157,7 +157,7 @@ export function CustomColors({ tokens }: { tokens: ModalColorToken[] }) {
               <Swatch value={t.light} className="h-12 flex-1" />
               {t.dark && <Swatch value={t.dark} className="h-12 flex-1" />}
             </div>
-            <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{t.name}</p>
+            <p className="text-sm font-medium text-stone-900 dark:text-rwe-neutral-100 truncate">{t.name}</p>
             <CopyValue value={t.cssVar} />
             <ColorCode value={t.light} />
           </div>
@@ -175,7 +175,7 @@ function ScaleRow({ scale, label }: { scale: ColorScale; label?: string }) {
   const format = useValueFormat()
   return (
     <div className="grid grid-cols-[4.5rem_1fr] items-start gap-3">
-      <p className="pt-2.5 text-xs font-medium text-stone-700 dark:text-stone-300 truncate" title={scale.name}>
+      <p className="pt-2.5 text-xs font-medium text-stone-700 dark:text-rwe-neutral-300 truncate" title={scale.name}>
         {label ?? scale.name}
       </p>
       <div className="flex gap-1">
@@ -189,9 +189,9 @@ function ScaleRow({ scale, label }: { scale: ColorScale; label?: string }) {
           >
             <Swatch
               value={step.value}
-              className="h-9 transition-transform group-hover:-translate-y-0.5 group-focus-visible:ring-2 group-focus-visible:ring-lime-500"
+              className="h-9 transition-transform group-hover:-translate-y-0.5 group-focus-visible:ring-2 group-focus-visible:ring-brand-blue-500"
             />
-            <span className="mt-1 block truncate text-center font-mono text-[10px] text-stone-400 dark:text-stone-500">
+            <span className="mt-1 block truncate text-center font-mono text-[10px] text-stone-400 dark:text-rwe-neutral-500">
               {step.step}
             </span>
           </button>
@@ -266,11 +266,11 @@ export function Gradients({ gradients }: { gradients: GradientStyle[] }) {
                 style={{ backgroundImage: g.css.replace('linear-gradient(', 'linear-gradient(to right, ') }}
               />
             ) : (
-              <div className="flex h-12 items-center justify-center rounded-md border border-dashed border-stone-300 text-[11px] text-stone-400 dark:border-stone-600">
+              <div className="flex h-12 items-center justify-center rounded-md border border-dashed border-stone-300 text-[11px] text-stone-400 dark:border-rwe-neutral-600">
                 incomplete in export
               </div>
             )}
-            <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{g.label}</p>
+            <p className="text-sm font-medium text-stone-900 dark:text-rwe-neutral-100 truncate">{g.label}</p>
             {g.css ? <CopyValue value={g.css} /> : <p className="font-mono text-[11px] text-stone-400 truncate">{g.raw}</p>}
           </div>
         ))}

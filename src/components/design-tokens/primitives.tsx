@@ -19,16 +19,16 @@ export function TokenGroup({
   return (
     <section className="space-y-3">
       <div className="flex items-baseline justify-between gap-4">
-        <h4 className="text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide">
+        <h4 className="text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide">
           {title}
           {count !== undefined && (
-            <span className="ml-2 font-mono text-xs normal-case tracking-normal text-stone-400 dark:text-stone-500">
+            <span className="ml-2 font-mono text-xs normal-case tracking-normal text-stone-400 dark:text-rwe-neutral-500">
               {count}
             </span>
           )}
         </h4>
       </div>
-      {hint && <p className="text-xs text-stone-500 dark:text-stone-400 -mt-1">{hint}</p>}
+      {hint && <p className="text-xs text-stone-500 dark:text-rwe-neutral-400 -mt-1">{hint}</p>}
       {children}
     </section>
   )
@@ -47,13 +47,13 @@ export function CopyValue({ value, className }: { value: string; className?: str
       }}
       title={`Copy ${value}`}
       className={cn(
-        'inline-flex max-w-full items-center gap-1 truncate rounded px-1 -mx-1 text-left font-mono text-[11px] text-stone-500 dark:text-stone-400',
-        'hover:bg-stone-100 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200 transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500',
+        'inline-flex max-w-full items-center gap-1 truncate rounded px-1 -mx-1 text-left font-mono text-[11px] text-stone-500 dark:text-rwe-neutral-400',
+        'hover:bg-stone-100 hover:text-stone-800 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-200 transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500',
         className,
       )}
     >
-      {copied ? <Check className="h-3 w-3 shrink-0 text-lime-600" strokeWidth={2} /> : null}
+      {copied ? <Check className="h-3 w-3 shrink-0 text-brand-blue-600" strokeWidth={2} /> : null}
       <span className="truncate">{copied ? 'Copied' : value}</span>
     </button>
   )
@@ -85,7 +85,7 @@ export function Swatch({
     return (
       <div
         className={cn(
-          'flex items-center justify-center rounded-md border border-dashed border-stone-300 dark:border-stone-600 text-[10px] text-stone-400',
+          'flex items-center justify-center rounded-md border border-dashed border-stone-300 dark:border-rwe-neutral-600 text-[10px] text-stone-400',
           className,
         )}
         title={title ?? 'Not defined'}
@@ -107,7 +107,7 @@ export function CodePill({ children, className }: { children: ReactNode; classNa
   return (
     <code
       className={cn(
-        'rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-700 dark:bg-stone-800 dark:text-stone-300',
+        'rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-700 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-300',
         className,
       )}
     >

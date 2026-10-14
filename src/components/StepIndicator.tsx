@@ -17,7 +17,7 @@ export function StepIndicator({ step, status, children, isLast = false, optional
       {/* Vertical connecting line - extends from this step to the next */}
       {!isLast && (
         <div
-          className="absolute left-[10px] top-[28px] w-[2px] h-[calc(100%+16px)] bg-stone-200 dark:bg-stone-700"
+          className="absolute left-[10px] top-[28px] w-[2px] h-[calc(100%+16px)] bg-stone-200 dark:bg-rwe-neutral-700"
           aria-hidden="true"
         />
       )}
@@ -47,7 +47,7 @@ function StepBadge({ step, status, optional = false }: StepBadgeProps) {
   // Optional steps that are upcoming show as dashed/muted
   if (optional && status === 'upcoming') {
     return (
-      <div className={`${baseClasses} border-2 border-dashed border-stone-300 dark:border-stone-600 text-stone-400 dark:text-stone-500`}>
+      <div className={`${baseClasses} border-2 border-dashed border-stone-300 dark:border-rwe-neutral-600 text-stone-400 dark:text-rwe-neutral-500`}>
         {step}
       </div>
     )
@@ -56,7 +56,7 @@ function StepBadge({ step, status, optional = false }: StepBadgeProps) {
   // Optional steps that are current show normally but slightly muted
   if (optional && status === 'current') {
     return (
-      <div className={`${baseClasses} bg-stone-700 dark:bg-stone-300 text-stone-200 dark:text-stone-800 shadow-sm`}>
+      <div className={`${baseClasses} bg-stone-700 dark:bg-rwe-neutral-300 text-stone-200 dark:text-rwe-neutral-800 shadow-sm`}>
         <ArrowRight className="w-3 h-3" strokeWidth={2.5} />
       </div>
     )
@@ -64,7 +64,7 @@ function StepBadge({ step, status, optional = false }: StepBadgeProps) {
 
   if (status === 'completed') {
     return (
-      <div className={`${baseClasses} bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400`}>
+      <div className={`${baseClasses} bg-stone-200 dark:bg-rwe-neutral-700 text-stone-500 dark:text-rwe-neutral-400`}>
         <Check className="w-3 h-3" strokeWidth={2.5} />
       </div>
     )
@@ -72,7 +72,7 @@ function StepBadge({ step, status, optional = false }: StepBadgeProps) {
 
   if (status === 'current') {
     return (
-      <div className={`${baseClasses} bg-stone-900 dark:bg-stone-100 text-stone-100 dark:text-stone-900 shadow-sm`}>
+      <div className={`${baseClasses} bg-stone-900 dark:bg-rwe-neutral-100 text-stone-100 dark:text-rwe-neutral-900 shadow-sm`}>
         <ArrowRight className="w-3 h-3" strokeWidth={2.5} />
       </div>
     )
@@ -88,7 +88,7 @@ function StepBadge({ step, status, optional = false }: StepBadgeProps) {
 
   // upcoming
   return (
-    <div className={`${baseClasses} bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400`}>
+    <div className={`${baseClasses} bg-stone-200 dark:bg-rwe-neutral-700 text-stone-500 dark:text-rwe-neutral-400`}>
       {step}
     </div>
   )

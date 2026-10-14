@@ -21,7 +21,7 @@ const App = load
 export function ClickdummyFullscreen() {
   if (!App) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-background text-sm text-stone-600 dark:text-stone-400">
+      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-background text-sm text-stone-600 dark:text-rwe-neutral-400">
         <p>The clickdummy has not been assembled yet.</p>
         <Link to={paths.preview} className="underline underline-offset-2">
           Back to the prototype

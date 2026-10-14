@@ -5,7 +5,7 @@ import { useChat } from '@/lib/chat/chat-context'
 
 /** The agent or command of a step for the selected tool, as inline code */
 export function StepName({ step }: { step: StepId }) {
-  return <code className="font-mono text-stone-700 dark:text-stone-300">{stepInvocation(step, 'opencode')}</code>
+  return <code className="font-mono text-stone-700 dark:text-rwe-neutral-300">{stepInvocation(step, 'opencode')}</code>
 }
 
 interface AgentPromptProps {
@@ -22,21 +22,21 @@ export function AgentPrompt({ step, prompt, compact = false }: AgentPromptProps)
 
   return (
     <div
-      className={`w-full space-y-2 rounded-md bg-stone-100 px-4 text-left dark:bg-stone-800 ${compact ? 'py-2.5' : 'py-3'}`}
+      className={`w-full space-y-2 rounded-md bg-stone-100 px-4 text-left dark:bg-rwe-neutral-800 ${compact ? 'py-2.5' : 'py-3'}`}
     >
       <div>
-        <p className="mb-0.5 text-xs text-stone-500 dark:text-stone-400">Agent command:</p>
-        <code className="text-sm font-mono text-stone-700 dark:text-stone-300">{stepInvocation(step, 'opencode')}</code>
+        <p className="mb-0.5 text-xs text-stone-500 dark:text-rwe-neutral-400">Agent command:</p>
+        <code className="text-sm font-mono text-stone-700 dark:text-rwe-neutral-300">{stepInvocation(step, 'opencode')}</code>
       </div>
-      <div className="border-t border-stone-200 pt-2 dark:border-stone-700">
+      <div className="border-t border-stone-200 pt-2 dark:border-rwe-neutral-700">
         <div className="mb-0.5 flex items-center justify-between">
-          <p className="text-xs text-stone-500 dark:text-stone-400">Then say:</p>
+          <p className="text-xs text-stone-500 dark:text-rwe-neutral-400">Then say:</p>
           <CopyButton text={buildPrompt(step, 'opencode', prompt)} title="Copy the command together with the prompt" />
         </div>
-        <p className="text-sm italic text-stone-600 dark:text-stone-300">"{prompt}"</p>
+        <p className="text-sm italic text-stone-600 dark:text-rwe-neutral-300">"{prompt}"</p>
       </div>
       {chat && (
-        <div className="border-t border-stone-200 pt-2 dark:border-stone-700">
+        <div className="border-t border-stone-200 pt-2 dark:border-rwe-neutral-700">
           <button
             type="button"
             disabled={chat.status === 'offline'}
@@ -47,7 +47,7 @@ export function AgentPrompt({ step, prompt, compact = false }: AgentPromptProps)
             Start with agent
           </button>
           {chat.status === 'offline' && (
-            <p className="mt-1.5 text-xs text-stone-500 dark:text-stone-400">OpenCode is not running, see the chat.</p>
+            <p className="mt-1.5 text-xs text-stone-500 dark:text-rwe-neutral-400">OpenCode is not running, see the chat.</p>
           )}
         </div>
       )}

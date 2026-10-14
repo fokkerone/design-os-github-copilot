@@ -18,6 +18,8 @@ export function useShellTheme(): [ShellTheme, (theme: ShellTheme) => void] {
     document.documentElement.classList.toggle('dark', theme === 'dark')
     try {
       localStorage.setItem(SHELL_THEME_KEY, theme)
+      // Fullscreen previews (outside the shell) follow this key
+      localStorage.setItem('theme', theme)
     } catch {
       /* storage unavailable: the choice lasts for this session */
     }
