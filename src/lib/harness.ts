@@ -1,27 +1,11 @@
 /**
- * The AI tool ("harness") the user runs the planning steps with.
+ * The planning steps and how they are started.
  *
- * Every planning step exists as a GitHub Copilot agent and as a Claude Code command.
- * OpenCode falls back to the Claude commands in .claude/commands.
- * The choice is stored in localStorage until the user changes it.
+ * Every step exists as a GitHub Copilot agent and as a command in .claude/commands. The Design OS
+ * chat runs on OpenCode, which reads the command file (see `buildStepMessage`).
  */
 
-import { useSyncExternalStore } from 'react'
-
 export type Harness = 'copilot' | 'claude' | 'opencode'
-
-export const HARNESSES: { id: Harness; label: string }[] = [
-  { id: 'copilot', label: 'GitHub Copilot' },
-  { id: 'claude', label: 'Claude Code' },
-  { id: 'opencode', label: 'OpenCode' },
-]
-
-export const DEFAULT_HARNESS: Harness = 'copilot'
-
-export const HARNESS_STORAGE_KEY = 'designos:harness'
-
-/** Fired in the same tab, because the `storage` event only reaches other tabs */
-const CHANGE_EVENT = 'designos:harness-change'
 
 /** Planning steps that have an agent / command */
 export type StepId =
@@ -55,56 +39,6 @@ const STEPS: Record<StepId, { copilot: string; claude: string }> = {
   'export-product': { copilot: '@11-export-product', claude: '/design-os:export-product' },
   persona: { copilot: '@persona', claude: '/design-os:persona' },
   userflow: { copilot: '@userflow', claude: '/design-os:userflow' },
-}
-
-export function isHarness(value: unknown): value is Harness {
-  return HARNESSES.some((harness) => harness.id === value)
-}
-
-/** Fallback when localStorage is blocked */
-let memoryHarness: Harness | null = null
-
-export function readHarness(): Harness {
-  try {
-    const stored = window.localStorage.getItem(HARNESS_STORAGE_KEY)
-    return isHarness(stored) ? stored : DEFAULT_HARNESS
-  } catch {
-    // Storage can be blocked (private mode, policies)
-    return DEFAULT_HARNESS
-  }
-}
-
-export function writeHarness(harness: Harness): void {
-  try {
-    window.localStorage.setItem(HARNESS_STORAGE_KEY, harness)
-  } catch {
-    // Not persisted; the choice still applies until the page is closed
-    memoryHarness = harness
-  }
-  window.dispatchEvent(new Event(CHANGE_EVENT))
-}
-
-function getSnapshot(): Harness {
-  return memoryHarness ?? readHarness()
-}
-
-function subscribe(onChange: () => void): () => void {
-  window.addEventListener(CHANGE_EVENT, onChange)
-  window.addEventListener('storage', onChange)
-  return () => {
-    window.removeEventListener(CHANGE_EVENT, onChange)
-    window.removeEventListener('storage', onChange)
-  }
-}
-
-/** The selected harness and a setter; every component using it updates together */
-export function useHarness(): [Harness, (harness: Harness) => void] {
-  const harness = useSyncExternalStore(subscribe, getSnapshot, () => DEFAULT_HARNESS)
-  return [harness, writeHarness]
-}
-
-export function harnessLabel(harness: Harness): string {
-  return HARNESSES.find((entry) => entry.id === harness)?.label ?? harness
 }
 
 /** The agent (Copilot) or command (Claude Code, OpenCode) that runs a step, e.g. "/design-os:product-vision" */

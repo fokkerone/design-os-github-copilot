@@ -3,6 +3,7 @@ import { AssistantRuntimeProvider, useAui } from '@assistant-ui/react'
 import { createOpencodeClient, useOpenCodeRuntime } from '@assistant-ui/react-opencode'
 import { OPENCODE_PROXY_PATH, resolveBaseUrl, useOpenCodeStatus } from '@/lib/chat/opencode'
 import { loadModelChoice, modelKey, parseProviders, saveModelChoice, type ModelOption, type ModelRef } from '@/lib/chat/models'
+import { loadSessionId, saveSessionId } from '@/lib/chat/session'
 import { useAgentActivity } from '@/lib/chat/activity'
 import { ChatContext, type ChatContextValue } from '@/lib/chat/chat-context'
 
@@ -21,7 +22,9 @@ export function ChatProvider({ baseUrl = OPENCODE_PROXY_PATH, children }: { base
   const model =
     options.length === 0 || (choice && options.some((o) => modelKey(o) === modelKey(choice))) ? choice : undefined
   // Sent with every prompt; undefined lets OpenCode use the model from opencode.json
-  const runtime = useOpenCodeRuntime({ client, defaultModel: model })
+  // Read once: the session to reopen after a reload
+  const [initialSessionId] = useState(loadSessionId)
+  const runtime = useOpenCodeRuntime({ client, defaultModel: model, initialSessionId, onThreadIdChange: saveSessionId })
 
   // The models come from the server, so the list always matches opencode.json
   useEffect(() => {

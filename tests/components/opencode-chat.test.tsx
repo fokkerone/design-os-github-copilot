@@ -95,3 +95,45 @@ describe('model choice', () => {
     expect(picker()).toHaveValue('')
   })
 })
+
+describe('reload', () => {
+  it('reopens the conversation after a page reload (the agent writes files, Vite may reload the page)', async () => {
+    fake.reply({ chunks: ['first answer'] })
+    const first = render(<ChatDock baseUrl={fake.url} />)
+    await userEvent.type(input(), 'remember me{Enter}')
+    expect(await screen.findByText('first answer', {}, { timeout: 5000 })).toBeInTheDocument()
+    await waitFor(() => expect(localStorage.getItem('designos:session')).toMatch(/^ses_/))
+    first.unmount()
+
+    render(<ChatDock baseUrl={fake.url} />)
+    expect(await screen.findByText('first answer', {}, { timeout: 5000 })).toBeInTheDocument()
+    expect(screen.getByText('remember me')).toBeInTheDocument()
+    expect(fake.requests.filter((r) => r === 'POST /session')).toHaveLength(1)
+  }, 20000)
+
+  it('starts fresh when the remembered session is gone from the server', async () => {
+    localStorage.setItem('designos:session', 'ses_gone')
+    render(<ChatDock baseUrl={fake.url} />)
+    await waitFor(() => expect(fake.requests).toContain('GET /session/ses_gone'), { timeout: 5000 })
+    expect(input()).toBeInTheDocument()
+    expect(screen.queryByText(/ask the agent/i)).toBeInTheDocument()
+  }, 15000)
+})
+
+describe('new chat', () => {
+  it('starts a fresh conversation in a new session', async () => {
+    fake.reply({ chunks: ['old answer'] })
+    render(<ChatDock baseUrl={fake.url} />)
+    await userEvent.type(input(), 'first{Enter}')
+    expect(await screen.findByText('old answer', {}, { timeout: 5000 })).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'New chat' }))
+    await waitFor(() => expect(screen.queryByText('old answer')).not.toBeInTheDocument())
+    expect(screen.getByText(/ask the agent/i)).toBeInTheDocument()
+
+    fake.reply({ chunks: ['new answer'] })
+    await userEvent.type(input(), 'second{Enter}')
+    expect(await screen.findByText('new answer', {}, { timeout: 5000 })).toBeInTheDocument()
+    expect(fake.prompts.map((p) => p.sessionID)[0]).not.toBe(fake.prompts[1].sessionID)
+  }, 25000)
+})

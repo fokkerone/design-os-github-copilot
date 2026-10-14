@@ -1,3 +1,5 @@
+import { SquarePen } from 'lucide-react'
+import { useAui } from '@assistant-ui/react'
 import { ChatProvider } from './ChatProvider'
 import { ChatPane } from './ChatPane'
 import { ModelPicker } from './ModelPicker'
@@ -7,6 +9,7 @@ import { useChat } from '@/lib/chat/chat-context'
 /** The chat of the current ChatProvider: connection banner, thread, composer and model choice */
 export function ChatPanel() {
   const chat = useChat()
+  const aui = useAui()
   if (!chat) return null
   return (
     <>
@@ -21,7 +24,18 @@ export function ChatPanel() {
       )}
       <ChatPane
         composerExtras={
-          chat.options.length > 0 ? <ModelPicker options={chat.options} value={chat.model} onChange={chat.setModel} /> : null
+          <>
+            <button
+              type="button"
+              aria-label="New chat"
+              title="New chat"
+              onClick={() => aui.threads().switchToNewThread()}
+              className="flex size-7 items-center justify-center rounded-sm text-stone-500 transition-colors hover:bg-rwe-sand-500 hover:text-rwe-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus dark:text-rwe-neutral-400 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-50"
+            >
+              <SquarePen className="size-4" strokeWidth={1.75} />
+            </button>
+            {chat.options.length > 0 && <ModelPicker options={chat.options} value={chat.model} onChange={chat.setModel} />}
+          </>
         }
       />
     </>

@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { HARNESSES, buildPrompt, buildStepMessage, isHarness, stepCommandFile, stepInvocation, type StepId } from '../src/lib/harness.ts'
+import { buildPrompt, buildStepMessage, stepCommandFile, stepInvocation, type StepId } from '../src/lib/harness.ts'
 
 describe('harness commands', () => {
-  it('offers Copilot, Claude Code and OpenCode', () => {
-    expect(HARNESSES.map((harness) => harness.id)).toEqual(['copilot', 'claude', 'opencode'])
-    expect(isHarness('claude')).toBe(true)
-    expect(isHarness('cursor')).toBe(false)
-  })
-
   it('uses agents for Copilot and slash commands for Claude Code and OpenCode', () => {
     expect(stepInvocation('product-vision', 'copilot')).toBe('@00-product-vision')
     expect(stepInvocation('product-vision', 'claude')).toBe('/design-os:product-vision')
