@@ -7,7 +7,10 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  esbuild: { jsx: 'automatic' },
   test: {
-    include: ['tests/**/*.test.ts'],
+    include: ['tests/**/*.test.{ts,tsx}'],
+    // Component tests opt in to the DOM with `// @vitest-environment jsdom`; model tests stay in node
+    setupFiles: ['tests/setup.ts'],
   },
 })
