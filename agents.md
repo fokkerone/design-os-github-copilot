@@ -9,7 +9,7 @@ Design OS is a **product planning and design tool** that helps users define thei
 ## Critical: Stay Focused on Your Task
 ## Critical: Product UI follows `product/design-system/DESIGN.md` when it exists
 
-`product/design-system/DESIGN.md` is generated from imported design tokens (`npm run tokens:build`) and is the single source of truth for every product UI: colors, typography, spacing, radius, shadows and rules. Never edit it by hand; fix the inputs in `product/design-system/import/` and rebuild. The Design OS app UI itself keeps its own stone/lime system (see the end of this file).
+`product/design-system/DESIGN.md` is generated from imported design tokens (`npm run tokens:build`) and is the single source of truth for every product UI: colors, typography, spacing, radius, shadows and rules. Never edit it by hand; fix the inputs in `product/design-system/import/` and rebuild. The Design OS app UI itself has its own look (see the end of this file).
 
 Product UI primitives (button, dialog, ...) come from the product-owned UI layer `src/ui/` and follow the tech stack in `product/techstack/techstack.md` when it exists (default: shadcn/ui, lucide-react). They never come from `@/components/*`, which is the Design OS UI.
 
@@ -41,7 +41,7 @@ When working in Design OS, be aware of two distinct contexts:
 The React application that displays and manages planning files. When modifying the Design OS UI itself:
 
 - Files live in `src/` (components, pages, utilities)
-- Uses the Design OS design system (stone palette, DM Sans, etc.)
+- Uses the Design OS look: the app chrome (sidebar, chat, step panel) uses the Volta palette from `src/app-theme.css` and Inter; the page content keeps stone/lime until it is migrated
 - Provides the interface for viewing specs, screen designs, exports, etc.
 
 ### 2. Product Design (Screen Designs & Exports)
@@ -358,7 +358,7 @@ Plus **Sections** — The individual features, each with spec, data, screen desi
 
 Design OS separates concerns between its own UI and the product being designed:
 
-- **Design OS UI**: Always uses the stone/lime palette and DM Sans typography
+- **Design OS UI**: The app chrome uses the Volta palette (`src/app-theme.css`) and Inter; page content inside the step panel still uses stone/lime and DM Sans
 - **Product Screen Designs**: Use the design tokens defined for the product (when available)
 - **Shell**: Uses product design tokens to preview the full app experience
 
@@ -368,7 +368,7 @@ Design OS tokens and product tokens never mix:
 
 | | Design OS app (`src/components`, `src/lib`, `src/index.css`) | Product (`src/sections`, `src/shell`, `src/ui`, `src/clickdummy`, `product-plan/`) |
 |---|---|---|
-| Theme | Own stone/lime theme in `src/index.css` (incl. its shadcn `--primary`, `--muted`, ...) | Product tokens from `product/design-system/DESIGN.md` |
+| Theme | Own theme in `src/index.css` (shadcn `--primary`, `--muted`, ...) plus the Volta app-chrome palette in `src/app-theme.css` | Product tokens from `product/design-system/DESIGN.md` |
 | Product tokens | Read as **data** only via `src/lib/design-tokens-loader.ts` and rendered with inline values on the Design page | Applied as CSS (`tokens.css`) **only in the exported codebase** |
 | Forbidden | Loading `product/design-system/tokens/tokens.css`; reading product token files outside the loader | Importing `@/components/*` (Design OS UI incl. shadcn ui) or the token loaders (product UI primitives come from `src/ui/`, never from `@/components/*`); global CSS imports; Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, `border-border`, `bg-card`, ...) — inside Design OS they resolve to the Design OS theme |
 
@@ -398,10 +398,12 @@ The handoff focuses on UI designs, product requirements, and user flows. Backend
 
 ## Design System (Design OS Application)
 
-The Design OS application itself uses a "Refined Utility" aesthetic:
+The Design OS application has two layers:
 
+- **App chrome** (left navigation, chat, step panel): Linear-style layout copied from the reference app (`software-factory`). Volta palette from `src/app-theme.css` (`rwe-*`, `brand-blue`, `energy-green`), Inter, dark by default, sidebar 238px with 30px rows, content inset panel with `rounded-lg` and a 1px border. The shell sets its own `dark` or `light` scope.
+- **Page content** inside the step panel ("Refined Utility"): not migrated yet.
 - **Typography**: DM Sans for headings and body, IBM Plex Mono for code
 - **Colors**: Stone palette for neutrals (warm grays), lime for accents
-- **Layout**: Maximum 800px content width, generous whitespace
+- **Layout**: Content fills the step panel; wide pages use the expanded panel mode
 - **Cards**: Minimal borders (1px), subtle shadows, generous padding
 - **Motion**: Subtle fade-ins (200ms), no bouncy animations
