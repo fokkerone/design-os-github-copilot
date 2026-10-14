@@ -13,5 +13,13 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    proxy: {
+      // opencode serve (127.0.0.1:4096), same origin for the browser, SSE passes through
+      '/opencode': {
+        target: 'http://127.0.0.1:4096',
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/opencode/, ''),
+      },
+    },
   },
 })
