@@ -10,16 +10,21 @@ const style =
   '[&_blockquote]:my-2 [&_blockquote]:border-l-2 [&_blockquote]:border-stone-300 [&_blockquote]:pl-3 [&_blockquote]:text-stone-600 dark:[&_blockquote]:border-rwe-neutral-700 dark:[&_blockquote]:text-rwe-neutral-300 ' +
   '[&_table]:my-2 [&_table]:text-[13px] [&_th]:border [&_th]:px-2 [&_th]:py-1 [&_td]:border [&_td]:px-2 [&_td]:py-1 [&_th]:border-stone-200 [&_td]:border-stone-200 dark:[&_th]:border-rwe-neutral-700 dark:[&_td]:border-rwe-neutral-700'
 
-// Links in answers open in a new tab
-DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-  if (node.tagName === 'A' && /^https?:/.test(node.getAttribute('href') || '')) {
-    node.setAttribute('target', '_blank')
-    node.setAttribute('rel', 'noopener noreferrer')
-  }
-})
+// Links in answers open in a new tab. Registered on first use: DOMPurify only works in a browser.
+let hooked = false
+function ensureHook() {
+  if (hooked) return
+  hooked = true
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.tagName === 'A' && /^https?:/.test(node.getAttribute('href') || '')) {
+      node.setAttribute('target', '_blank')
+      node.setAttribute('rel', 'noopener noreferrer')
+    }
+  })
+}
 
 /** Markdown of an agent answer, sanitized. Safe while streaming: partial markdown renders as far as it parses. */
 export function ChatMarkdown({ text }: { text: string }) {
-  const html = useMemo(() => DOMPurify.sanitize(marked.parse(text, { async: false, gfm: true, breaks: true })), [text])
+  const html = useMemo(() => (ensureHook(), DOMPurify.sanitize(marked.parse(text, { async: false, gfm: true, breaks: true }))), [text])
   return <div className={`text-[14px] leading-relaxed ${style}`} dangerouslySetInnerHTML={{ __html: html }} />
 }

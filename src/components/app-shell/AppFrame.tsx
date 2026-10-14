@@ -2,7 +2,7 @@ import { useMemo, type ReactNode } from 'react'
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { AppShell } from './AppShell'
 import { SplitLayout } from './SplitLayout'
-import { ChatPlaceholder } from './ChatPlaceholder'
+import { ChatDock } from '@/components/chat/ChatDock'
 import { buildNavigation, legacyRedirect, type NavFacts, type NavItem } from '@/lib/navigation'
 import { loadNavFacts } from '@/lib/navigation-facts'
 import { useShellTheme } from '@/lib/shell-theme'
@@ -35,7 +35,7 @@ export function AppFrame({ facts, chat }: AppFrameProps) {
 
   return (
     <AppShell navigation={navigation} theme={theme} onThemeChange={setTheme}>
-      <SplitLayout title={activeTitle(navigation)} chat={chat ?? <ChatPlaceholder />}>
+      <SplitLayout title={activeTitle(navigation)} chat={chat ?? <ChatDock />}>
         <Outlet />
       </SplitLayout>
     </AppShell>

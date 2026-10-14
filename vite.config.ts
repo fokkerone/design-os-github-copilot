@@ -2,10 +2,12 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
+// @ts-expect-error plain ESM script, tested in tests/opencode-dev.test.ts
+import { opencodeServePlugin } from './scripts/opencode-dev.mjs'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), ...(process.env.DESIGNOS_NO_OPENCODE ? [] : [opencodeServePlugin()])],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
