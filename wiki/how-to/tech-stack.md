@@ -30,7 +30,7 @@ The tech stack step records what the prototype is built with: the UI library (**
 
 - **Claude Code:** run the slash command above.
 - **GitHub Copilot:** select the `@01-techstack` agent and type the same text without the command, e.g. `@01-techstack quick`.
-- **OpenCode:** run the same slash command; OpenCode uses the commands in `.claude/commands`, and questions come through its `question` tool.
+- **Design OS app chat (OpenCode):** use "Start with agent" on the page. The chat sends a message that points the agent to the command file in `.claude/commands/design-os/`; questions come through OpenCode's `question` tool.
 
 The command needs `product/product-overview.md`. If it is missing, it tells you to run `/design-os:product-vision` first. Every question is multiple choice with a recommended answer; nothing is written before you confirm the review step.
 
