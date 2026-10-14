@@ -117,3 +117,18 @@ export function buildPrompt(step: StepId, harness: Harness, prompt?: string): st
   const invocation = stepInvocation(step, harness)
   return prompt ? `${invocation} ${prompt}` : invocation
 }
+
+/** Every planning step */
+export const STEP_IDS = Object.keys(STEPS) as StepId[]
+
+/** The command file the chat agent reads to run a step */
+export function stepCommandFile(step: StepId): string {
+  const name = STEPS[step].claude.replace('/design-os:', '')
+  return `.claude/commands/design-os/${name}.md`
+}
+
+/** The chat message that starts a step: OpenCode does not parse slash commands from text, so the agent reads the command file */
+export function buildStepMessage(step: StepId, prompt?: string): string {
+  const head = `Follow the instructions in ${stepCommandFile(step)}.`
+  return prompt ? `${head}\n\n${prompt}` : head
+}

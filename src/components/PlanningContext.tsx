@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { AlertTriangle, CircleDashed, GitBranch, Layout, UserRound } from 'lucide-react'
 import { CopyButton } from '@/components/CopyButton'
-import { HarnessSelect } from '@/components/AgentPrompt'
-import { buildPrompt, useHarness, type StepId } from '@/lib/harness'
+import { buildPrompt, buildStepMessage, type StepId } from '@/lib/harness'
+import { useChat } from '@/lib/chat/chat-context'
 import type { FlowCoverage, ProjectIssue, ResolvedStep, StepStatus } from '@/lib/model/project.ts'
 import type { Flow } from '@/lib/model/flow.ts'
 import type { Persona } from '@/lib/model/persona.ts'
@@ -172,10 +172,10 @@ export function IssueList({ issues }: { issues: ProjectIssue[] }) {
   )
 }
 
-/** A step to run with the selected tool (agent or command), ready to copy */
+/** A step to run with the chat agent, or to copy when there is no chat */
 export function CommandHint({ label, step, args }: { label: string; step: StepId; args?: string }) {
-  const [harness] = useHarness()
-  const command = buildPrompt(step, harness, args)
+  const chat = useChat()
+  const command = buildPrompt(step, 'opencode', args)
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-md bg-stone-100 dark:bg-stone-800 px-3 py-2">
       <div className="min-w-0">
@@ -183,7 +183,16 @@ export function CommandHint({ label, step, args }: { label: string; step: StepId
         <code className="text-sm font-mono text-stone-700 dark:text-stone-300 break-all">{command}</code>
       </div>
       <div className="flex items-center gap-3">
-        <HarnessSelect />
+        {chat && (
+          <button
+            type="button"
+            disabled={chat.status === 'offline'}
+            onClick={() => chat.send(buildStepMessage(step, args))}
+            className="text-xs font-medium text-brand-blue-500 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50 dark:text-energy-green-500"
+          >
+            Start with agent
+          </button>
+        )}
         <CopyButton text={command} />
       </div>
     </div>

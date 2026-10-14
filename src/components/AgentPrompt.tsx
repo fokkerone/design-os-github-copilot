@@ -1,56 +1,11 @@
+import { Play } from 'lucide-react'
 import { CopyButton } from '@/components/CopyButton'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import {
-  HARNESSES,
-  buildPrompt,
-  harnessLabel,
-  isHarness,
-  stepInvocation,
-  useHarness,
-  type Harness,
-  type StepId,
-} from '@/lib/harness'
-
-const RUN_LABEL: Record<Harness, string> = {
-  copilot: 'Select Copilot agent:',
-  claude: 'Run Claude Code command:',
-  opencode: 'Run OpenCode command:',
-}
-
-/** Choose the tool the planning steps are run with. The choice is remembered in localStorage. */
-export function HarnessSelect({ className = '' }: { className?: string }) {
-  const [harness, setHarness] = useHarness()
-
-  return (
-    <Select
-      value={harness}
-      onValueChange={(value) => {
-        if (isHarness(value)) setHarness(value)
-      }}
-    >
-      <SelectTrigger
-        size="sm"
-        aria-label="Tool to run the planning steps with"
-        title="Tool to run the planning steps with. Your choice is remembered."
-        className={`h-6 gap-1.5 border-stone-200 bg-white px-2 py-0 text-xs text-stone-700 shadow-none data-[size=sm]:h-6 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300 ${className}`}
-      >
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent align="end" position="popper">
-        {HARNESSES.map((entry) => (
-          <SelectItem key={entry.id} value={entry.id} className="text-xs">
-            {entry.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  )
-}
+import { buildPrompt, buildStepMessage, stepInvocation, type StepId } from '@/lib/harness'
+import { useChat } from '@/lib/chat/chat-context'
 
 /** The agent or command of a step for the selected tool, as inline code */
 export function StepName({ step }: { step: StepId }) {
-  const [harness] = useHarness()
-  return <code className="font-mono text-stone-700 dark:text-stone-300">{stepInvocation(step, harness)}</code>
+  return <code className="font-mono text-stone-700 dark:text-stone-300">{stepInvocation(step, 'opencode')}</code>
 }
 
 interface AgentPromptProps {
@@ -61,31 +16,41 @@ interface AgentPromptProps {
   compact?: boolean
 }
 
-/** Which agent or command to start and what to say, for the selected tool, with a copy button */
+/** Starts a step with the chat agent, or shows the command to copy when there is no chat */
 export function AgentPrompt({ step, prompt, compact = false }: AgentPromptProps) {
-  const [harness] = useHarness()
+  const chat = useChat()
 
   return (
     <div
       className={`w-full space-y-2 rounded-md bg-stone-100 px-4 text-left dark:bg-stone-800 ${compact ? 'py-2.5' : 'py-3'}`}
     >
       <div>
-        <div className="mb-0.5 flex items-center justify-between gap-2">
-          <p className="text-xs text-stone-500 dark:text-stone-400">{RUN_LABEL[harness]}</p>
-          <HarnessSelect />
-        </div>
-        <code className="text-sm font-mono text-stone-700 dark:text-stone-300">{stepInvocation(step, harness)}</code>
+        <p className="mb-0.5 text-xs text-stone-500 dark:text-stone-400">Agent command:</p>
+        <code className="text-sm font-mono text-stone-700 dark:text-stone-300">{stepInvocation(step, 'opencode')}</code>
       </div>
       <div className="border-t border-stone-200 pt-2 dark:border-stone-700">
         <div className="mb-0.5 flex items-center justify-between">
           <p className="text-xs text-stone-500 dark:text-stone-400">Then say:</p>
-          <CopyButton
-            text={buildPrompt(step, harness, prompt)}
-            title={`Copy the ${harnessLabel(harness)} command together with the prompt`}
-          />
+          <CopyButton text={buildPrompt(step, 'opencode', prompt)} title="Copy the command together with the prompt" />
         </div>
         <p className="text-sm italic text-stone-600 dark:text-stone-300">"{prompt}"</p>
       </div>
+      {chat && (
+        <div className="border-t border-stone-200 pt-2 dark:border-stone-700">
+          <button
+            type="button"
+            disabled={chat.status === 'offline'}
+            onClick={() => chat.send(buildStepMessage(step, prompt))}
+            className="inline-flex h-8 items-center gap-1.5 rounded-sm bg-brand-blue-500 px-3 text-[13px] font-medium text-white transition-colors hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:bg-stone-200 disabled:text-stone-400 dark:bg-energy-green-500 dark:text-brand-blue-900 dark:hover:bg-energy-green-400 dark:disabled:bg-rwe-neutral-800 dark:disabled:text-rwe-neutral-500"
+          >
+            <Play className="size-3.5" strokeWidth={2} />
+            Start with agent
+          </button>
+          {chat.status === 'offline' && (
+            <p className="mt-1.5 text-xs text-stone-500 dark:text-stone-400">OpenCode is not running, see the chat.</p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

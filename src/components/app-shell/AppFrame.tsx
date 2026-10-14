@@ -2,7 +2,8 @@ import { useMemo, type ReactNode } from 'react'
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { AppShell } from './AppShell'
 import { SplitLayout } from './SplitLayout'
-import { ChatDock } from '@/components/chat/ChatDock'
+import { ChatPanel } from '@/components/chat/ChatDock'
+import { ChatProvider } from '@/components/chat/ChatProvider'
 import { buildNavigation, legacyRedirect, type NavFacts, type NavItem } from '@/lib/navigation'
 import { loadNavFacts } from '@/lib/navigation-facts'
 import { useShellTheme } from '@/lib/shell-theme'
@@ -33,13 +34,15 @@ export function AppFrame({ facts, chat }: AppFrameProps) {
   const navFacts = useMemo(() => facts ?? loadNavFacts(), [facts, pathname])
   const navigation = useMemo(() => buildNavigation(pathname, navFacts), [pathname, navFacts])
 
-  return (
+  const frame = (
     <AppShell navigation={navigation} theme={theme} onThemeChange={setTheme}>
-      <SplitLayout title={activeTitle(navigation)} chat={chat ?? <ChatDock />}>
+      <SplitLayout title={activeTitle(navigation)} chat={chat ?? <ChatPanel />}>
         <Outlet />
       </SplitLayout>
     </AppShell>
   )
+  // One OpenCode runtime for chat and pages. An overriding chat (tests) brings its own.
+  return chat ? frame : <ChatProvider>{frame}</ChatProvider>
 }
 
 /** Catch-all: old routes redirect to their new place, everything else is a 404 */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { HARNESSES, buildPrompt, isHarness, stepInvocation, type StepId } from '../src/lib/harness.ts'
+import { HARNESSES, buildPrompt, buildStepMessage, isHarness, stepCommandFile, stepInvocation, type StepId } from '../src/lib/harness.ts'
 
 describe('harness commands', () => {
   it('offers Copilot, Claude Code and OpenCode', () => {
@@ -27,5 +27,26 @@ describe('harness commands', () => {
     )
     expect(buildPrompt('userflow', 'copilot')).toBe('@userflow')
     expect(buildPrompt('persona', 'opencode', 'validate p1')).toBe('/design-os:persona validate p1')
+  })
+})
+
+describe('messages for the chat agent', () => {
+  it('points at the command file of a step', () => {
+    expect(stepCommandFile('product-vision')).toBe('.claude/commands/design-os/product-vision.md')
+    expect(stepCommandFile('design-system')).toBe('.claude/commands/design-os/design-tokens.md')
+    expect(stepCommandFile('userflow')).toBe('.claude/commands/design-os/userflow.md')
+  })
+
+  it('asks the agent to follow the command, then states the request', () => {
+    expect(buildStepMessage('techstack', "Let's decide the tech stack")).toBe(
+      "Follow the instructions in .claude/commands/design-os/techstack.md.\n\nLet's decide the tech stack"
+    )
+    expect(buildStepMessage('persona')).toBe('Follow the instructions in .claude/commands/design-os/persona.md.')
+  })
+
+  it('has a command file for every step', async () => {
+    const { existsSync } = await import('node:fs')
+    const { STEP_IDS } = await import('../src/lib/harness.ts')
+    for (const step of STEP_IDS) expect(existsSync(stepCommandFile(step)), step).toBe(true)
   })
 })
