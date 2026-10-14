@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { AssistantRuntimeProvider, useAui } from '@assistant-ui/react'
 import { createOpencodeClient, useOpenCodeRuntime } from '@assistant-ui/react-opencode'
 import { OPENCODE_PROXY_PATH, resolveBaseUrl, useOpenCodeStatus } from '@/lib/chat/opencode'
@@ -57,6 +57,6 @@ function Bridge({ state, children }: { state: Omit<ChatContextValue, 'send' | 'a
   const aui = useAui()
   const activity = useAgentActivity()
   const send = useCallback((text: string) => aui.thread().append(text), [aui])
-  const value = useMemo(() => ({ ...state, activity, send }), [activity, state.status, state.options, state.model, state.setModel, send]) // eslint-disable-line react-hooks/exhaustive-deps
+  const value = { ...state, activity, send }
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
 }

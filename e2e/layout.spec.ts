@@ -41,6 +41,39 @@ test.describe('layout', () => {
     expect(total).toBeGreaterThan(0)
   })
 
+  test('the split can be resized by dragging and keyboard, and is remembered', async ({ page, opencode }) => {
+    void opencode
+    await page.goto('/prototype/vision')
+    const step = page.getByRole('complementary', { name: 'Step' })
+    const handle = page.getByRole('separator', { name: 'Resize chat and step' })
+    const before = (await step.boundingBox())!.width
+    const h = (await handle.boundingBox())!
+    await page.mouse.move(h.x + h.width / 2, h.y + h.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(h.x - 200, h.y + h.height / 2, { steps: 8 })
+    await page.mouse.up()
+    await expect.poll(async () => (await step.boundingBox())!.width).toBeGreaterThan(before + 150)
+    const dragged = (await step.boundingBox())!.width
+    await handle.focus()
+    await page.keyboard.press('ArrowRight')
+    await expect.poll(async () => (await step.boundingBox())!.width).toBeLessThan(dragged)
+    const kept = (await step.boundingBox())!.width
+    await page.reload()
+    await expect.poll(async () => Math.abs((await step.boundingBox())!.width - kept)).toBeLessThan(4)
+  })
+
+  test('dragging the step to the edge hides it', async ({ page, opencode }) => {
+    void opencode
+    await page.goto('/prototype/vision')
+    const handle = page.getByRole('separator', { name: 'Resize chat and step' })
+    const h = (await handle.boundingBox())!
+    await page.mouse.move(h.x + h.width / 2, h.y + h.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(1430, h.y + h.height / 2, { steps: 10 })
+    await page.mouse.up()
+    await expect(page.getByRole('button', { name: 'Show step panel' })).toBeVisible()
+  })
+
   test('uses Inter and the Volta dark background', async ({ page, opencode }) => {
     void opencode
     await page.goto('/prototype/vision')

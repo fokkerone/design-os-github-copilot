@@ -26,12 +26,21 @@ describe('SplitLayout', () => {
     expect(screen.getByText('step content')).toBeInTheDocument()
   })
 
-  it('docks the step panel on the right with a border and 44-46 percent width', () => {
+  it('docks the step panel on the right of a draggable handle', () => {
     setup()
-    const panel = screen.getByRole('complementary', { name: 'Step' })
-    expect(panel.className).toContain('lg:w-[46%]')
-    expect(panel.className).toContain('xl:w-[44%]')
-    expect(panel.className).toContain('lg:border-l')
+    const handle = screen.getByRole('separator', { name: 'Resize chat and step' })
+    expect(handle).toBeInTheDocument()
+    const chat = chatArea()
+    const step = screen.getByRole('complementary', { name: 'Step' })
+    expect(chat.compareDocumentPosition(handle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(handle.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('lets the keyboard resize the panels and remembers the sizes', async () => {
+    setup()
+    const handle = screen.getByRole('separator', { name: 'Resize chat and step' })
+    expect(handle).toHaveAttribute('aria-valuenow')
+    expect(handle).toHaveAttribute('tabindex', '0')
   })
 
   it('hides the step panel and keeps the chat', async () => {
@@ -48,22 +57,16 @@ describe('SplitLayout', () => {
   it('expands the step over the whole area but keeps the chat mounted', async () => {
     setup()
     await userEvent.click(screen.getByRole('button', { name: /expand step/i }))
-    expect(chatArea().className).toContain('hidden')
+    expect(chatArea()).toHaveAttribute('data-collapsed', 'true')
     expect(screen.getByText('chat content')).toBeInTheDocument()
-    expect(screen.getByRole('complementary', { name: 'Step' }).className).toContain('lg:flex-1')
+    expect(screen.getByRole('complementary', { name: 'Step' })).toHaveAttribute('data-collapsed', 'false')
     await userEvent.click(screen.getByRole('button', { name: /collapse step/i }))
-    expect(chatArea().className).not.toMatch(/(^|\s)hidden(\s|$)/)
+    expect(chatArea()).toHaveAttribute('data-collapsed', 'false')
   })
 
   it('can be controlled', () => {
     setup({ panelMode: 'expanded' })
-    expect(chatArea().className).toContain('hidden')
-  })
-
-  it('closes the overlay on narrow screens via the backdrop', async () => {
-    setup()
-    await userEvent.click(screen.getByRole('button', { name: 'Close step' }))
-    expect(screen.queryByText('step content')).not.toBeInTheDocument()
+    expect(chatArea()).toHaveAttribute('data-collapsed', 'true')
   })
 
   it('shows a chat indicator in the header that pulses while the agent works', () => {
@@ -89,9 +92,9 @@ describe('SplitLayout', () => {
   it('brings the chat back from the expanded step with the chat indicator', async () => {
     setup()
     await userEvent.click(screen.getByRole('button', { name: /expand step/i }))
-    expect(chatArea().className).toContain('hidden')
+    expect(chatArea()).toHaveAttribute('data-collapsed', 'true')
     await userEvent.click(screen.getByRole('button', { name: 'Chat' }))
-    expect(chatArea().className).not.toMatch(/(^|\s)hidden(\s|$)/)
+    expect(chatArea()).toHaveAttribute('data-collapsed', 'false')
   })
 
   it('is a no-chat layout when no chat is given', () => {
@@ -114,6 +117,14 @@ describe('narrow screens', () => {
     setup()
     expect(screen.queryByText('step content')).not.toBeInTheDocument()
     expect(screen.getByText('chat content')).toBeInTheDocument()
+  })
+
+  it('closes the overlay on narrow screens via the backdrop', async () => {
+    narrow()
+    setup()
+    await userEvent.click(screen.getByRole('button', { name: /show step/i }))
+    await userEvent.click(screen.getByRole('button', { name: 'Close step' }))
+    expect(screen.queryByText('step content')).not.toBeInTheDocument()
   })
 
   it('opens the step again with the header button', async () => {
