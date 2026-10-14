@@ -17,7 +17,7 @@ const muted = 'text-stone-500 dark:text-rwe-neutral-400'
  * The agent chat: thread and composer, styled like the reference app.
  * Needs an AssistantRuntimeProvider above it, the runtime decides who answers.
  */
-export function ChatPane() {
+export function ChatPane({ composerExtras }: { composerExtras?: React.ReactNode }) {
   return (
     <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col text-rwe-neutral-900 dark:text-rwe-neutral-100">
       <ThreadPrimitive.Viewport className="relative min-h-0 flex-1 overflow-y-auto">
@@ -40,7 +40,7 @@ export function ChatPane() {
 
       <div className="shrink-0 px-4 pb-4 sm:px-6">
         <div className="mx-auto max-w-[720px]">
-          <Composer />
+          <Composer extras={composerExtras} />
         </div>
       </div>
     </ThreadPrimitive.Root>
@@ -91,7 +91,7 @@ function AssistantText() {
   return <ChatMarkdown text={text} />
 }
 
-function Composer() {
+function Composer({ extras }: { extras?: React.ReactNode }) {
   return (
     <ComposerPrimitive.Root className="rounded-lg border border-stone-200 bg-rwe-sand-25 px-3.5 pb-2.5 pt-3 transition-colors focus-within:border-stone-300 dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950/60 dark:focus-within:border-rwe-neutral-700">
       <ComposerPrimitive.Input
@@ -100,7 +100,9 @@ function Composer() {
         rows={1}
         className="block max-h-40 min-h-6 w-full resize-none bg-transparent text-[14px] text-rwe-neutral-900 placeholder:text-stone-500 focus:outline-none dark:text-rwe-neutral-50 dark:placeholder:text-rwe-neutral-500"
       />
-      <div className="mt-2 flex items-center justify-end gap-1">
+      <div className="mt-2 flex items-center gap-1">
+        {extras}
+        <span className="ml-auto" />
         <AuiIf condition={(s) => !s.thread.isRunning}>
           <ComposerPrimitive.Send
             aria-label="Send"
