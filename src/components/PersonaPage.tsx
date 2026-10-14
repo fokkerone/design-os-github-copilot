@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/AppLayout'
 import { CommandHint, CoverageBar, FlowChip, IssueList, SectionChip } from '@/components/PlanningContext'
 import { getProjectModel, sectionTitle } from '@/lib/project-model'
 import { getWikiPage } from '@/lib/wiki-loader'
+import { paths } from '@/lib/paths'
 
 const cardClass = 'border-stone-200 dark:border-stone-700 shadow-sm'
 const titleClass = 'text-lg font-semibold text-stone-900 dark:text-stone-100'
@@ -38,7 +39,7 @@ export function PersonaPage() {
 
   if (!persona) {
     return (
-      <AppLayout backTo="/" backLabel="Product">
+      <AppLayout backTo={paths.personas} backLabel="Personas">
         <div className="text-center py-12">
           <p className="text-stone-600 dark:text-stone-400">
             Persona not found: <span className="font-mono">product/personas/{personaId}.md</span>
@@ -55,7 +56,7 @@ export function PersonaPage() {
   const toValidate = persona.assumptions.filter((item) => ['assumption', 'hypothesis'].includes(item.evidenceLevel)).length
 
   return (
-    <AppLayout backTo="/" backLabel="Product" title={persona.name}>
+    <AppLayout backTo={paths.personas} backLabel="Personas" title={persona.name}>
       <div className="space-y-6">
         <div className="mb-8">
           <p className={labelClass}>
@@ -128,7 +129,7 @@ export function PersonaPage() {
                   {screens.map((screen) => (
                     <Link
                       key={`${screen.sectionId}/${screen.name}`}
-                      to={`/sections/${screen.sectionId}/screen-designs/${screen.name}`}
+                      to={paths.screen(screen.sectionId, screen.name)}
                       className="inline-flex items-center gap-1.5 font-mono text-xs text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 underline decoration-stone-300 dark:decoration-stone-600 underline-offset-2"
                     >
                       <Layout className="w-3.5 h-3.5" strokeWidth={1.5} />

@@ -5,11 +5,11 @@ import { AppLayout } from '@/components/AppLayout'
 import { EmptyState } from '@/components/EmptyState'
 import { PhaseWarningBanner } from '@/components/PhaseWarningBanner'
 import { NextPhaseButton } from '@/components/NextPhaseButton'
-import { FlowsCard } from '@/components/FlowsCard'
 import { getProjectModel } from '@/lib/project-model'
 import { loadProductData } from '@/lib/product-loader'
 import { getSectionScreenDesigns, getSectionScreenshots, hasSectionSpec, hasSectionData } from '@/lib/section-loader'
 import { ChevronRight, Check, Circle } from 'lucide-react'
+import { paths } from '@/lib/paths'
 
 interface SectionProgress {
   hasSpec: boolean
@@ -75,9 +75,6 @@ export function SectionsPage() {
         {/* Warning banner for incomplete prerequisite phases */}
         <PhaseWarningBanner />
 
-        {/* User flows: they cross sections, so they are listed once, above them */}
-        {sections.length > 0 && <FlowsCard />}
-
         {/* Sections list */}
         {sections.length === 0 ? (
           <EmptyState type="roadmap" />
@@ -97,7 +94,7 @@ export function SectionsPage() {
                   return (
                     <li key={section.id}>
                       <button
-                        onClick={() => navigate(`/sections/${section.id}`)}
+                        onClick={() => navigate(paths.section(section.id))}
                         className="w-full px-6 py-4 flex items-center justify-between gap-4 text-left hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                       >
                         <div className="flex items-start gap-4 min-w-0">

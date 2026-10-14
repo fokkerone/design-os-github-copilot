@@ -6,8 +6,6 @@ const page = <T extends Record<string, unknown>>(load: () => Promise<T>, name: k
   lazy: async () => ({ Component: (await load())[name] as React.ComponentType }),
 })
 
-const product = () => import('@/components/ProductPage')
-const sections = () => import('@/components/SectionsPage')
 
 export const appRoutes: RouteObject[] = [
   // Fullscreen previews render outside the shell
@@ -16,16 +14,20 @@ export const appRoutes: RouteObject[] = [
     ...page(() => import('@/components/ScreenDesignPage'), 'ScreenDesignFullscreen'),
   },
   {
+    path: '/prototype/preview/fullscreen',
+    ...page(() => import('@/components/ClickdummyFullscreen'), 'ClickdummyFullscreen'),
+  },
+  {
     path: '/design-system/shell/fullscreen',
     ...page(() => import('@/components/ShellDesignPage'), 'ShellDesignFullscreen'),
   },
   {
     element: <AppFrame />,
     children: [
-      { path: '/prototype/vision', ...page(product, 'ProductPage') },
-      { path: '/prototype/roadmap', ...page(product, 'ProductPage') },
+      { path: '/prototype/vision', ...page(() => import('@/components/VisionPage'), 'VisionPage') },
+      { path: '/prototype/roadmap', ...page(() => import('@/components/RoadmapPage'), 'RoadmapPage') },
       { path: '/prototype/roadmap/data-shape', ...page(() => import('@/components/DataShapePage'), 'DataShapePage') },
-      { path: '/prototype/sections', ...page(sections, 'SectionsPage') },
+      { path: '/prototype/sections', ...page(() => import('@/components/SectionsPage'), 'SectionsPage') },
       { path: '/prototype/sections/:sectionId', ...page(() => import('@/components/SectionPage'), 'SectionPage') },
       {
         path: '/prototype/sections/:sectionId/screen-designs/:screenDesignName',
@@ -33,13 +35,13 @@ export const appRoutes: RouteObject[] = [
       },
       { path: '/prototype/preview', ...page(() => import('@/components/ClickdummyPage'), 'ClickdummyPage') },
       { path: '/prototype/export', ...page(() => import('@/components/ExportPage'), 'ExportPage') },
-      { path: '/personas', ...page(product, 'ProductPage') },
+      { path: '/personas', ...page(() => import('@/components/PersonasPage'), 'PersonasPage') },
       { path: '/personas/:personaId', ...page(() => import('@/components/PersonaPage'), 'PersonaPage') },
-      { path: '/flows', ...page(sections, 'SectionsPage') },
+      { path: '/flows', ...page(() => import('@/components/FlowsPage'), 'FlowsPage') },
       { path: '/flows/:flowId', ...page(() => import('@/components/FlowPage'), 'FlowPage') },
       { path: '/design-system', ...page(() => import('@/components/DesignPage'), 'DesignPage') },
       { path: '/design-system/shell', ...page(() => import('@/components/ShellDesignPage'), 'ShellDesignPage') },
-      { path: '/techstack', ...page(product, 'ProductPage') },
+      { path: '/techstack', ...page(() => import('@/components/TechstackPage'), 'TechstackPage') },
       { path: '/wiki', ...page(() => import('@/components/WikiPage'), 'WikiPage') },
       { path: '/wiki/*', ...page(() => import('@/components/WikiArticlePage'), 'WikiArticlePage') },
       { path: '*', element: <LegacyOrNotFound /> },

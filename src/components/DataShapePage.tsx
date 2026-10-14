@@ -5,6 +5,8 @@ import { StepName } from '@/components/AgentPrompt'
 import { EmptyState } from '@/components/EmptyState'
 import { StepIndicator, type StepStatus } from '@/components/StepIndicator'
 import { NextPhaseButton } from '@/components/NextPhaseButton'
+import { PageTabs } from '@/components/PageTabs'
+import { roadmapTabs } from '@/components/tabs'
 import { loadProductData } from '@/lib/product-loader'
 
 export function DataShapePage() {
@@ -16,6 +18,7 @@ export function DataShapePage() {
 
   return (
     <AppLayout>
+      <PageTabs label="Roadmap views" tabs={roadmapTabs} />
       <div className="space-y-6">
         {/* Page intro */}
         <div className="mb-8">
@@ -112,7 +115,7 @@ export function DataShapePage() {
         {/* Next Phase Button - shown when all steps complete */}
         {hasDataShape && (
           <StepIndicator step={2} status="current" isLast>
-            <NextPhaseButton nextPhase="design" />
+            <NextPhaseButton nextPhase="design-system" />
           </StepIndicator>
         )}
       </div>

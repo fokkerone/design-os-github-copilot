@@ -3,10 +3,10 @@ import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { AppShell } from './AppShell'
 import { SplitLayout } from './SplitLayout'
 import { ChatPlaceholder } from './ChatPlaceholder'
-import { InShellContext } from './InShell'
 import { buildNavigation, legacyRedirect, type NavFacts, type NavItem } from '@/lib/navigation'
 import { loadNavFacts } from '@/lib/navigation-facts'
 import { useShellTheme } from '@/lib/shell-theme'
+import { paths } from '@/lib/paths'
 
 function activeTitle(items: NavItem[]): string {
   for (const item of items) {
@@ -34,13 +34,11 @@ export function AppFrame({ facts, chat }: AppFrameProps) {
   const navigation = useMemo(() => buildNavigation(pathname, navFacts), [pathname, navFacts])
 
   return (
-    <InShellContext.Provider value>
-      <AppShell navigation={navigation} theme={theme} onThemeChange={setTheme}>
-        <SplitLayout title={activeTitle(navigation)} chat={chat ?? <ChatPlaceholder />}>
-          <Outlet />
-        </SplitLayout>
-      </AppShell>
-    </InShellContext.Provider>
+    <AppShell navigation={navigation} theme={theme} onThemeChange={setTheme}>
+      <SplitLayout title={activeTitle(navigation)} chat={chat ?? <ChatPlaceholder />}>
+        <Outlet />
+      </SplitLayout>
+    </AppShell>
   )
 }
 
@@ -55,7 +53,7 @@ export function LegacyOrNotFound() {
       <p className="mt-1 text-stone-500 dark:text-rwe-neutral-400">
         <code>{pathname}</code> does not exist.
       </p>
-      <Link to="/prototype/vision" className="mt-4 inline-block underline underline-offset-2">
+      <Link to={paths.vision} className="mt-4 inline-block underline underline-offset-2">
         Back to Vision
       </Link>
     </div>

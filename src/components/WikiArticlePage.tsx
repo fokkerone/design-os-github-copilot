@@ -4,6 +4,7 @@ import { WikiLayout } from '@/components/WikiLayout'
 import { WikiMarkdown } from '@/components/WikiMarkdown'
 import { getWikiPage, type FrontmatterValue } from '@/lib/wiki-loader'
 import { extractWikiHeadings } from '@/lib/wiki-markdown'
+import { paths } from '@/lib/paths'
 
 function list(value: FrontmatterValue | undefined): string[] {
   if (Array.isArray(value)) return value
@@ -111,7 +112,7 @@ export function WikiArticlePage() {
               <Property label="Sections">
                 <span className="flex flex-wrap gap-x-3 gap-y-1">
                   {sections.map((id) => (
-                    <Link key={id} to={`/sections/${id}`} className="underline decoration-stone-300 dark:decoration-stone-600 underline-offset-2 hover:decoration-stone-500">
+                    <Link key={id} to={paths.section(id)} className="underline decoration-stone-300 dark:decoration-stone-600 underline-offset-2 hover:decoration-stone-500">
                       {id}
                     </Link>
                   ))}

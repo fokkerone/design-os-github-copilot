@@ -126,7 +126,7 @@ const LEGACY: [from: string, to: string][] = [
 export function legacyRedirect(pathname: string): string | null {
   const path = normalize(pathname)
   if (path === '/' || path === '/prototype') return '/prototype/vision'
-  if (path === '/clickdummy/preview') return '/prototype/preview'
+  if (path === '/clickdummy/preview') return '/prototype/preview/fullscreen'
   for (const [from, to] of LEGACY) {
     if (underPrefix(path, from)) return to + path.slice(from.length)
   }

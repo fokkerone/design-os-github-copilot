@@ -1,17 +1,17 @@
 import { Suspense, useState, useRef, useCallback, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, PanelLeft, Maximize2, GripVertical, Smartphone, Tablet, Monitor } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { PanelLeft, Maximize2, GripVertical, Smartphone, Tablet, Monitor } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { RenderComponent } from '@/components/RenderComponent'
 import { loadShellPreview } from '@/lib/shell-loader'
+import { PageTabs } from '@/components/PageTabs'
+import { designSystemTabs } from '@/components/tabs'
+import { paths } from '@/lib/paths'
 import React from 'react'
 
 const MIN_WIDTH = 320
 const DEFAULT_WIDTH_PERCENT = 100
 
 export function ShellDesignPage() {
-  const navigate = useNavigate()
   const [widthPercent, setWidthPercent] = useState(DEFAULT_WIDTH_PERCENT)
   const containerRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
@@ -58,20 +58,11 @@ export function ShellDesignPage() {
   const previewWidth = `${widthPercent}%`
 
   return (
-    <div className="h-screen bg-stone-100 dark:bg-stone-900 animate-fade-in flex flex-col overflow-hidden">
+    <div className="h-full min-h-[480px] bg-stone-100 dark:bg-stone-900 animate-fade-in flex flex-col overflow-hidden">
+      <div className="shrink-0 px-4 pt-3 bg-white dark:bg-stone-950"><PageTabs label="Design system views" tabs={designSystemTabs} /></div>
       {/* Header */}
       <header className="border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 shrink-0 z-50">
         <div className="px-4 py-2 flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/design')}
-            className="text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 -ml-2"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" strokeWidth={1.5} />
-            Back
-          </Button>
-          <div className="h-4 w-px bg-stone-200 dark:bg-stone-700" />
           <div className="flex items-center gap-2">
             <PanelLeft className="w-4 h-4 text-stone-400" strokeWidth={1.5} />
             <span className="text-sm font-medium text-stone-700 dark:text-stone-300">
@@ -122,7 +113,7 @@ export function ShellDesignPage() {
             </span>
             <ThemeToggle />
             <a
-              href="/shell/design/fullscreen"
+              href={paths.shellFullscreen}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
@@ -155,7 +146,7 @@ export function ShellDesignPage() {
           style={{ width: previewWidth, minWidth: MIN_WIDTH, maxWidth: '100%' }}
         >
           <iframe
-            src="/shell/design/fullscreen"
+            src={paths.shellFullscreen}
             className="w-full h-full border-0"
             title="Shell Preview"
           />

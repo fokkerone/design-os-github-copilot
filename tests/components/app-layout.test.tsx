@@ -3,17 +3,12 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { AppLayout } from '@/components/AppLayout'
-import { InShellContext } from '@/components/app-shell/InShell'
 
 function inShell(ui: React.ReactNode) {
-  return render(
-    <MemoryRouter>
-      <InShellContext.Provider value>{ui}</InShellContext.Provider>
-    </MemoryRouter>,
-  )
+  return render(<MemoryRouter>{ui}</MemoryRouter>)
 }
 
-describe('AppLayout inside the app shell', () => {
+describe('AppLayout', () => {
   it('renders only the page: no phase nav, no own header, no footer', () => {
     const { container } = inShell(<AppLayout>page body</AppLayout>)
     expect(screen.getByText('page body')).toBeInTheDocument()

@@ -14,6 +14,7 @@ import {
 } from '@/components/PlanningContext'
 import { getProjectModel, sectionTitle } from '@/lib/project-model'
 import { getWikiPage } from '@/lib/wiki-loader'
+import { paths } from '@/lib/paths'
 
 const cardClass = 'border-stone-200 dark:border-stone-700 shadow-sm'
 const titleClass = 'text-lg font-semibold text-stone-900 dark:text-stone-100'
@@ -30,7 +31,7 @@ export function FlowPage() {
 
   if (!flow) {
     return (
-      <AppLayout backTo="/sections" backLabel="Sections">
+      <AppLayout backTo={paths.flows} backLabel="User Flows">
         <div className="text-center py-12">
           <p className="text-stone-600 dark:text-stone-400">
             Flow not found: <span className="font-mono">product/flows/{flowId}.md</span>
@@ -55,7 +56,7 @@ export function FlowPage() {
   ].filter(([, value]) => value)
 
   return (
-    <AppLayout backTo="/sections" backLabel="Sections" title={flow.title}>
+    <AppLayout backTo={paths.flows} backLabel="User Flows" title={flow.title}>
       <div className="space-y-6">
         <div className="mb-8">
           <p className={labelClass}>User flow · {flow.status}</p>

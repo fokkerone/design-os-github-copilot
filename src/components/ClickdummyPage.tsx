@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/AppLayout'
 import { AgentPrompt } from '@/components/AgentPrompt'
 import { loadProductData, hasClickdummy } from '@/lib/product-loader'
 import { getAllSectionIds, getSectionScreenDesigns } from '@/lib/section-loader'
+import { paths } from '@/lib/paths'
 
 export function ClickdummyPage() {
   const productData = useMemo(() => loadProductData(), [])
@@ -144,7 +145,7 @@ export function ClickdummyPage() {
                   </p>
                 </div>
                 <a
-                  href="/clickdummy/preview"
+                  href={paths.previewFullscreen}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white font-medium text-sm rounded-md transition-colors"

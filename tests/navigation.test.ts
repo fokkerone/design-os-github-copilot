@@ -166,7 +166,7 @@ describe('legacyRedirect', () => {
       '/prototype/sections/citizen-chat/screen-designs/Start/fullscreen',
     ],
     ['/clickdummy', '/prototype/preview'],
-    ['/clickdummy/preview', '/prototype/preview'],
+    ['/clickdummy/preview', '/prototype/preview/fullscreen'],
     ['/export', '/prototype/export'],
   ])('%s -> %s', (from, to) => {
     expect(legacyRedirect(from)).toBe(to)
@@ -195,6 +195,7 @@ describe('isFullscreenPath', () => {
   it('detects fullscreen routes that render outside the shell', () => {
     expect(isFullscreenPath('/prototype/sections/a/screen-designs/B/fullscreen')).toBe(true)
     expect(isFullscreenPath('/design-system/shell/fullscreen')).toBe(true)
+    expect(isFullscreenPath('/prototype/preview/fullscreen')).toBe(true)
     expect(isFullscreenPath('/prototype/sections/a')).toBe(false)
     expect(isFullscreenPath('/prototype/preview')).toBe(false)
   })

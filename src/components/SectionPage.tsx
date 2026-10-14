@@ -13,6 +13,7 @@ import { StepIndicator, type StepStatus } from '@/components/StepIndicator'
 import { loadProductData } from '@/lib/product-loader'
 import { loadSectionData } from '@/lib/section-loader'
 import { ChevronRight, Layout, Image, Download, ArrowRight, LayoutList } from 'lucide-react'
+import { paths } from '@/lib/paths'
 
 /**
  * Determine the status of each step based on what data exists
@@ -75,7 +76,7 @@ export function SectionPage() {
   // Handle missing section
   if (!section) {
     return (
-      <AppLayout backTo="/sections" backLabel="Sections">
+      <AppLayout backTo={paths.sections} backLabel="Sections">
         <div className="text-center py-12">
           <p className="text-stone-600 dark:text-stone-400">
             Section not found: {sectionId}
@@ -93,7 +94,7 @@ export function SectionPage() {
   const nextSection = !isLastSection ? sections[currentIndex + 1] : null
 
   return (
-    <AppLayout backTo="/sections" backLabel="Sections" title={section.title}>
+    <AppLayout backTo={paths.sections} backLabel="Sections" title={section.title}>
       <div className="space-y-6">
         {/* Page intro */}
         <div className="mb-8">
@@ -141,7 +142,7 @@ export function SectionPage() {
                   {sectionData.screenDesigns.map((screenDesign) => (
                     <li key={screenDesign.name}>
                       <Link
-                        to={`/sections/${sectionId}/screen-designs/${screenDesign.name}`}
+                        to={paths.screen(sectionId ?? '', screenDesign.name)}
                         className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                       >
                         <div className="flex items-center gap-3 min-w-0">
@@ -234,7 +235,7 @@ export function SectionPage() {
               {nextSection ? (
                 <>
                   <button
-                    onClick={() => navigate(`/sections/${nextSection.id}`)}
+                    onClick={() => navigate(paths.section(nextSection.id))}
                     className="w-full flex items-center justify-between gap-4 px-6 py-4 bg-stone-900 dark:bg-stone-100 text-stone-100 dark:text-stone-900 rounded-lg hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors group"
                   >
                     <div className="flex items-center gap-3">
@@ -244,7 +245,7 @@ export function SectionPage() {
                     <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
                   </button>
                   <button
-                    onClick={() => navigate('/sections')}
+                    onClick={() => navigate(paths.sections)}
                     className="w-full flex items-center justify-between gap-4 px-6 py-4 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors group"
                   >
                     <div className="flex items-center gap-3">
@@ -257,7 +258,7 @@ export function SectionPage() {
               ) : (
                 /* If this is the last or only section, show single link back to sections */
                 <button
-                  onClick={() => navigate('/sections')}
+                  onClick={() => navigate(paths.sections)}
                   className="w-full flex items-center justify-between gap-4 px-6 py-4 bg-stone-900 dark:bg-stone-100 text-stone-100 dark:text-stone-900 rounded-lg hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors group"
                 >
                   <div className="flex items-center gap-3">

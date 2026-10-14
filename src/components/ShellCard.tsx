@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { ChevronDown, ChevronRight, PanelLeft, Layout } from 'lucide-react'
 import type { ShellInfo } from '@/types/product'
+import { paths } from '@/lib/paths'
 
 interface ShellCardProps {
   shell: ShellInfo
@@ -64,7 +65,7 @@ export function ShellCard({ shell }: ShellCardProps) {
         {shell.hasComponents && (
           <div className="pt-2 border-t border-stone-100 dark:border-stone-800">
             <Link
-              to="/shell/design"
+              to={paths.shell}
               className="flex items-center justify-between gap-4 py-2 hover:text-stone-900 dark:hover:text-stone-100 transition-colors group"
             >
               <div className="flex items-center gap-3">

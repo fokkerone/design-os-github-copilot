@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, GitBranch, UserRound } from 'lucide-react'
 import { getProjectModel } from '@/lib/project-model'
 import type { ResolvedStep } from '@/lib/model/project.ts'
+import { paths } from '@/lib/paths'
 
 interface ScreenContextBarProps {
   sectionId: string
@@ -30,7 +31,7 @@ function StepLink({ step, direction }: { step: ResolvedStep | null; direction: '
   }
   return (
     <Link
-      to={`/sections/${step.target.sectionId}/screen-designs/${step.target.name}`}
+      to={paths.screen(step.target.sectionId, step.target.name)}
       className="inline-flex items-center gap-1 text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
       title={`${step.target.sectionId}/${step.target.name}`}
     >

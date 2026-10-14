@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChevronRight, Layout } from 'lucide-react'
 import { EmptyState } from '@/components/EmptyState'
 import type { ScreenDesignInfo } from '@/types/section'
+import { paths } from '@/lib/paths'
 
 interface ScreenDesignsCardProps {
   screenDesigns: ScreenDesignInfo[]
@@ -28,7 +29,7 @@ export function ScreenDesignsCard({ screenDesigns, sectionId, sectionName }: Scr
           {screenDesigns.map((screenDesign) => (
             <li key={screenDesign.name}>
               <Link
-                to={`/sections/${sectionId}/screen-designs/${screenDesign.name}`}
+                to={paths.screen(sectionId, screenDesign.name)}
                 className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0">

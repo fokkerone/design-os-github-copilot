@@ -6,6 +6,7 @@ import { buildPrompt, useHarness, type StepId } from '@/lib/harness'
 import type { FlowCoverage, ProjectIssue, ResolvedStep, StepStatus } from '@/lib/model/project.ts'
 import type { Flow } from '@/lib/model/flow.ts'
 import type { Persona } from '@/lib/model/persona.ts'
+import { paths } from '@/lib/paths'
 
 /**
  * Small building blocks shared by the persona and user flow views:
@@ -49,7 +50,7 @@ export function StepScreen({ step }: { step: ResolvedStep }) {
   if (step.target) {
     return (
       <Link
-        to={`/sections/${step.target.sectionId}/screen-designs/${step.target.name}`}
+        to={paths.screen(step.target.sectionId, step.target.name)}
         className="inline-flex items-center gap-1.5 text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 underline decoration-stone-300 dark:decoration-stone-600 underline-offset-2"
       >
         <Layout className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
@@ -118,7 +119,7 @@ export function FlowChip({ flow, detail }: { flow: Flow; detail?: string }) {
 export function SectionChip({ sectionId, title }: { sectionId: string; title: string }) {
   return (
     <Link
-      to={`/sections/${sectionId}`}
+      to={paths.section(sectionId)}
       className="inline-flex items-center rounded-full bg-stone-100 dark:bg-stone-800 px-2.5 py-1 text-xs text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
     >
       {title}
