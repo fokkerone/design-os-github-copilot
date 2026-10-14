@@ -45,8 +45,8 @@ export class FakeOpenCode {
     this.server = createServer((req, res) => this.handle(req, res))
   }
 
-  async start(): Promise<this> {
-    await new Promise<void>((resolve) => this.server.listen(0, '127.0.0.1', resolve))
+  async start(port = 0): Promise<this> {
+    await new Promise<void>((resolve) => this.server.listen(port, '127.0.0.1', resolve))
     this.url = `http://127.0.0.1:${(this.server.address() as AddressInfo).port}`
     return this
   }

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { afterEach } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { SplitLayout } from '@/components/app-shell/SplitLayout'
 
@@ -96,5 +97,52 @@ describe('SplitLayout', () => {
   it('is a no-chat layout when no chat is given', () => {
     render(<SplitLayout title="x"><p>only step</p></SplitLayout>)
     expect(screen.getByText('only step')).toBeInTheDocument()
+  })
+})
+
+describe('narrow screens', () => {
+  const original = window.matchMedia
+  const narrow = () => {
+    window.matchMedia = ((q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia
+  }
+  afterEach(() => {
+    window.matchMedia = original
+  })
+
+  it('starts with the chat only, so the step sheet does not cover the page', () => {
+    narrow()
+    setup()
+    expect(screen.queryByText('step content')).not.toBeInTheDocument()
+    expect(screen.getByText('chat content')).toBeInTheDocument()
+  })
+
+  it('opens the step again with the header button', async () => {
+    narrow()
+    setup()
+    await userEvent.click(screen.getByRole('button', { name: /show step/i }))
+    expect(screen.getByText('step content')).toBeInTheDocument()
+  })
+
+  it('shows the step when the user navigates to another one', () => {
+    narrow()
+    const { rerender } = setup({ stepKey: '/a' })
+    expect(screen.queryByText('step content')).not.toBeInTheDocument()
+    rerender(
+      <SplitLayout title="Vision" chat={<p>chat content</p>} stepKey="/b">
+        <p>step content</p>
+      </SplitLayout>,
+    )
+    expect(screen.getByText('step content')).toBeInTheDocument()
+  })
+
+  it('leaves the mode alone on wide screens when the step changes', async () => {
+    const { rerender } = setup({ stepKey: '/a' })
+    await userEvent.click(screen.getByRole('button', { name: /hide step/i }))
+    rerender(
+      <SplitLayout title="Vision" chat={<p>chat content</p>} stepKey="/b">
+        <p>step content</p>
+      </SplitLayout>,
+    )
+    expect(screen.queryByText('step content')).not.toBeInTheDocument()
   })
 })

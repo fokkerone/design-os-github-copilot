@@ -15,7 +15,8 @@
     "techstack": "node scripts/techstack.mjs",
     "tokens:build": "node scripts/design-tokens/cli.mjs",
     "tokens:check": "node scripts/design-tokens/cli.mjs --check",
-    "test:tokens": "node --test \"scripts/design-tokens/tests/*.test.mjs\""
+    "test:tokens": "node --test \"scripts/design-tokens/tests/*.test.mjs\"",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.15.28",
@@ -46,6 +47,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.64.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",

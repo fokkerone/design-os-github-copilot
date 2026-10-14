@@ -41,7 +41,7 @@ When working in Design OS, be aware of two distinct contexts:
 The React application that displays and manages planning files. When modifying the Design OS UI itself:
 
 - Files live in `src/` (components, pages, utilities)
-- Uses the Design OS look: the app chrome (sidebar, chat, step panel) uses the Volta palette from `src/app-theme.css` and Inter; the page content keeps stone/lime until it is migrated
+- Uses the Design OS look: the app chrome (sidebar, chat, step panel) uses the Volta palette from `src/app-theme.css` and Inter, the page content in the step panel follows it
 - Provides the interface for viewing specs, screen designs, exports, etc.
 
 ### 2. Product Design (Screen Designs & Exports)
@@ -168,7 +168,7 @@ The chat is [assistant-ui](https://www.assistant-ui.com/) with the OpenCode runt
 - The chat remembers its OpenCode session (`designos:session` in localStorage), so a page reload (e.g. when the agent writes files and Vite reloads) reopens the conversation. "New chat" starts a fresh session. Agent questions and permissions are answered in the chat (`src/components/chat/ToolCall.tsx`); typed `/design-os:<step>` commands are expanded to the instruction to read the command file (`expandSlashCommand`).
 - The chat remembers its OpenCode session (`designos:session` in localStorage), so a page reload (e.g. when the agent writes files and Vite reloads) reopens the conversation. "New chat" starts a fresh session. Agent questions and permissions are answered in the chat (`src/components/chat/ToolCall.tsx`); typed `/design-os:<step>` commands are expanded to the instruction to read the command file (`expandSlashCommand`).
 - Without OpenCode the chat shows the command to start it. Pages outside a chat fall back to copy-and-paste commands.
-- Chat tests run against a fake OpenCode server (`tests/helpers/fake-opencode.ts`). Component tests use jsdom (`// @vitest-environment jsdom`), model tests run in node.
+- Chat tests run against a fake OpenCode server (`tests/helpers/fake-opencode.ts`). Component tests use jsdom (`// @vitest-environment jsdom`), model tests run in node. Smoke tests: `npm run test:e2e` (Playwright in the installed Chrome, `e2e/`) start the app on port 3100 with a fake OpenCode on 4196, so no agent or API key is needed and `product/` stays untouched. `DESIGNOS_OPENCODE_PORT` moves the proxy and the autostart to another port. Smoke tests: `npm run test:e2e` (Playwright in the installed Chrome, `e2e/`) start the app on port 3100 with a fake OpenCode on 4196, so no agent or API key is needed and `product/` stays untouched. `DESIGNOS_OPENCODE_PORT` moves the proxy and the autostart to another port.
 
 ---
 
@@ -374,7 +374,7 @@ Plus **Sections** — The individual features, each with spec, data, screen desi
 
 Design OS separates concerns between its own UI and the product being designed:
 
-- **Design OS UI**: The app chrome uses the Volta palette (`src/app-theme.css`) and Inter; page content inside the step panel still uses stone/lime and DM Sans
+- **Design OS UI**: The app chrome uses the Volta palette (`src/app-theme.css`) and Inter; page content inside the step panel follows the same look
 - **Product Screen Designs**: Use the design tokens defined for the product (when available)
 - **Shell**: Uses product design tokens to preview the full app experience
 
@@ -417,9 +417,8 @@ The handoff focuses on UI designs, product requirements, and user flows. Backend
 The Design OS application has two layers:
 
 - **App chrome** (left navigation, chat, step panel): Linear-style layout copied from the reference app (`software-factory`). Volta palette from `src/app-theme.css` (`rwe-*`, `brand-blue`, `energy-green`), Inter, dark by default, sidebar 238px with 30px rows, content inset panel with `rounded-lg` and a 1px border. The shell sets its own `dark` or `light` scope.
-- **Page content** inside the step panel ("Refined Utility"): not migrated yet.
-- **Typography**: DM Sans for headings and body, IBM Plex Mono for code
-- **Colors**: Stone palette for neutrals (warm grays), lime for accents
+- **Page content** inside the step panel uses the same Volta look (guarded by `tests/volta-content.test.ts`): dark mode on `rwe-neutral`, accents `brand-blue` (light) and `energy-green` (dark), the shadcn variables in `src/index.css` map to the Volta palette. Light mode may keep `stone` for borders and muted text, as the reference app does.
+- **Typography**: Inter for headings and body, IBM Plex Mono for code
 - **Layout**: Content fills the step panel; wide pages use the expanded panel mode
 - **Cards**: Minimal borders (1px), subtle shadows, generous padding
 - **Motion**: Subtle fade-ins (200ms), no bouncy animations

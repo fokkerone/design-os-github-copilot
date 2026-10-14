@@ -19,7 +19,7 @@ if (typeof document !== 'undefined') {
   Element.prototype.scrollTo ??= function () {}
   Element.prototype.scrollIntoView ??= function () {}
   window.matchMedia ??= ((q: string) => ({
-    matches: false, media: q, onchange: null,
+    matches: /min-width/.test(q), media: q, onchange: null,
     addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, dispatchEvent: () => false,
   })) as unknown as typeof window.matchMedia
 }

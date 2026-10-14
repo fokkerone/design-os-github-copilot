@@ -13,10 +13,14 @@ interface SplitLayoutProps {
   /** The step page */
   children: React.ReactNode
   panelMode?: PanelMode
+  /** Identifies the shown step, e.g. the path. On narrow screens a change opens the step sheet. */
+  stepKey?: string
   /** What the agent does, shown by the chat icon in the header */
   chatActivity?: AgentActivity
   onPanelModeChange?: (mode: PanelMode) => void
 }
+
+const isWide = () => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches
 
 const border = 'border-stone-200 dark:border-rwe-neutral-800'
 
@@ -24,8 +28,15 @@ const border = 'border-stone-200 dark:border-rwe-neutral-800'
  * Chat on the left, the page of the current step on the right (layout of the reference app).
  * The chat stays mounted in every mode, so a running conversation survives navigation and expanding.
  */
-export function SplitLayout({ title, chat, children, panelMode, onPanelModeChange, chatActivity = 'idle' }: SplitLayoutProps) {
-  const [internal, setInternal] = useState<PanelMode>('open')
+export function SplitLayout({ title, chat, children, panelMode, onPanelModeChange, chatActivity = 'idle', stepKey }: SplitLayoutProps) {
+  // Below the lg breakpoint the step is an overlay sheet, so it starts closed and the chat is visible
+  const [internal, setInternal] = useState<PanelMode>(() => (isWide() ? 'open' : 'hidden'))
+  const [prevKey, setPrevKey] = useState(stepKey)
+  if (prevKey !== stepKey) {
+    setPrevKey(stepKey)
+    // Choosing another step on a narrow screen means: show it
+    if (!isWide() && internal === 'hidden') setInternal('open')
+  }
   const requested = panelMode ?? internal
   const hasChat = chat !== undefined
   const mode: PanelMode = hasChat ? requested : 'expanded'

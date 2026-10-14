@@ -46,9 +46,10 @@ export function AppFrame({ facts, chat }: AppFrameProps) {
 
 /** Reads the agent activity from the chat of the provider above, for the header indicator */
 function FramedSplit({ title, chat }: { title: string; chat: ReactNode }) {
+  const { pathname } = useLocation()
   const activity = useChat()?.activity ?? 'idle'
   return (
-    <SplitLayout title={title} chat={chat} chatActivity={activity}>
+    <SplitLayout title={title} chat={chat} chatActivity={activity} stepKey={pathname}>
       <Outlet />
     </SplitLayout>
   )
