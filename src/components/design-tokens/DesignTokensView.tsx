@@ -95,7 +95,7 @@ export function DesignTokensView({ tokens, guide }: { tokens: DesignTokens; guid
             <FormatToggle value={format} onChange={setFormat} />
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 @2xl:grid-cols-4 gap-2">
             <Stat label="DTCG tokens" value={meta.counts.tokens} />
             <Stat label="CSS variables" value={meta.counts.cssVariables} />
             <Stat label="Documented only" value={meta.counts.documentedOnly} />

@@ -158,7 +158,7 @@ Generate the complete export package with all components, types, and handoff doc
 
 ## The Design OS App: Layout and Agent Chat
 
-The app has a left main navigation (Prototype with Vision, Roadmap, Sections, Prototype and Export; Personas; User Flows; Design System; Tech Stack; Wiki). Right of it the content splits: the agent chat on the left, the page of the current step on the right (resizable by dragging the handle, sizes remembered in `designos:split`; collapsible and expandable in the header). Data Shape is a tab of Roadmap, the Shell a tab of Design System. Old routes (`/sections`, `/design`, `/clickdummy`, ...) redirect (`src/lib/navigation.ts`); all routes live in `src/lib/paths.ts` and `src/lib/routes.tsx`.
+The app has a left main navigation (Prototype with Vision, Roadmap, Sections, Prototype and Export; Personas; User Flows; Design System; Tech Stack; Wiki). Right of it the content splits: the agent chat on the left, the page of the current step on the right (resizable by dragging the handle, sizes remembered in localStorage under `react-resizable-panels:designos:split…`; collapsible and expandable in the header). Data Shape is a tab of Roadmap, the Shell a tab of Design System. Old routes (`/sections`, `/design`, `/clickdummy`, ...) redirect (`src/lib/navigation.ts`); all routes live in `src/lib/paths.ts` and `src/lib/routes.tsx`.
 
 The chat is [assistant-ui](https://www.assistant-ui.com/) with the OpenCode runtime (`@assistant-ui/react-opencode`):
 

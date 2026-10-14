@@ -183,15 +183,15 @@ export function WikiLayout({ children, currentPath, toc = [], backTo, backLabel,
 
   return (
     <AppLayout backTo={backTo} backLabel={backLabel} title={title}>
-      <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[13rem_minmax(0,1fr)_13rem]">
-        <aside className="hidden lg:block">
+      <div className="@5xl:grid @5xl:grid-cols-[13rem_minmax(0,1fr)] @5xl:gap-10 @7xl:grid-cols-[13rem_minmax(0,1fr)_13rem]">
+        <aside className="hidden @5xl:block">
           <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-2">
             <WikiNav currentPath={currentPath} />
           </div>
         </aside>
 
         <div className="min-w-0 space-y-6">
-          <details className="lg:hidden">
+          <details className="@5xl:hidden">
             <summary className={detailsSummary}>Wiki navigation</summary>
             <div className="px-1 py-4">
               <WikiNav currentPath={currentPath} />
@@ -200,7 +200,7 @@ export function WikiLayout({ children, currentPath, toc = [], backTo, backLabel,
 
           {toc.length > 0 && (
             <details
-              className="xl:hidden"
+              className="@7xl:hidden"
               open={mobileTocOpen}
               onToggle={(event) => setMobileTocOpen(event.currentTarget.open)}
             >
@@ -215,7 +215,7 @@ export function WikiLayout({ children, currentPath, toc = [], backTo, backLabel,
         </div>
 
         {toc.length > 0 && (
-          <aside className="hidden xl:block">
+          <aside className="hidden @7xl:block">
             <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
               <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400">
                 On this page

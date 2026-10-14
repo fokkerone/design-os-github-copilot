@@ -34,7 +34,7 @@ export function Shadows({ shadows }: { shadows: ShadowToken[] }) {
         {roles.map((role) => (
           <div key={role} className="space-y-2">
             {roles.length > 1 && <p className="text-xs font-medium capitalize text-stone-600 dark:text-rwe-neutral-300">{role}</p>}
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 @2xl:grid-cols-3 @5xl:grid-cols-4 gap-4">
               {shadows
                 .filter((s) => s.role === role)
                 .map((s) => (

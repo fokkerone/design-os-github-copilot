@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures'
+import { test, expect, hasSampleProject } from './fixtures'
 
 const routes: [string, RegExp, string][] = [
   ['Vision', /prototype\/vision$/, 'Vision'],
@@ -44,7 +44,7 @@ test.describe('navigation', () => {
     await expect(page).toHaveURL(/roadmap\/data-shape$/)
     await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /^Roadmap/ })).toHaveAttribute('aria-current', 'page')
     await page.goto('/design-system')
-    await page.getByRole('link', { name: 'Shell' }).click()
+    await page.getByRole('link', { name: 'Shell', exact: true }).click()
     await expect(page).toHaveURL(/design-system\/shell$/)
   })
 
@@ -73,10 +73,11 @@ test.describe('navigation', () => {
     await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)
     await page.goto('/prototype/preview/fullscreen')
     await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)
-    await expect(page.getByText(/not been assembled/i)).toBeVisible()
+    if (!hasSampleProject) await expect(page.getByText(/not been assembled/i)).toBeVisible()
   })
 
   test('empty project shows the start card and starts the step in the chat', async ({ page, opencode }) => {
+    test.skip(hasSampleProject, 'needs an empty project')
     opencode.reply({ chunks: ['Tell me about your product'] })
     await page.goto('/prototype/vision')
     await expect(page.getByText('No product defined yet')).toBeVisible()

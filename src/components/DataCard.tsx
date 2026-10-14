@@ -72,7 +72,7 @@ export function DataCard({ data, sectionName }: DataCardProps) {
               <h4 className="text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-3">
                 Data Shapes
               </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 @2xl:grid-cols-2 gap-4">
                 {Object.entries(meta.models).map(([modelName, description]) => (
                   <div
                     key={modelName}

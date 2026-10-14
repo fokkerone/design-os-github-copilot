@@ -17,7 +17,7 @@ interface AppLayoutProps {
 export function AppLayout({ children, backTo, backLabel = 'Back', title }: AppLayoutProps) {
   // The sidebar, header and step panel are the chrome (see AppFrame): a page renders only its content
   return (
-    <div className="animate-fade-in px-4 py-6 sm:px-6">
+    <div className="animate-fade-in px-4 py-6 @2xl:px-6">
       {backTo && (
         <div className="mb-6 flex items-center gap-3 text-sm">
           <Link

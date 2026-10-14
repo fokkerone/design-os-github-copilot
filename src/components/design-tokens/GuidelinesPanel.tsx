@@ -44,7 +44,7 @@ export function GuidelinesPanel({ tokens, guide }: { tokens: DesignTokens; guide
       )}
 
       {(g.rulesDo.length > 0 || g.rulesDont.length > 0) && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 @2xl:grid-cols-2 gap-6">
           {g.rulesDo.length > 0 && (
             <TokenGroup title="Do">
               <RuleList items={g.rulesDo} kind="do" />
@@ -59,7 +59,7 @@ export function GuidelinesPanel({ tokens, guide }: { tokens: DesignTokens; guide
       )}
 
       {(g.componentRules.length > 0 || g.qualityGates.length > 0 || g.accessibility.length > 0) && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 @2xl:grid-cols-3 gap-6">
           {g.accessibility.length > 0 && (
             <TokenGroup title="Accessibility">
               <RuleList items={g.accessibility} kind="neutral" />

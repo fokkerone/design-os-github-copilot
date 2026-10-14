@@ -51,7 +51,7 @@ export function ImportReport({ tokens }: { tokens: DesignTokens }) {
   return (
     <div className="space-y-8">
       <TokenGroup title="Pipeline">
-        <ol className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
+        <ol className="grid grid-cols-1 @2xl:grid-cols-4 gap-2 text-xs">
           {[
             ['1 · Import', 'product/design-system/import/', 'tokens.json (DTCG), DESIGN.md, skill.md'],
             ['2 · Convert', 'Style Dictionary ' + meta.generator.styleDictionary, 'classify · hex → OKLCH · px → rem'],

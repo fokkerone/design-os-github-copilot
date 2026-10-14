@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { test as base } from '@playwright/test'
 import { FakeOpenCode } from '../tests/helpers/fake-opencode'
 
@@ -11,3 +13,6 @@ export const test = base.extend<{ opencode: FakeOpenCode }>({
   },
 })
 export { expect } from '@playwright/test'
+
+/** True when product/ holds a project (this worktree): tests written for the empty template skip */
+export const hasSampleProject = existsSync(join(process.cwd(), 'product/product-overview.md'))

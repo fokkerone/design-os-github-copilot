@@ -155,7 +155,7 @@ export function FlowPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {context.length > 0 && (
-                <dl className="grid grid-cols-1 sm:grid-cols-[8rem_1fr] gap-x-4 gap-y-2">
+                <dl className="grid grid-cols-1 @2xl:grid-cols-[8rem_1fr] gap-x-4 gap-y-2">
                   {context.map(([label, value]) => (
                     <div key={label} className="contents">
                       <dt className="text-sm text-stone-500 dark:text-rwe-neutral-400">{label}</dt>

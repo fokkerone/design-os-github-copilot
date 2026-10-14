@@ -51,17 +51,17 @@ export function StepScreen({ step }: { step: ResolvedStep }) {
     return (
       <Link
         to={paths.screen(step.target.sectionId, step.target.name)}
-        className="inline-flex items-center gap-1.5 text-sm text-stone-700 dark:text-rwe-neutral-300 hover:text-stone-900 dark:hover:text-rwe-neutral-100 underline decoration-stone-300 dark:decoration-rwe-neutral-600 underline-offset-2"
+        className="inline-flex max-w-full items-center gap-1.5 text-sm text-stone-700 dark:text-rwe-neutral-300 hover:text-stone-900 dark:hover:text-rwe-neutral-100 underline decoration-stone-300 dark:decoration-rwe-neutral-600 underline-offset-2"
       >
         <Layout className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
-        <span className="font-mono text-xs">
+        <span className="min-w-0 break-all font-mono text-xs">
           {step.target.sectionId}/{step.target.name}
         </span>
       </Link>
     )
   }
   const wanted = [step.sectionId, step.screen].filter(Boolean).join('/')
-  return <span className="font-mono text-xs text-stone-400 dark:text-rwe-neutral-500">{wanted || '—'}</span>
+  return <span className="break-all font-mono text-xs text-stone-400 dark:text-rwe-neutral-500">{wanted || '—'}</span>
 }
 
 export function CoverageBar({ coverage, compact = false }: { coverage: FlowCoverage; compact?: boolean }) {

@@ -295,7 +295,7 @@ export function DesignPage() {
                     <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-3'>
                       UI Style
                     </h4>
-                    <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
+                    <div className='grid grid-cols-2 @2xl:grid-cols-3 gap-3'>
                       {designSystem.uiStyle.borderRadius && (
                         <div className='bg-stone-50 dark:bg-rwe-neutral-800/50 rounded px-3 py-2'>
                           <p className='text-xs text-stone-500 dark:text-rwe-neutral-400 mb-0.5'>

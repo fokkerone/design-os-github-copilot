@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures'
+import { test, expect, hasSampleProject } from './fixtures'
 
 const input = (page: import('@playwright/test').Page) => page.getByRole('textbox', { name: 'Message the agent' })
 
@@ -93,6 +93,6 @@ test.describe('chat', () => {
   test('shows how to start OpenCode when it is not running', async ({ page }) => {
     await page.goto('/prototype/vision')
     await expect(page.getByRole('status').filter({ hasText: 'opencode serve --port 4096' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Start with agent' })).toBeDisabled()
+    if (!hasSampleProject) await expect(page.getByRole('button', { name: 'Start with agent' })).toBeDisabled()
   })
 })

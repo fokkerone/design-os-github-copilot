@@ -126,7 +126,7 @@ export function SplitLayout({ title, chat, children, panelMode, onPanelModeChang
                   hasChat ? 'fixed inset-y-0 right-0 z-40 w-full max-w-[560px] shadow-xl' : 'min-w-0 flex-1'
                 }`}
               >
-                <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+                <div className="@container min-h-0 flex-1 overflow-y-auto">{children}</div>
               </aside>
             </>
           )}
@@ -221,7 +221,7 @@ function ResizableSplit({
           data-collapsed={mode === 'hidden'}
           className="flex h-full flex-col bg-rwe-sand-50 data-[collapsed=true]:invisible dark:bg-rwe-neutral-900"
         >
-          <div className="min-h-0 flex-1 overflow-y-auto">{mode !== 'hidden' && children}</div>
+          <div className="@container min-h-0 flex-1 overflow-y-auto">{mode !== 'hidden' && children}</div>
         </aside>
       </ResizablePanel>
     </ResizablePanelGroup>

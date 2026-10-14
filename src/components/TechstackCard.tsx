@@ -48,11 +48,11 @@ export function TechstackCard() {
               <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400 mb-2">
                 {TECHSTACK_GROUPS[group]}
               </h3>
-              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
+              <dl className="grid grid-cols-1 @2xl:grid-cols-2 gap-x-6 gap-y-1.5">
                 {rows.map((row) => (
                   <div key={row.area} className="flex items-baseline justify-between gap-3 text-sm">
                     <dt className="text-stone-500 dark:text-rwe-neutral-400">{row.label}</dt>
-                    <dd className="text-stone-900 dark:text-rwe-neutral-100 text-right">
+                    <dd className="min-w-0 break-words text-stone-900 dark:text-rwe-neutral-100 text-right">
                       {row.choice}
                       {row.source !== 'chosen' && (
                         <span className="ml-1.5 text-xs text-stone-400 dark:text-rwe-neutral-500">{row.source}</span>

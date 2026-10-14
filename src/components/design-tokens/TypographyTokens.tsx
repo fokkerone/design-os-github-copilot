@@ -18,7 +18,7 @@ export function FontFamilies({ typography }: { typography: Typography }) {
       count={typography.fontFamilies.length}
       hint="Previews use the token stack; if a family is not installed locally, the browser falls back to the next entry."
     >
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 @2xl:grid-cols-3 gap-4">
         {typography.fontFamilies.map((f) => (
           <div key={f.name} className="rounded-md border border-stone-200 dark:border-rwe-neutral-700 p-4 space-y-2 min-w-0">
             <p className="text-4xl text-stone-900 dark:text-rwe-neutral-100 leading-none" style={{ fontFamily: f.stack }}>
@@ -73,7 +73,7 @@ export function FontWeights({ typography }: { typography: Typography }) {
   const stack = bodyStack(typography)
   return (
     <TokenGroup title="Font weights" count={typography.fontWeights.length}>
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 @2xl:grid-cols-5 gap-3">
         {typography.fontWeights.map((w) => (
           <div key={w.name} className="rounded-md bg-stone-50 dark:bg-rwe-neutral-800/50 px-3 py-2.5 space-y-1">
             <p className="text-2xl text-stone-900 dark:text-rwe-neutral-100" style={{ fontFamily: stack, fontWeight: w.value }}>

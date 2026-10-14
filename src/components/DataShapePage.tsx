@@ -50,7 +50,7 @@ export function DataShapePage() {
                   {dataShape.entities.length === 0 ? (
                     <p className="text-stone-500 dark:text-rwe-neutral-400">No entities defined.</p>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 @2xl:grid-cols-2 gap-4">
                       {dataShape.entities.map((entity, index) => (
                         <div
                           key={index}

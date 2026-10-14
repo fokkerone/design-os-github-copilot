@@ -100,7 +100,7 @@ export function SemanticColors({ tokens }: { tokens: ModalColorToken[] }) {
             {groups.length > 1 && (
               <p className="text-xs font-medium capitalize text-stone-600 dark:text-rwe-neutral-300">{group.name}</p>
             )}
-            <div className="hidden sm:grid grid-cols-[14rem_1fr_1fr] gap-4 text-[11px] uppercase tracking-wide text-stone-400 dark:text-rwe-neutral-500">
+            <div className="hidden @2xl:grid grid-cols-[14rem_1fr_1fr] gap-4 text-[11px] uppercase tracking-wide text-stone-400 dark:text-rwe-neutral-500">
               <span>Token</span>
               <span>Light</span>
               <span>Dark</span>
@@ -111,9 +111,9 @@ export function SemanticColors({ tokens }: { tokens: ModalColorToken[] }) {
                 return (
                   <div
                     key={base.name}
-                    className="grid grid-cols-2 sm:grid-cols-[14rem_1fr_1fr] gap-x-4 gap-y-2 py-3"
+                    className="grid grid-cols-2 @2xl:grid-cols-[14rem_1fr_1fr] gap-x-4 gap-y-2 py-3"
                   >
-                    <div className="col-span-2 sm:col-span-1 min-w-0 space-y-1">
+                    <div className="col-span-2 @2xl:col-span-1 min-w-0 space-y-1">
                       <p className="flex items-center gap-1.5 text-sm font-medium text-stone-900 dark:text-rwe-neutral-100">
                         {base.name}
                         {missingLight && (
@@ -150,7 +150,7 @@ export function CustomColors({ tokens }: { tokens: ModalColorToken[] }) {
   if (!tokens.length) return null
   return (
     <TokenGroup title="Custom colors" count={tokens.length}>
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 @2xl:grid-cols-4 @5xl:grid-cols-6 gap-4">
         {tokens.map((t) => (
           <div key={t.name} className="space-y-1.5 min-w-0">
             <div className="flex gap-1">
@@ -174,11 +174,11 @@ export function CustomColors({ tokens }: { tokens: ModalColorToken[] }) {
 function ScaleRow({ scale, label }: { scale: ColorScale; label?: string }) {
   const format = useValueFormat()
   return (
-    <div className="grid grid-cols-[4.5rem_1fr] items-start gap-3">
+    <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] items-start gap-3">
       <p className="pt-2.5 text-xs font-medium text-stone-700 dark:text-rwe-neutral-300 truncate" title={scale.name}>
         {label ?? scale.name}
       </p>
-      <div className="flex gap-1">
+      <div className="flex min-w-0 gap-1 overflow-x-auto">
         {scale.steps.map((step) => (
           <button
             key={step.step}
@@ -257,7 +257,7 @@ export function Gradients({ gradients }: { gradients: GradientStyle[] }) {
       count={gradients.length}
       hint="Figma paint styles from DESIGN.md — reference only, not part of tokens.css. Direction is not exported."
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 gap-4">
         {gradients.map((g, i) => (
           <div key={`${g.name}-${i}`} className="space-y-1.5 min-w-0">
             {g.css ? (

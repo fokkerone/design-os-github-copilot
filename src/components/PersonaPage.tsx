@@ -17,7 +17,7 @@ function capitalize(text: string): string {
 
 function LabeledList({ items }: { items: Record<string, string> }) {
   return (
-    <dl className="grid grid-cols-1 sm:grid-cols-[11rem_1fr] gap-x-4 gap-y-2">
+    <dl className="grid grid-cols-1 @2xl:grid-cols-[11rem_1fr] gap-x-4 gap-y-2">
       {Object.entries(items).map(([label, value]) => (
         <div key={label} className="contents">
           <dt className="text-sm text-stone-500 dark:text-rwe-neutral-400">{capitalize(label)}</dt>
@@ -231,7 +231,7 @@ export function PersonaPage() {
                 <div key={dimension.dimension}>
                   <p className="text-sm text-stone-700 dark:text-rwe-neutral-300 mb-1">{dimension.dimension}</p>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-stone-500 dark:text-rwe-neutral-400 w-24 text-right shrink-0">{dimension.low}</span>
+                    <span className="text-xs text-stone-500 dark:text-rwe-neutral-400 w-16 @2xl:w-24 text-right shrink-0">{dimension.low}</span>
                     <div className="flex gap-1" aria-label={`${dimension.position ?? '?'} of 5`}>
                       {[1, 2, 3, 4, 5].map((value) => (
                         <span

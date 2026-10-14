@@ -150,7 +150,7 @@ export function ExportPage() {
                   <FolderTree className="w-4 h-4" strokeWidth={1.5} />
                   What's Included
                 </h4>
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid @2xl:grid-cols-2 gap-4">
                   <ExportItem
                     title="Ready-to-Use Prompts"
                     description="Pre-written prompts to copy/paste into your coding agent."

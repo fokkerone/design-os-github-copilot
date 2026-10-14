@@ -12,6 +12,7 @@ import { DesignPage } from '@/components/DesignPage'
 import { ShellDesignPage } from '@/components/ShellDesignPage'
 import { ClickdummyPage } from '@/components/ClickdummyPage'
 import { PageTabs } from '@/components/PageTabs'
+import { defaultTechstack } from '@/lib/model/techstack'
 
 // These tests describe an empty project. The loaders read the real product/ folder (which fills up
 // while you work with the agent), so they are replaced here.
@@ -24,6 +25,7 @@ vi.mock('@/lib/product-loader', async (importOriginal) => ({
 vi.mock('@/lib/techstack-loader', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/techstack-loader')>()),
   hasTechstack: () => false,
+  loadTechstack: () => defaultTechstack(),
 }))
 vi.mock('@/lib/project-model', async (importOriginal) => {
   const real = await importOriginal<typeof import('@/lib/project-model')>()
