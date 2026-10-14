@@ -2,7 +2,7 @@
 
 After completing [Product Planning](product-planning.md), you're ready to design individual sections. Work through each section in your roadmap, completing these steps for each one.
 
-## 1. Shape the Section (`@05-shape-section`)
+## 1. Shape the Section (`@06-shape-section`)
 
 Define what the section does and how it should work. If you have multiple sections, you'll be asked which one to work on.
 
@@ -19,7 +19,7 @@ You'll also be asked whether this section should display inside the application 
 
 **Creates:** `product/sections/[section-id]/spec.md`
 
-## 2. Generate Sample Data (`@06-sample-data`)
+## 2. Generate Sample Data (`@07-sample-data`)
 
 Generate sample data and TypeScript types for the section. The agent reviews the section spec and asks clarifying questions about:
 
@@ -31,9 +31,9 @@ Generate sample data and TypeScript types for the section. The agent reviews the
 - `product/sections/[section-id]/data.json` — Sample data with `_meta` descriptions
 - `product/sections/[section-id]/types.ts` — TypeScript interfaces
 
-Run `@06-sample-data` again any time you need to update the data structure or sample records.
+Run `@07-sample-data` again any time you need to update the data structure or sample records.
 
-## 3. Design the Screen (`@07-design-screen`)
+## 3. Design the Screen (`@08-design-screen`)
 
 Build the actual React components for the section. This is where the spec and sample data become a working UI.
 
@@ -67,21 +67,23 @@ All screen designs include:
 - **Mobile responsive** — Tailwind responsive prefixes (`sm:`, `md:`, `lg:`)
 - **Light & dark mode** — Using `dark:` variants
 - **Design tokens applied** — Your color palette and typography choices
+- **Tech stack followed** — UI primitives come from the product UI layer `src/ui/` (never `@/components/*`) and icons from your stack; missing primitives are ported into `src/ui/` and only listed packages are used
 - **All spec requirements** — Every user flow and UI requirement implemented
 
 ### Multiple Views
 
-If the spec implies multiple views (list view, detail view, form, etc.), you'll be asked which to build first. Run `@07-design-screen` again for additional views.
+If the spec implies multiple views (list view, detail view, form, etc.), you'll be asked which to build first. Run `@08-design-screen` again for additional views.
 
 **Creates:**
 - `src/sections/[section-id]/components/[ViewName].tsx` — Main component
 - `src/sections/[section-id]/components/[SubComponent].tsx` — Sub-components as needed
 - `src/sections/[section-id]/components/index.ts` — Component exports
 - `src/sections/[section-id]/[ViewName].tsx` — Preview wrapper
+- `src/ui/[primitive].tsx` — Any product UI primitive the screen needs that is not in `src/ui/` yet (exported to `product-plan/ui/`)
 
 **Important:** Restart your dev server after creating screen designs to see the changes.
 
-## 4. Capture Screenshots (Optional) (`@08-screenshot-design`)
+## 4. Capture Screenshots (Optional) (`@09-screenshot-design`)
 
 Take screenshots of your screen designs for documentation. Screenshots are saved alongside the spec and data files.
 
@@ -102,7 +104,7 @@ Screenshots are useful for:
 
 ## Repeat for Each Section
 
-Work through your roadmap sections in order. Each section builds on the foundation you established and benefits from the consistency of your global data shape and design tokens.
+Work through your roadmap sections in order. Each section builds on the foundation you established and benefits from the consistency of your global data shape, design tokens and tech stack.
 
 ## What's Next
 

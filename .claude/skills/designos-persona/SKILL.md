@@ -41,7 +41,7 @@ A persona is designed through a fixed pipeline that combines the established app
   - Free-text answers come through the automatic "Other" option. Don't add your own "Other".
   - Keep labels short (1–5 words) and put detail in the description, so the prompts work with hardware controllers like Stream Deck.
 - **Never write a file before the user confirmed the review step.**
-- **Stay in scope.** You create personas. You do not create flows (`/design-os:userflow`), section specs (`/shape-section`) or screen designs. Point to those commands instead.
+- **Stay in scope.** You create personas. You do not create flows (`/design-os:userflow`), section specs (`/design-os:shape-section`) or screen designs. Point to those commands instead.
 
 ---
 
@@ -53,7 +53,7 @@ A persona is designed through a fixed pipeline that combines the established app
 | `research` | Interviews, surveys, support tickets or analytics exist in `wiki/raw/`, `wiki/research/` or as pasted notes | Kind `qualitative` (or `statistical` with a clustered survey); claims cite their source and start at `signal` or higher |
 | `update <persona-id>` | Revise an existing persona | Loads `product/personas/<persona-id>.md`, asks what to change, re-runs affected stages only |
 | `validate <persona-id>` | New evidence arrived | Walks through the Assumptions table, raises or lowers evidence levels, marks disproven assumptions, recomputes `confidence` and `status` |
-| `inline` | Called from `/design-os:userflow`, `/shape-section` or `/product-vision` | Pre-fill from the calling conversation and confirm instead of asking again; the caller does the linking |
+| `inline` | Called from `/design-os:userflow`, `/design-os:shape-section` or `/design-os:product-vision` | Pre-fill from the calling conversation and confirm instead of asking again; the caller does the linking |
 
 No mode given: if `wiki/raw/` or `wiki/research/` contain interviews or research about users, ask `research` vs `proto` (recommend `research`); otherwise use `proto`.
 
@@ -173,7 +173,7 @@ The links chosen in Step 9 are written in three places, all as **metadata or a s
    ```markdown
    - <Persona name> — <archetype, one line> (persona: <persona-id>)
    ```
-   Change nothing else in the spec. Sections without a `spec.md` are listed with the hint to run `/shape-section`.
+   Change nothing else in the spec. Sections without a `spec.md` are listed with the hint to run `/design-os:shape-section`.
 2. **Flows**: add `<persona-id>` to the `personas: [...]` list in the **frontmatter** of each chosen `product/flows/<flow-id>.md` (create the key if missing), then run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md`. Never edit the flow body.
 3. **The persona itself**: set `sections:` and `flows:` in the persona file's frontmatter to what is now linked, and `status: active` if anything is linked. Then run `npm run -s wiki -- sync-meta product/personas/<persona-id>.md`.
 
@@ -203,7 +203,7 @@ Linked: sections <ids> · flows <ids>
 Next:
   /design-os:persona validate <persona-id>   Record new evidence
   /design-os:userflow                       Design a flow for this persona
-  /shape-section                            Link the persona in a section spec
+  /design-os:shape-section                            Link the persona in a section spec
   /design-os:wiki-query                     Ask the brain about this persona
 ```
 

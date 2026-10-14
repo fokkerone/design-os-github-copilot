@@ -4,7 +4,7 @@ summary: Import W3C DTCG design tokens (for example a Figma variables export) wi
 tags: [how-to, design-system]
 sources: [scripts/design-tokens/pipeline.mjs]
 created: 2026-10-12
-updated: 2026-10-12
+updated: 2026-10-14
 ---
 
 # Design Tokens
@@ -13,7 +13,7 @@ updated: 2026-10-12
 The token import is the alternative to the design system interview. You drop exported files into one folder, run one command, and Design OS shows the result on the Design page. Nothing is edited by hand, and the build is **deterministic and idempotent**: the same inputs always produce byte-identical outputs, and running it again changes nothing.
 
 ## When to use it
-Your design system already lives in Figma (variables, styles) or another tool that exports W3C DTCG tokens. Use the `@03-design-system` agent (`/design-tokens`) instead when you want to define colors and fonts in a conversation.
+Your design system already lives in Figma (variables, styles) or another tool that exports W3C DTCG tokens. Use the `@04-design-system` agent (`/design-tokens`) instead when you want to define colors and fonts in a conversation.
 
 ## Step by step
 
@@ -53,7 +53,7 @@ Strict import: every Tailwind namespace the import provides is reset first (`--c
 Design OS has its own theme (stone/lime, `src/index.css`); the product has the imported tokens. They never mix:
 
 - The Design OS app reads product tokens only as data (`src/lib/design-tokens-loader.ts`) and shows them with inline values. It never loads `tokens.css`.
-- Screen designs, the shell and the clickdummy never use Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, ...) or Design OS components — inside Design OS these would show the Design OS theme. They use the palette steps from DESIGN.md plus a `token:` comment.
+- Screen designs, the shell and the clickdummy never use Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, ...) or Design OS components (`@/components/*`) — inside Design OS these would show the Design OS theme. They import UI primitives from the product UI layer `src/ui/` (chosen in the tech stack step, see [[how-to/tech-stack]]) and use the palette steps from DESIGN.md plus a `token:` comment.
 - `tokens.css` is applied only in the exported codebase. `npm run test:tokens` enforces all of this.
 
 ## Rules
@@ -63,4 +63,5 @@ Design OS has its own theme (stone/lime, `src/index.css`); the product has the i
 
 ## Related
 - [[how-to/planning-flow]]
+- [[how-to/tech-stack]]
 - [[how-to/getting-started]]

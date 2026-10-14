@@ -14,7 +14,7 @@ The core issue: we're asking coding agents to figure out what to build _and_ bui
 
 Design OS powers a guided design and architecture process. You + AI, working together through structured steps:
 
-1. **Product Planning** — Define your vision, break down your roadmap, and model your data
+1. **Product Planning** — Define your vision, decide the tech stack (UI library, icons, packages; shadcn/ui is the default), break down your roadmap, and model your data
 2. **Design System** — Choose colors, typography, and design your application shell
 3. **Section Design** — For each feature area: specify requirements, generate sample data, and design the screens
 4. **Export** — Generate a complete handoff package for implementation
@@ -28,16 +28,17 @@ Design OS is its own separate codebase—a design environment you use _before_ b
 You interact with Design OS through **Copilot agents**. Each agent walks you through a specific part of the process:
 
 - `@00-product-vision` — Define your product name, description, problems, solutions, and key features
-- `@01-product-roadmap` — Define the main areas/sections of your product
-- `@02-data-shape` — Sketch out the core data entities and relationships
-- `@03-design-system` — Define your visual identity and brand personality
-- `@04-design-shell` — Design navigation and layout
-- `@05-shape-section` — Define a section's scope and requirements
-- `@06-sample-data` — Generate sample data and TypeScript types for a section
-- `@07-design-screen` — Create production-ready React components
-- `@08-screenshot-design` — Snap a screenshot of a finished design screen for quick reference
-- `@09-clickdummy` — Assemble a navigable clickdummy for stakeholder demos and feedback
-- `@10-export-product` — Generate the complete handoff package
+- `@01-techstack` — Decide the tech stack: UI library (shadcn/ui by default), icons, registries, packages
+- `@02-product-roadmap` — Define the main areas/sections of your product
+- `@03-data-shape` — Sketch out the core data entities and relationships
+- `@04-design-system` — Define your visual identity and brand personality
+- `@05-design-shell` — Design navigation and layout
+- `@06-shape-section` — Define a section's scope and requirements
+- `@07-sample-data` — Generate sample data and TypeScript types for a section
+- `@08-design-screen` — Create production-ready React components
+- `@09-screenshot-design` — Snap a screenshot of a finished design screen for quick reference
+- `@10-clickdummy` — Assemble a navigable clickdummy for stakeholder demos and feedback
+- `@11-export-product` — Generate the complete handoff package
 
 See [Usage](usage.md) for the full workflow.
 
@@ -50,6 +51,7 @@ See [Usage](usage.md) for the full workflow.
 
 - Works with GitHub Copilot in VS Code via custom agents
 - Your frontend needs React and Tailwind CSS
+- UI primitives are built from the tech stack you choose (shadcn/ui by default) and exported with the components
 - Your backend can be anything—Rails, Laravel, Next.js, Python, whatever
 
 ## Open Source

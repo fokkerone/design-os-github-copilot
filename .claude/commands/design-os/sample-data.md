@@ -2,7 +2,18 @@
 
 You are helping the user create or update realistic sample data for a section of their product. This data will be used to populate screen designs. You will also generate TypeScript types based on the data structure.
 
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
+
 **Golden rule: NEVER generate files without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
+
+## Step 0: Load the Tech Stack
+
+Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`).
+
+- Tell the user in one line which stack applies: `product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react".
+- The decisions are binding. Undecided means no new dependency.
+- A request the stack cannot serve is a conflict: show it to the user and offer `/design-os:techstack update`. Never edit `product/techstack/techstack.md` from this step.
+- **This step:** types stay plain TypeScript interfaces. When `validation` is decided, note in a comment which fields would be validated (for example `/** validated: required, email */`) without importing the library or generating schemas. The prototype adds no data-fetching library: the screens read `data.json` through props.
 
 ## Step 1: Check Prerequisites
 
@@ -14,7 +25,7 @@ If there's only one section, auto-select it. If there are multiple sections, ask
 
 Then check if `product/sections/[section-id]/spec.md` exists. If it doesn't:
 
-"I don't see a specification for **[Section Title]** yet. Please run `/shape-section` first to define the section's requirements, then come back to generate sample data."
+"I don't see a specification for **[Section Title]** yet. Please run `/design-os:shape-section` first to define the section's requirements, then come back to generate sample data."
 
 Stop here if the spec doesn't exist.
 
@@ -48,7 +59,7 @@ Check if `product/data-shape/data-shape.md` exists.
 **If it doesn't exist:**
 Show a warning but continue:
 
-"Note: A global data shape hasn't been defined yet. I'll create entity structures based on the section spec, but for consistency across sections, consider running `/data-shape` first."
+"Note: A global data shape hasn't been defined yet. I'll create entity structures based on the section spec, but for consistency across sections, consider running `/design-os:data-shape` first."
 
 ## Step 4: Ask Clarifying Questions
 
@@ -64,7 +75,7 @@ Read and analyze `product/sections/[section-id]/spec.md` to understand:
 - **Edge cases** (`E1…`): include at least one record or value that produces each edge case that returns to a step in this section (a rejected value, an expired item, an empty list, a blocked account). Name the edge case in `_meta` so the screen design can find it.
 - **Rules** (`R1…`): the sample values must respect them, apart from the records that exist to show a rule being broken.
 - **Personas**: let their context decide what realistic means: wording, language, volumes, the kind of names and amounts they would see.
-- **The spec is binding**: flows and personas shape the sample values. They do not add entities or fields the spec does not call for. If a flow needs data the spec does not cover, tell the user and point to `/shape-section`.
+- **The spec is binding**: flows and personas shape the sample values. They do not add entities or fields the spec does not call for. If a flow needs data the spec does not cover, tell the user and point to `/design-os:shape-section`.
 
 If the section has no flow and no persona, continue as before.
 
@@ -159,6 +170,10 @@ Generate TypeScript types based on the data structure.
 4. **Use consistent entity names:**
    - If a global data shape exists, use the same entity names
 
+5. **Plain TypeScript only (tech stack):**
+   - Interfaces and union types, no schema library and no imports from packages
+   - If `validation` is decided in the stack, add a short JSDoc note on the fields that would be validated (e.g. `/** validated: required, email */`); do not import the library
+
 Example types.ts:
 
 ```typescript
@@ -222,7 +237,7 @@ The types include:
 - `[Entity]` - The main data type
 - `[SectionName]Props` - Props interface for the component (includes callbacks for [list actions])
 
-Review the files and let me know if you'd like any adjustments. When you're ready, run `/design-screen` to create the screen design for this section."
+Review the files and let me know if you'd like any adjustments. When you're ready, run `/design-os:design-screen` to create the screen design for this section."
 
 ## Important Notes
 
@@ -235,6 +250,7 @@ Review the files and let me know if you'd like any adjustments. When you're read
 - When flows are linked, every edge case that returns to a step in this section has sample data that produces it
 - Never edit a flow, persona or spec file from this command
 - Always generate types.ts alongside data.json
+- types.ts stays plain TypeScript: no validation or data-fetching library is imported (tech stack)
 - Callback props should cover all actions mentioned in the spec
 - **Use entity names from the global data shape for consistency across sections**
 - If the user requests changes after reviewing, update the files immediately

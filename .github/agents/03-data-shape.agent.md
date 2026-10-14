@@ -1,9 +1,9 @@
 ---
-name: 02-data-shape
-description: "Step 2: Create or update the general data shape for your product — core entities and their relationships. Establishes shared vocabulary for consistent naming across sections."
+name: 03-data-shape
+description: "Step 3: Create or update the general data shape for your product — core entities and their relationships. Establishes shared vocabulary for consistent naming across sections."
 handoffs:
   - label: Define Design System
-    agent: 03-design-system
+    agent: 04-design-system
     prompt: "Data shape is defined. Define the visual identity — colors, typography, and brand personality."
 ---
 
@@ -121,7 +121,7 @@ Once the user has confirmed the entities and relationships, create `product/data
 
 This provides a shared vocabulary for your screen designs. When you use the `sample-data` agent, it will reference these entities to ensure consistent naming across sections.
 
-Review and let me know if you'd like to adjust anything. When you're ready, use the `@03-design-system` agent to define your visual identity and brand personality."
+Review and let me know if you'd like to adjust anything. When you're ready, use the `@04-design-system` agent to define your visual identity and brand personality."
 
 ---
 

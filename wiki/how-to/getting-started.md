@@ -4,7 +4,7 @@ summary: Run the Design OS app, choose Claude Code or GitHub Copilot, and learn 
 tags: [how-to]
 sources: [agents.md]
 created: 2026-10-09
-updated: 2026-10-09
+updated: 2026-10-14
 ---
 
 # Getting Started
@@ -27,7 +27,7 @@ Every step exists twice, with the same behavior:
 
 | You use | How you start a step | Example |
 |---------|----------------------|---------|
-| Claude Code | Slash command | `/product-vision`, `/design-os:userflow` |
+| Claude Code | Slash command | `/design-os:product-vision`, `/design-os:userflow` |
 | GitHub Copilot | Agent in the chat | `@00-product-vision`, `@userflow` |
 
 The full list is in [[how-to/planning-flow]].
@@ -44,8 +44,9 @@ The full list is in [[how-to/planning-flow]].
 
 | Folder | What it holds |
 |--------|---------------|
-| `product/` | Planning files: overview, roadmap, data shape, design system, shell, personas, flows, section specs |
+| `product/` | Planning files: overview, tech stack, roadmap, data shape, design system, shell, personas, flows, section specs |
 | `src/sections/`, `src/shell/` | Screen design components (React, Tailwind CSS v4, props-based) |
+| `src/ui/` | Product UI primitives (button, dialog, ...), built from the tech stack; shadcn/ui by default |
 | `wiki/` | The project brain, also an Obsidian vault |
 | `product-plan/` | The generated export package |
 
@@ -56,10 +57,12 @@ The full walkthrough with every command is the [[how-to/step-by-step]] guide. Th
 
 1. Run `/product-vision` (or `@00-product-vision`) and describe your product in your own words.
 2. Run `/design-os:persona` to make your primary user concrete.
-3. Continue with `/product-roadmap`. From here, follow [[how-to/planning-flow]].
+3. Run `/design-os:techstack` (or `@01-techstack`) to decide the UI library, icons and packages. It is recommended, not blocking: without it the defaults apply (shadcn/ui, lucide-react). See [[how-to/tech-stack]].
+4. Continue with `/product-roadmap`. From here, follow [[how-to/planning-flow]].
 
 ## Related
 - [[how-to/step-by-step]] — the complete walkthrough
 - [[how-to/planning-flow]] — every step in order
+- [[how-to/tech-stack]] — decide the UI library, icons and packages
 - [[how-to/project-brain]] — how the wiki works
 - `agents.md` — the full directive for agents

@@ -1,9 +1,9 @@
 ---
-name: 03-design-system
-description: "Step 3: Define your product's visual identity — colors, typography, brand personality, and UI style. Optionally import brand resources (logos, style guides) for analysis."
+name: 04-design-system
+description: "Step 4: Define your product's visual identity — colors, typography, brand personality, and UI style. Optionally import brand resources (logos, style guides) for analysis."
 handoffs:
   - label: Design Shell
-    agent: 04-design-shell
+    agent: 05-design-shell
     prompt: "Design system is defined. Design the application shell — navigation and layout."
 ---
 
@@ -35,6 +35,16 @@ If it doesn't exist:
 "Before defining your design system, you'll need to establish your product vision. Please use the `@00-product-vision` agent first."
 
 Stop here if the prerequisite is missing.
+
+## Step 1a: Load the Tech Stack
+
+Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`).
+
+- Tell the user in one line which stack applies: `product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react".
+- The decisions are binding. Undecided means no new dependency.
+- A request the stack cannot serve is a conflict: show it to the user and offer `@01-techstack` (mode `update`). Never edit `product/techstack/techstack.md` from this step.
+- **This step:** the colors must cover the semantic roles the UI library expects, so `DESIGN.md` maps one to one. For shadcn/ui: primary, secondary, muted, accent, destructive, background, foreground, card, popover, border, input, ring. On the token import path, check this against `DESIGN.md` and report missing roles to the user. On the interview path, pick palettes from which every role can be assigned.
+- Fonts and radius are the design system's. The stack's `ui-style` never overrides them.
 
 ## Step 1b: Check for Imported Design Tokens (DTCG)
 
@@ -413,7 +423,7 @@ Once approved, create:
 
 ---
 
-_This design system informs all screen designs and the application shell. The `@04-design-shell` and `@07-design-screen` agents will reference these tokens and preferences._
+_This design system informs all screen designs and the application shell. The `@05-design-shell` and `@08-design-screen` agents will reference these tokens and preferences._
 ```
 
 ## Step 7b: Update Google Fonts in index.html
@@ -449,7 +459,7 @@ Let the user know:
 
 These will be used when creating screen designs for your sections.
 
-Next step: Use the `@04-design-shell` agent to design your application's navigation and layout."
+Next step: Use the `@05-design-shell` agent to design your application's navigation and layout."
 
 ---
 

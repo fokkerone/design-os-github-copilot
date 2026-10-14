@@ -2,6 +2,8 @@
 
 You are helping the user capture a screenshot of a screen design they've created. The screenshot will be saved to the product folder for documentation purposes.
 
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
+
 ## Prerequisites: Check for Playwright MCP
 
 Before proceeding, verify that you have access to the Playwright MCP tool. Look for a tool named `browser_take_screenshot` or `mcp__playwright__browser_take_screenshot`.
@@ -15,7 +17,7 @@ To capture screenshots, I need the Playwright MCP server installed. Please run:
 claude mcp add playwright npx @playwright/mcp@latest
 ```
 
-Then restart this Claude Code session and run `/screenshot-design` again.
+Then restart this Claude Code session and run `/design-os:screenshot-design` again.
 ---
 
 Do not substitute different package names or modify the command. Output it exactly as written above.

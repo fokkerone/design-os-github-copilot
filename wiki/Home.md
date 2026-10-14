@@ -29,9 +29,10 @@ New here? Start with the guides that ship with Design OS: [[how-to/Home|How To]]
 1. [[how-to/getting-started]] — run the app, pick Claude Code or Copilot
 2. [[how-to/step-by-step]] — the complete walkthrough, command by command
 3. [[how-to/planning-flow]] — the planning flow at a glance
-4. [[how-to/project-brain]] — how this wiki works
-5. [[how-to/user-flows]] — design user flows
-6. [[how-to/personas]] — create and validate personas
+4. [[how-to/tech-stack]] — decide the UI library, icons and packages
+5. [[how-to/project-brain]] — how this wiki works
+6. [[how-to/user-flows]] — design user flows
+7. [[how-to/personas]] — create and validate personas
 
 ## Domains
 

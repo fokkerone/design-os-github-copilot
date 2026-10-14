@@ -1,9 +1,9 @@
-import { FileText, Map, ClipboardList, Database, Layout, Package, Boxes, Palette, PanelLeft, UserRound, GitBranch } from 'lucide-react'
+import { FileText, Map, ClipboardList, Database, Layout, Package, Boxes, Palette, PanelLeft, UserRound, GitBranch, Layers } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { AgentPrompt } from '@/components/AgentPrompt'
 import type { StepId } from '@/lib/harness'
 
-type EmptyStateType = 'overview' | 'roadmap' | 'spec' | 'data' | 'screen-designs' | 'data-shape' | 'design-system' | 'shell' | 'export' | 'personas' | 'flows'
+type EmptyStateType = 'overview' | 'roadmap' | 'spec' | 'data' | 'screen-designs' | 'data-shape' | 'design-system' | 'shell' | 'export' | 'personas' | 'flows' | 'techstack'
 
 interface EmptyStateProps {
   type: EmptyStateType
@@ -23,6 +23,13 @@ const config: Record<EmptyStateType, {
     step: 'product-vision',
     starter: 'Let\'s define my product vision',
     description: 'Define your product vision, key problems, and features',
+  },
+  techstack: {
+    icon: Layers,
+    title: 'No tech stack decided yet',
+    step: 'techstack',
+    starter: 'Let\'s decide the tech stack of my prototype',
+    description: 'Choose the UI library (shadcn/ui is the default), icons, registries, repos and the target framework',
   },
   roadmap: {
     icon: Map,

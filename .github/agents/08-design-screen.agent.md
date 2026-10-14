@@ -1,15 +1,15 @@
 ---
-name: 07-design-screen
-description: "Step 7: Create a screen design for a product section. Builds props-based React components with Tailwind CSS that can be exported and integrated into any React codebase. use DESIGN.md for design guidelines and UI best practices."
+name: 08-design-screen
+description: "Step 8: Create a screen design for a product section. Builds props-based React components with Tailwind CSS that can be exported and integrated into any React codebase. use DESIGN.md for design guidelines and UI best practices."
 handoffs:
   - label: Capture Screenshot
-    agent: 08-screenshot-design
+    agent: 09-screenshot-design
     prompt: "Screen design is complete. Capture a screenshot for documentation."
   - label: Shape Next Section
-    agent: 05-shape-section
+    agent: 06-shape-section
     prompt: "Screen design is done. Shape the next section in the roadmap."
   - label: Assemble Clickdummy
-    agent: 09-clickdummy
+    agent: 10-clickdummy
     prompt: "All sections are designed. Assemble the navigable clickdummy."
 ---
 
@@ -37,11 +37,11 @@ Then verify all required files exist:
 
 If spec.md doesn't exist:
 
-"I don't see a specification for **[Section Title]** yet. Please use the `@05-shape-section` agent first to define the section's requirements."
+"I don't see a specification for **[Section Title]** yet. Please use the `@06-shape-section` agent first to define the section's requirements."
 
 If data.json or types.ts don't exist:
 
-"I don't see sample data for **[Section Title]** yet. Please use the `@06-sample-data` agent first to create sample data and types for the screen designs."
+"I don't see sample data for **[Section Title]** yet. Please use the `@07-sample-data` agent first to create sample data and types for the screen designs."
 
 Stop here if any file is missing.
 
@@ -56,7 +56,7 @@ Check for optional enhancements:
 
 If design system exists, read it and use it for styling. If it doesn't exist, show a warning:
 
-"Note: Design system hasn't been defined yet. I'll use default styling, but for consistent branding, consider using the `@03-design-system` agent first."
+"Note: Design system hasn't been defined yet. I'll use default styling, but for consistent branding, consider using the `@04-design-system` agent first."
 
 If the design system contains brand identity fields (personality, voice, uiStyle), use them to inform the screen design:
 
@@ -78,7 +78,15 @@ When designing with brand identity, reference the context:
 
 If shell exists, the screen design will render inside the shell in Design OS. If not, show a warning:
 
-"Note: An application shell hasn't been designed yet. The screen design will render standalone. Consider using the `@04-design-shell` agent first to see section screen designs in the full app context."
+"Note: An application shell hasn't been designed yet. The screen design will render standalone. Consider using the `@05-design-shell` agent first to see section screen designs in the full app context."
+
+## Step 2b: Load the Tech Stack
+
+Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`). Tell the user in one line which stack applies: the file `product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react".
+
+- The decisions are binding. An undecided area means no new dependency: build it with React, TypeScript and Tailwind.
+- A request the stack cannot serve is a conflict. Show it to the user, name the area, and offer to update the stack with `@01-techstack` (update). Never pick a side silently.
+- Never edit `product/techstack/techstack.md` from this step.
 
 ## Step 3: Analyze Requirements
 
@@ -107,7 +115,7 @@ From the report, note:
 
 Tell the user in two or three lines what you found (see the skill, Step 2). If the section has no persona and no flow, say so in one line and continue as before.
 
-**The spec is binding.** `spec.md` is the plan for this section. A flow step or a persona never justifies a screen, feature or dependency that the spec does not cover. If a flow needs something the spec leaves out, tell the user and point to the `@05-shape-section` agent; do not build it.
+**The spec is binding.** `spec.md` is the plan for this section. A flow step or a persona never justifies a screen, feature or dependency that the spec does not cover. If a flow needs something the spec leaves out, tell the user and point to the `@06-shape-section` agent; do not build it.
 
 ## Step 4: Clarify the Screen Design Scope
 
@@ -154,6 +162,7 @@ Example:
 
 ```tsx
 import type { InvoiceListProps } from "@/../product/sections/[section-id]/types";
+import { Button } from "../../../ui/button"; // product UI layer, src/ui/
 
 export function InvoiceList({
   invoices,
@@ -165,19 +174,33 @@ export function InvoiceList({
   return (
     <div className='max-w-4xl mx-auto'>
       {/* Component content here */}
-      <button onClick={onCreate}>Create Invoice</button>
+      <Button onClick={onCreate}>Create Invoice</Button>
       {invoices.map((invoice) => (
         <div key={invoice.id}>
           <span>{invoice.clientName}</span>
-          <button onClick={() => onView?.(invoice.id)}>View</button>
-          <button onClick={() => onEdit?.(invoice.id)}>Edit</button>
-          <button onClick={() => onDelete?.(invoice.id)}>Delete</button>
+          <Button variant='ghost' onClick={() => onView?.(invoice.id)}>View</Button>
+          <Button variant='ghost' onClick={() => onEdit?.(invoice.id)}>Edit</Button>
+          <Button variant='ghost' onClick={() => onDelete?.(invoice.id)}>Delete</Button>
         </div>
       ))}
     </div>
   );
 }
 ```
+
+### UI Primitives and Packages (from the tech stack)
+
+Follow rule 3 of "Applying the stack" in the `designos-techstack` skill:
+
+- **Compose only from `src/ui/`.** Import primitives with relative paths (`../../../ui/button` from `components/`, `../../ui/button` from the preview wrapper). Never import `@/components/*`: that is the Design OS UI.
+- **Port a missing primitive** (shadcn/ui): read its source with `npx shadcn@latest view @shadcn/<name>` (read-only; use `@<registry>/<name>` for a registry listed in the stack) and create `src/ui/<name>.tsx`. NEVER run `npx shadcn@latest add`: it would overwrite Design OS UI. When porting:
+  - Use relative imports, and `cn` from `src/ui/utils.ts` (create it with the first primitive).
+  - Replace semantic utilities (`bg-primary`, `text-muted-foreground`, `border-border`, ...) with palette steps from `product/design-system/DESIGN.md` (with the `dark:` pair) and mark the role in a comment (`// token: primary`). Without `DESIGN.md`, use `stone` and `lime`.
+  - Respect `ui-base` (`asChild` for Radix UI, `render` for Base UI) and `ui-style`.
+  - Port only what the screen needs. Compose from what `src/ui/` already has before porting another primitive.
+- **Packages:** use only packages listed in the stack. Ask before installing one (including what a ported primitive imports), and use the stack's `package-manager`.
+- **Icons** come from the stack's `icons` area (default `lucide-react`). Import them at the top of the file like any dependency.
+- The rules against `@/components/*` and semantic utilities apply to `src/ui/` as well: `npm run test:tokens` covers it as a product directory.
 
 ### Design Requirements
 
@@ -315,6 +338,12 @@ Let the user know:
 
 - `src/sections/[section-id]/[ViewName].tsx`
 
+**Tech stack** ([stack line from Step 2b]):
+
+- Primitives this screen uses from `src/ui/`: [button, card, ...] (newly ported: [dialog, ...])
+- Packages this screen needs: [none / name — installed now or still to install]
+- Icons: [icon package and the icons used]
+
 **Important:** Restart your dev server to see the changes.
 
 [If shell exists]: The screen design will render inside your application shell, showing the full app experience.
@@ -327,9 +356,9 @@ Let the user know:
 
 **Next steps:**
 
-- Use the `@08-screenshot-design` agent to capture a screenshot of this screen design for documentation
-- If the spec calls for additional views, use `@07-design-screen` again to create them
-- When all sections are complete, use the `@10-export-product` agent to generate the complete export package"
+- Use the `@09-screenshot-design` agent to capture a screenshot of this screen design for documentation
+- If the spec calls for additional views, use `@08-design-screen` again to create them
+- When all sections are complete, use the `@11-export-product` agent to generate the complete export package"
 
 ## Important Notes
 
@@ -346,4 +375,6 @@ Let the user know:
 - Always remind the user to restart the dev server after creating files
 - Sub-components should also be props-based for maximum portability
 - Apply design tokens when available for consistent branding
+- ALWAYS load the tech stack (`npm run -s techstack`) before the first design decision; compose screens from `src/ui/`, never run `npx shadcn@latest add`, never import `@/components/*`
+- Never edit `product/techstack/techstack.md` from this command; a request the stack cannot serve is a conflict to show to the user
 - Screen designs render inside the shell when viewed in Design OS (if shell exists)

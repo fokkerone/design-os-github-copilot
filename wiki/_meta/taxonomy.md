@@ -1,6 +1,6 @@
 ---
 title: Wiki Taxonomy
-updated: 2026-10-06
+updated: 2026-10-14
 ---
 
 # Wiki Taxonomy
@@ -22,6 +22,7 @@ Domains are concern-centric, not source-centric. A page's domain describes *what
 | `product` | `product/` | Vision, target users, problems & solutions, value proposition, key features | `product/product-overview.md` |
 | `roadmap` | `roadmap/` | Sections, scope, sequencing, in/out decisions | `product/product-roadmap.md` |
 | `data` | `data/` | Entities, relationships, shared vocabulary | `product/data-shape/data-shape.md` |
+| `techstack` | `techstack/` | Tech stack of the prototype and the export: UI library, icons, registries and reference repos, packages, app patterns, tooling, target framework | `product/techstack/techstack.md` |
 | `design-system` | `design-system/` | Colors, typography, tokens, brand personality, voice, UI style | `product/design-system/design-system.md` |
 | `shell` | `shell/` | Global navigation, layout pattern, user menu | `product/shell/spec.md` |
 | `ui` | `ui/` | Reusable screen & interaction patterns, component conventions, responsive / dark-mode rules | `product/sections/*/spec.md` |
@@ -46,15 +47,16 @@ Assign each knowledge unit to a domain with this decision tree:
 2. **Vision, users, problems, solutions, features**? → `product/`
 3. **Sections, scope, sequencing**? → `roadmap/`
 4. **Entities, relationships, vocabulary**? → `data/`
-5. **Colors, typography, tokens, brand, voice, UI style**? → `design-system/`
-6. **Global navigation, layout, user menu**? → `shell/`
-7. **A concrete user flow** (steps from trigger to goal)? → `flows/` (one page per flow, id = flow id)
-8. **A persona or proto-persona** (`product/personas/*.md`)? → `personas/` (one page per persona, id = persona id)
-9. **Reusable screen/interaction pattern or component convention**? → `ui/`
-10. **User research findings, competitors, market, external knowledge**? → `research/`
-11. **Feedback from stakeholders or users**? → `feedback/`
-12. **Export, handoff, implementation notes**? → `handoff/`
-13. **Section-specific knowledge that fits none of the above**?
+5. **The tech stack** (`product/techstack/techstack.md`: UI library, icons, registries, packages, target framework)? → `techstack/` (one page, `techstack.md`)
+6. **Colors, typography, tokens, brand, voice, UI style**? → `design-system/`
+7. **Global navigation, layout, user menu**? → `shell/`
+8. **A concrete user flow** (steps from trigger to goal)? → `flows/` (one page per flow, id = flow id)
+9. **A persona or proto-persona** (`product/personas/*.md`)? → `personas/` (one page per persona, id = persona id)
+10. **Reusable screen/interaction pattern or component convention**? → `ui/`
+11. **User research findings, competitors, market, external knowledge**? → `research/`
+12. **Feedback from stakeholders or users**? → `feedback/`
+13. **Export, handoff, implementation notes**? → `handoff/`
+14. **Section-specific knowledge that fits none of the above**?
     → Create a domain named after the section id (e.g. `invoices/`)
     → Add it under "Project Domains" below before creating the folder
 
@@ -77,6 +79,7 @@ Tags mirror domain names. Every content page gets the tag of its domain.
 - `product` — vision, users, problems, features
 - `roadmap` — sections and scope
 - `data` — entities and relationships
+- `techstack` — tech stack decisions
 - `design-system` — visual identity and tokens
 - `shell` — navigation and layout chrome
 - `ui` — screen and interaction patterns
@@ -91,6 +94,9 @@ Tags mirror domain names. Every content page gets the tag of its domain.
 ## Topic Tags
 
 - `entity` — a single data entity
+- `ui-library` — a UI component library and its setup
+- `registry` — a component registry or reference repository
+- `dependency` — a package the prototype or the export depends on
 - `proto-persona` — an assumption-based persona that still needs validation
 - `negative-persona` — a persona the product deliberately does not design for
 - `competitor` — a competing product
@@ -131,5 +137,9 @@ _(add project-specific topic tags here)_
 - `user-flow` → `flows`
 - `flow` → `flows`
 - `persona` → `personas`
+- `tech-stack` → `techstack`
+- `stack` → `techstack`
+- `registries` → `registry`
+- `packages` → `dependency`
 
 _(non-canonical → canonical mappings, managed by `/design-os:wiki-taxonomy`)_

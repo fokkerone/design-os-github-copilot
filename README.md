@@ -18,7 +18,7 @@ This template provides the agent instructions and configuration needed to run th
 
 Design OS powers a guided design and architecture process. You + AI, working together through structured steps:
 
-1. **Product Planning** — Define your vision, break down your roadmap, and model your data
+1. **Product Planning** — Define your vision, decide the tech stack (UI library, icons, packages; shadcn/ui is the default), break down your roadmap, and model your data
 2. **Design System** — Choose colors, typography, and design your application shell
 3. **Section Design** — For each feature area: specify requirements, generate sample data, and design the screens
 4. **Clickdummy** — Assemble a fully navigable prototype from all designed sections to demo to stakeholders and gather feedback

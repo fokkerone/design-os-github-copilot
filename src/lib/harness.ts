@@ -26,6 +26,7 @@ const CHANGE_EVENT = 'designos:harness-change'
 /** Planning steps that have an agent / command */
 export type StepId =
   | 'product-vision'
+  | 'techstack'
   | 'product-roadmap'
   | 'data-shape'
   | 'design-system'
@@ -40,17 +41,18 @@ export type StepId =
   | 'userflow'
 
 const STEPS: Record<StepId, { copilot: string; claude: string }> = {
-  'product-vision': { copilot: '@00-product-vision', claude: '/product-vision' },
-  'product-roadmap': { copilot: '@01-product-roadmap', claude: '/product-roadmap' },
-  'data-shape': { copilot: '@02-data-shape', claude: '/data-shape' },
-  'design-system': { copilot: '@03-design-system', claude: '/design-tokens' },
-  'design-shell': { copilot: '@04-design-shell', claude: '/design-shell' },
-  'shape-section': { copilot: '@05-shape-section', claude: '/shape-section' },
-  'sample-data': { copilot: '@06-sample-data', claude: '/sample-data' },
-  'design-screen': { copilot: '@07-design-screen', claude: '/design-screen' },
-  'screenshot-design': { copilot: '@08-screenshot-design', claude: '/screenshot-design' },
-  clickdummy: { copilot: '@09-clickdummy', claude: '/clickdummy' },
-  'export-product': { copilot: '@10-export-product', claude: '/export-product' },
+  'product-vision': { copilot: '@00-product-vision', claude: '/design-os:product-vision' },
+  techstack: { copilot: '@01-techstack', claude: '/design-os:techstack' },
+  'product-roadmap': { copilot: '@02-product-roadmap', claude: '/design-os:product-roadmap' },
+  'data-shape': { copilot: '@03-data-shape', claude: '/design-os:data-shape' },
+  'design-system': { copilot: '@04-design-system', claude: '/design-os:design-tokens' },
+  'design-shell': { copilot: '@05-design-shell', claude: '/design-os:design-shell' },
+  'shape-section': { copilot: '@06-shape-section', claude: '/design-os:shape-section' },
+  'sample-data': { copilot: '@07-sample-data', claude: '/design-os:sample-data' },
+  'design-screen': { copilot: '@08-design-screen', claude: '/design-os:design-screen' },
+  'screenshot-design': { copilot: '@09-screenshot-design', claude: '/design-os:screenshot-design' },
+  clickdummy: { copilot: '@10-clickdummy', claude: '/design-os:clickdummy' },
+  'export-product': { copilot: '@11-export-product', claude: '/design-os:export-product' },
   persona: { copilot: '@persona', claude: '/design-os:persona' },
   userflow: { copilot: '@userflow', claude: '/design-os:userflow' },
 }
@@ -105,7 +107,7 @@ export function harnessLabel(harness: Harness): string {
   return HARNESSES.find((entry) => entry.id === harness)?.label ?? harness
 }
 
-/** The agent (Copilot) or command (Claude Code, OpenCode) that runs a step, e.g. "/product-vision" */
+/** The agent (Copilot) or command (Claude Code, OpenCode) that runs a step, e.g. "/design-os:product-vision" */
 export function stepInvocation(step: StepId, harness: Harness): string {
   return harness === 'copilot' ? STEPS[step].copilot : STEPS[step].claude
 }

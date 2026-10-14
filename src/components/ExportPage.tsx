@@ -6,6 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { AppLayout } from '@/components/AppLayout'
 import { loadProductData, hasExportZip, getExportZipUrl } from '@/lib/product-loader'
 import { getAllSectionIds, getSectionScreenDesigns } from '@/lib/section-loader'
+import { hasTechstack } from '@/lib/techstack-loader'
 
 export function ExportPage() {
   const productData = useMemo(() => loadProductData(), [])
@@ -23,6 +24,7 @@ export function ExportPage() {
 
   const hasOverview = !!productData.overview
   const hasRoadmap = !!productData.roadmap
+  const techstackDecided = hasTechstack()
   const hasDataShape = !!productData.dataShape
   const hasDesignSystem = !!(productData.designSystem || productData.designTokens)
   const hasShell = !!productData.shell
@@ -74,6 +76,7 @@ export function ExportPage() {
             <CardContent>
               <div className="space-y-1">
                 <ChecklistItem label="Product Overview" isComplete={hasOverview} />
+                <ChecklistItem label="Tech Stack (defaults apply without it)" isComplete={techstackDecided} />
                 <ChecklistItem label="Product Roadmap" isComplete={hasRoadmap} />
                 <ChecklistItem label="Data Shape" isComplete={hasDataShape} />
                 <ChecklistItem label="Design System" isComplete={hasDesignSystem} />
@@ -157,6 +160,11 @@ export function ExportPage() {
                     title="Instructions"
                     description="Detailed implementation guides for your coding agent."
                     items={['product-overview.md', 'one-shot-instructions.md', 'incremental/ (milestones)']}
+                  />
+                  <ExportItem
+                    title="Tech Stack and UI"
+                    description="The stack decisions and the product UI primitives the screens are built from."
+                    items={['techstack.md', 'ui/ (src/ui primitives)', 'Packages and registries']}
                   />
                   <ExportItem
                     title="Design System"

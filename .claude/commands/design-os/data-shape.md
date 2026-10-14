@@ -2,6 +2,8 @@
 
 You are helping the user create or update the general shape of their product's data — the core entities ("nouns") and how they relate to each other. This creates a shared vocabulary that ensures consistency across sections when generating sample data and screen designs. This is not the final data model — it's a starting point that the implementation agent will extend and refine.
 
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
+
 **Golden rule: NEVER generate a file without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
 
 ## Step 1: Check Current State
@@ -47,7 +49,7 @@ Read:
 
 If either file is missing, let the user know:
 
-"Before defining your data shape, you'll need to establish your product vision. Please run `/product-vision` first."
+"Before defining your data shape, you'll need to establish your product vision. Please run `/design-os:product-vision` first."
 
 Stop here if prerequisites are missing.
 
@@ -100,9 +102,9 @@ Once the user has confirmed the entities and relationships, create `product/data
 **Relationships:**
 - [List key relationships]
 
-This provides a shared vocabulary for your screen designs. When you use the `/sample-data` command, it will reference these entities to ensure consistent naming across sections.
+This provides a shared vocabulary for your screen designs. When you use the `/design-os:sample-data` command, it will reference these entities to ensure consistent naming across sections.
 
-Review and let me know if you'd like to adjust anything. When you're ready, run `/design-tokens` to define your visual identity and brand personality."
+Review and let me know if you'd like to adjust anything. When you're ready, run `/design-os:design-tokens` to define your visual identity and brand personality."
 
 ---
 
@@ -111,6 +113,7 @@ Review and let me know if you'd like to adjust anything. When you're ready, run 
 - **Always ask clarifying questions before generating** — never auto-generate from the product overview alone
 - Keep it **minimal** — entity names, descriptions, and relationships
 - Do NOT define detailed schemas, field types, or validation rules
+- Do NOT ask about databases, libraries or frameworks. The tech stack is decided in `/design-os:techstack` (see `npm run -s techstack`); the data shape stays technology-neutral
 - Use plain language that a non-technical person could understand
 - Relationships are conceptual — they describe how data relates from the user's perspective, not database structure
 - The implementation agent will decide how to model, store, and extend these entities

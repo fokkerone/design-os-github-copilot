@@ -1,12 +1,12 @@
 ---
-name: 08-screenshot-design
-description: "Step 8: Capture a screenshot of a screen design using Playwright. Saves screenshots to the product folder for documentation purposes."
+name: 09-screenshot-design
+description: "Step 9: Capture a screenshot of a screen design using Playwright. Saves screenshots to the product folder for documentation purposes."
 handoffs:
   - label: Shape Next Section
-    agent: 05-shape-section
+    agent: 06-shape-section
     prompt: "Screenshot captured. Shape the next section in the roadmap."
   - label: Assemble Clickdummy
-    agent: 09-clickdummy
+    agent: 10-clickdummy
     prompt: "All sections are designed. Assemble the navigable clickdummy."
 ---
 

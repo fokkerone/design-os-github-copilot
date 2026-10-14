@@ -60,14 +60,15 @@ After archiving and confirmation:
 2. **Re-initialize:** fresh `wiki/Home.md` (same template as the initial vault, including the How To section), `_manifest.json` → `{"sources": []}`.
 3. **Recompile, one source at a time,** with the `designos-wiki-ingest` process, in planning-flow order so later artifacts build on earlier ones:
    1. `product/product-overview.md`
-   2. `product/product-roadmap.md`
-   3. `product/data-shape/data-shape.md`
-   4. `product/design-system/design-system.md`
-   5. `product/shell/spec.md`
-   6. `product/personas/*.md` (primary first, then alphabetical)
-   7. `product/sections/*/spec.md` (roadmap order)
-   8. `product/flows/*.md` (alphabetical)
-   9. `wiki/raw/*` sorted by collected/capture date, oldest first
+   2. `product/techstack/techstack.md`
+   3. `product/product-roadmap.md`
+   4. `product/data-shape/data-shape.md`
+   5. `product/design-system/design-system.md`
+   6. `product/shell/spec.md`
+   7. `product/personas/*.md` (primary first, then alphabetical)
+   8. `product/sections/*/spec.md` (roadmap order)
+   9. `product/flows/*.md` (alphabetical)
+   10. `wiki/raw/*` sorted by collected/capture date, oldest first
 4. **Post-rebuild:** run the `designos-cross-linker` and `designos-tag-taxonomy` (audit) processes.
 5. Append:
    ```markdown
