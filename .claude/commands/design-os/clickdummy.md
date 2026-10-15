@@ -2,6 +2,8 @@
 
 You are helping the user assemble a **clickdummy** — a fully navigable prototype that wraps all designed sections in the application shell with working inter-section navigation, and lets every user flow be walked step by step through its screens. The clickdummy is served at `/clickdummy/preview` alongside the Design OS planning UI and is meant to be shared with stakeholders (POs, UI/UX designers) for feedback.
 
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
+
 **Scope:** This command ONLY assembles clickdummies from **existing** screen designs. It does NOT create screen designs, specifications, or sample data. If sections are missing designs, it tells the user which commands to use and stops.
 
 ## Step 1: Check Core Prerequisites
@@ -15,17 +17,26 @@ Verify these files exist:
 If any core file is missing:
 
 "Before assembling a clickdummy, you need:
-- A product overview → run `/product-vision`
-- A roadmap with sections → run `/product-roadmap`
-- An application shell → run `/design-shell`
+- A product overview → run `/design-os:product-vision`
+- A roadmap with sections → run `/design-os:product-roadmap`
+- An application shell → run `/design-os:design-shell`
 
-Please create these first, then run `/clickdummy` again."
+Please create these first, then run `/design-os:clickdummy` again."
 
 **Stop here** if any core file is missing.
 
 Also check for optional design tokens (`product/design-system/design-system.json`). If missing, show a brief note but continue — the screen designs should already have their own styling.
 
 > **Token separation:** The clickdummy is product code. It must not import Design OS UI (`@/components/*`) or use Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, ...); data loaders from `@/lib/product-loader` and `@/lib/section-loader` are fine. See "Token separation" in agents.md.
+
+## Step 1b: Load the Tech Stack
+
+Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`). Tell the user in one line which stack applies: the file `product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react".
+
+- The decisions are binding. An undecided area means no new dependency: build it with React, TypeScript and Tailwind.
+- A request the stack cannot serve is a conflict. Show it to the user, name the area, and offer `/design-os:techstack update`. Never pick a side silently.
+- Never edit `product/techstack/techstack.md` from this step.
+- The clickdummy imports UI primitives only from `src/ui/` (never `@/components/*`) and icons from the stack's `icons` area. Note the stack's `routing` decision for the summary in Step 6.
 
 ## Step 2: Inventory Sections
 
@@ -69,17 +80,17 @@ If **any** sections from the roadmap lack screen designs, report what's needed a
 For sections **missing specs** (no `spec.md`):
 
 "**[Section Title]** needs a specification first. Use these commands in order:
-1. `/shape-section` — Define the section specification
-2. `/sample-data` — Generate sample data and types
-3. `/design-screen` — Create the screen design"
+1. `/design-os:shape-section` — Define the section specification
+2. `/design-os:sample-data` — Generate sample data and types
+3. `/design-os:design-screen` — Create the screen design"
 
 For sections **with spec + data but no screen design** (has `spec.md` and `data.json` but no `.tsx` in `src/sections/[id]/`):
 
-"**[Section Title]** has a spec and data but no screen design yet. Run `/design-screen` to create it."
+"**[Section Title]** has a spec and data but no screen design yet. Run `/design-os:design-screen` to create it."
 
 Then finish with:
 
-"Once all sections have screen designs, run `/clickdummy` again to assemble the clickdummy."
+"Once all sections have screen designs, run `/design-os:clickdummy` again to assemble the clickdummy."
 
 **Stop here. Do not proceed to assembly.**
 
@@ -120,7 +131,8 @@ This component must:
 - Import `NavItem` type from `@/shell/components/MainNav`
 - Import `loadProductData` from `@/lib/product-loader`
 - Import `getSectionScreenDesigns`, `loadScreenDesignComponent` from `@/lib/section-loader`
-- Import appropriate **Lucide icons** for each section (pick icons that match the section purposes — e.g., `LayoutDashboard` for dashboards, `CalendarDays` for planning, `Users` for profiles, `BookOpen` for knowledge bases, etc.)
+- Import an appropriate icon for each section from the stack's `icons` area (default `lucide-react`). Pick icons that match the section purposes — e.g., for lucide-react: `LayoutDashboard` for dashboards, `CalendarDays` for planning, `Users` for profiles, `BookOpen` for knowledge bases, etc. With another icon set, use its equivalents and make sure they fit the `NavItem["icon"]` type (wrap them if needed).
+- Import any UI primitive the clickdummy itself needs (for example in the loading skeleton or fallback) from `src/ui/`, never from `@/components/*`
 - Use `React.lazy` + `Suspense` for lazy-loading screen design components
 - Use **React state** (`useState`) for tracking the active section — NOT React Router
 - Intercept the shell's `onNavigate` callback to update the active section state
@@ -138,7 +150,7 @@ import { loadProductData } from "@/lib/product-loader";
 import { getSectionScreenDesigns, loadScreenDesignComponent } from "@/lib/section-loader";
 import { useFlowWalk } from "@/lib/clickdummy-flows";
 import { FlowWalkBar, FlowStepGap } from "@/components/FlowWalkBar";
-// Import Lucide icons matching the roadmap sections:
+// Import icons from the stack's `icons` area (default lucide-react) matching the roadmap sections:
 import { Circle } from "lucide-react";
 // e.g., import { LayoutDashboard, CalendarDays, Users, BookOpen } from 'lucide-react'
 
@@ -158,7 +170,7 @@ export default function ClickdummyApp() {
     : (getSectionScreenDesigns(activeSectionId)[0]?.name ?? null);
   const visibleSections = walk.locked ? sections.filter((s) => walk.sectionIds.includes(s.id)) : sections;
 
-  // Map section IDs to Lucide icons — fill in based on actual roadmap sections
+  // Map section IDs to icons from the stack's icon set — fill in based on actual roadmap sections
   const iconMap: Record<string, NavItem["icon"]> = {
     // 'dashboard': LayoutDashboard,
     // 'rotation-planning': CalendarDays,
@@ -247,7 +259,7 @@ function FallbackContent({ sectionId }: { sectionId: string }) {
           No screen design found for &ldquo;{sectionId}&rdquo;
         </p>
         <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
-          Run <code>/design-screen</code> to create one.
+          Run <code>/design-os:design-screen</code> to create one.
         </p>
       </div>
     </div>
@@ -258,9 +270,9 @@ function FallbackContent({ sectionId }: { sectionId: string }) {
 **Critical requirements:**
 
 1. **Dynamic discovery** — Use `loadProductData()` for sections and `getSectionScreenDesigns()` / `loadScreenDesignComponent()` for screen designs. Do NOT hardcode section names or component imports.
-2. **State-based navigation** — Use `useState(activeSectionId)`, NOT React Router. The entire clickdummy is a single `/clickdummy` route.
+2. **State-based navigation** — Use `useState(activeSectionId)`, NOT React Router. The entire clickdummy is a single `/clickdummy` route. This stays true even when the stack's `routing` decision names the target's router: that decision is for the export, not for the prototype.
 3. **Lazy loading** — Use `React.lazy()` wrapping the loader from `loadScreenDesignComponent()`. The loader returns `() => Promise<{ default: ComponentType }>`.
-4. **Icon mapping** — Read the roadmap sections and pick appropriate Lucide icons. Use `Circle` as a fallback for unknown sections.
+4. **Icon mapping** — Read the roadmap sections and pick appropriate icons from the stack's `icons` area (default `lucide-react`). Use a neutral circle icon (`Circle` in lucide-react) as a fallback for unknown sections.
 5. **Shell pattern** — Follow the exact same pattern as `src/shell/ShellPreview.tsx` for constructing `navigationItems` and handling `onNavigate`.
 
 6. **Flows at runtime** — Use `useFlowWalk()` from `@/lib/clickdummy-flows` and render `FlowWalkBar` and `FlowStepGap` from `@/components/FlowWalkBar`. Do NOT copy flow steps, screen names or transitions into the file: they are derived from `product/flows/` on every load, so the clickdummy stays current when flows and screens change.
@@ -345,6 +357,8 @@ It includes **[N] sections** with working navigation:
 
 [If conflicts were reported]: **Open conflicts** between flows, specs and screens: [list]. I left them as they are.
 
+**Tech stack** ([stack line from Step 1b]): UI from `src/ui/`, icons from [icon package]. Routing decision for the export: [the stack's `routing` choice, or "state-based navigation in the prototype; the target's router is not decided"]. The clickdummy itself keeps state-based navigation.
+
 **For stakeholder demos:** Share this URL or run `npm run dev` to serve locally.
 
-Want any adjustments to the clickdummy? When you're ready to hand off, run `/export-product` to generate the complete export package."
+Want any adjustments to the clickdummy? When you're ready to hand off, run `/design-os:export-product` to generate the complete export package."

@@ -6,7 +6,8 @@
  *     - reads product tokens as DATA only, through src/lib/design-tokens-loader.ts
  *     - never loads product/design-system/tokens/tokens.css
  *
- *   Product (src/sections, src/shell, src/clickdummy)
+ *   Product (src/sections, src/shell, src/ui, src/clickdummy)
+ *     - src/ui is the product-owned UI layer (primitives ported per the tech stack)
  *     - never imports Design OS UI (@/components/*) or the token loaders
  *     - never uses Design OS semantic utilities (bg-primary, text-muted-foreground, ...):
  *       inside Design OS these resolve to the Design OS theme, not to the product tokens
@@ -34,7 +35,7 @@ function walk(dir, exts) {
 }
 
 const CODE = ['.ts', '.tsx', '.css', '.js', '.jsx', '.mjs']
-const PRODUCT_DIRS = ['src/sections', 'src/shell', 'src/clickdummy'].map((d) => join(root, d))
+const PRODUCT_DIRS = ['src/sections', 'src/shell', 'src/ui', 'src/clickdummy'].map((d) => join(root, d))
 const isProduct = (file) => PRODUCT_DIRS.some((d) => file.startsWith(d + '/') || file.startsWith(d + '\\'))
 const appFiles = [...walk(join(root, 'src'), CODE), join(root, 'index.html'), join(root, 'vite.config.ts')].filter(
   (f) => existsSync(f) && !isProduct(f),
@@ -115,4 +116,58 @@ test('the semantic utility guard detects leaks (self-check)', () => {
   for (const ok of ['bg-teal-600', 'text-zinc-500', 'border-stone-200', 'accent-lime-600', 'shadow-sm', 'rounded-md']) {
     assert.doesNotMatch(` ${ok} `, SEMANTIC, ok)
   }
+})
+
+test('the product UI layer exists in the product scope (src/ui)', () => {
+  assert.ok(PRODUCT_DIRS.some((dir) => rel(dir) === 'src/ui'), 'src/ui must be checked like the other product directories')
+  assert.ok(productFiles.some((file) => rel(file) === 'src/ui/utils.ts'), 'src/ui/utils.ts (cn helper) anchors the layer')
+})
+
+test('product UI primitives (src/ui) use palette steps and import no Design OS UI', () => {
+  const uiFiles = walk(join(root, 'src/ui'), CODE)
+  for (const file of uiFiles) {
+    const source = code(file)
+    assert.doesNotMatch(source, /from\s+['"]@\/components\//, `${rel(file)} must not import Design OS UI`)
+    assert.equal(SEMANTIC.exec(source), null, `${rel(file)} must use palette steps, not semantic utilities`)
+  }
+})
+
+// --- App chrome look: the Design OS shell uses the Volta palette (same look as the reference app) ---
+
+test('the app chrome theme (src/app-theme.css) defines the Volta palette and is imported by index.css', () => {
+  const themePath = join(root, 'src/app-theme.css')
+  assert.ok(existsSync(themePath), 'src/app-theme.css must exist')
+  const theme = code(themePath)
+  for (const token of [
+    '--color-brand-blue-500',
+    '--color-energy-green-500',
+    '--color-rwe-sand-50',
+    '--color-rwe-sand-200',
+    '--color-rwe-sand-500',
+    '--color-rwe-neutral-700',
+    '--color-rwe-neutral-900',
+    '--color-rwe-neutral-950',
+    '--color-rwe-focus',
+    '--color-rwe-black-a-25',
+  ]) {
+    assert.match(theme, new RegExp(token + '\\s*:'), `${token} must be defined`)
+  }
+  assert.match(code(join(root, 'src/index.css')), /@import\s+["']\.\/app-theme\.css["']/, 'index.css must import app-theme.css')
+})
+
+test('the app chrome theme stays separate from the product tokens', () => {
+  const theme = code(join(root, 'src/app-theme.css'))
+  assert.doesNotMatch(theme, /product\//, 'app-theme.css must not reference product/')
+  assert.doesNotMatch(theme, /--box-shadow-|-alpha-\d/, 'app-theme.css must not contain generated product variables')
+})
+
+test('the dark variant lets a nearer .light scope opt out (shell can differ from the page theme)', () => {
+  assert.match(
+    code(join(root, 'src/index.css')),
+    /@custom-variant dark \(&:is\(\.dark \*\):not\(:is\(\.light \*\)\)\)/,
+  )
+})
+
+test('Inter is loaded for the app chrome', () => {
+  assert.match(readFileSync(join(root, 'index.html'), 'utf8'), /family=Inter/)
 })

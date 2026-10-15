@@ -1,128 +1,41 @@
 import type { ReactNode } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { Layers, ArrowLeft, BookOpen } from 'lucide-react'
-import { PhaseNav } from './PhaseNav'
-import { ThemeToggle } from './ThemeToggle'
-import { Button } from '@/components/ui/button'
+import { Link } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 
 interface AppLayoutProps {
   children: ReactNode
-  /** Optional title shown in the header (for sub-pages) */
+  /** Optional title shown next to the back link (for sub-pages) */
   title?: string
   /** Optional back navigation path */
   backTo?: string
   /** Optional back label */
   backLabel?: string
-  /** Whether to show the phase nav (default: true) */
-  showPhaseNav?: boolean
-  /** Content width: "default" (768px, reading pages) or "wide" (1280px, token/data-heavy pages) */
+  /** Kept for call sites written for the old page layout; the step panel decides the width now */
   width?: 'default' | 'wide'
 }
 
-const contentWidth = {
-  default: 'max-w-3xl',
-  wide: 'max-w-7xl',
-} as const
-
-export function AppLayout({
-  children,
-  title,
-  backTo,
-  backLabel = 'Back',
-  showPhaseNav = true,
-  width = 'default',
-}: AppLayoutProps) {
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  // Determine if this is a sub-page (has back navigation)
-  const isSubPage = !!backTo
-
+export function AppLayout({ children, backTo, backLabel = 'Back', title }: AppLayoutProps) {
+  // The sidebar, header and step panel are the chrome (see AppFrame): a page renders only its content
   return (
-    <div className="min-h-screen bg-background animate-fade-in flex flex-col">
-      {/* Header */}
-      <header className="border-b border-stone-200 dark:border-stone-800 bg-card/80 backdrop-blur-sm sticky top-0 z-20">
-        <div className="px-4 sm:px-6 py-3">
-          {isSubPage ? (
-            /* Sub-page header with back button */
-            <div className={`${contentWidth[width]} mx-auto flex items-center gap-4`}>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(backTo)}
-                className="text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 -ml-2"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" strokeWidth={1.5} />
-                {backLabel}
-              </Button>
-              {title && (
-                <>
-                  <div className="h-4 w-px bg-stone-200 dark:bg-stone-700" />
-                  <h1 className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">
-                    {title}
-                  </h1>
-                </>
-              )}
-              <div className="ml-auto">
-                <ThemeToggle />
-              </div>
-            </div>
-          ) : (
-            /* Main page header with phase nav - full width */
-            <div className="flex items-center justify-between gap-4">
-              {/* Spacer on the left, same width as the right-hand actions, keeps the phase nav centered */}
-              <div className="w-24 shrink-0">
-                {/* Empty spacer for balance */}
-              </div>
-
-              {/* Phase Navigation - centered */}
-              {showPhaseNav && (
-                <div className="flex-1 flex justify-center">
-                  <PhaseNav />
-                </div>
-              )}
-
-              {/* Wiki + Theme Toggle */}
-              <div className="w-24 shrink-0 flex items-center justify-end gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate('/wiki')}
-                  aria-current={location.pathname.startsWith('/wiki') ? 'page' : undefined}
-                  className={`px-2 ${location.pathname.startsWith('/wiki')
-                    ? 'bg-stone-900 dark:bg-stone-100 text-stone-100 dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-stone-200 hover:text-stone-100 dark:hover:text-stone-900'
-                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'}`}
-                >
-                  <BookOpen className="w-4 h-4 mr-1.5" strokeWidth={1.5} />
-                  Wiki
-                </Button>
-                <ThemeToggle />
-              </div>
-            </div>
+    <div className="animate-fade-in px-4 py-6 @2xl:px-6">
+      {backTo && (
+        <div className="mb-6 flex items-center gap-3 text-sm">
+          <Link
+            to={backTo}
+            className="-ml-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-stone-600 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:text-rwe-neutral-100"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+            {backLabel}
+          </Link>
+          {title && (
+            <>
+              <span className="h-4 w-px bg-stone-200 dark:bg-rwe-neutral-700" />
+              <span className="truncate font-medium text-stone-900 dark:text-rwe-neutral-100">{title}</span>
+            </>
           )}
         </div>
-      </header>
-
-      {/* Main content */}
-      <main className={`flex-1 ${contentWidth[width]} mx-auto px-6 py-12 w-full`}>
-        {children}
-      </main>
-
-      {/* Footer with logo */}
-      <footer className="py-8 flex justify-center">
-        <a
-          href="https://buildermethods.com/design-os"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-400 transition-colors group"
-        >
-          <span className="text-xs">Powered by</span>
-          <div className="w-5 h-5 rounded bg-stone-300 dark:bg-stone-600 flex items-center justify-center transition-colors group-hover:bg-stone-400 dark:group-hover:bg-stone-500">
-            <Layers className="w-3 h-3 text-stone-100 dark:text-stone-900" strokeWidth={1.5} />
-          </div>
-          <span className="text-xs font-medium">Design OS</span>
-        </a>
-      </footer>
+      )}
+      {children}
     </div>
   )
 }

@@ -6,15 +6,15 @@ When your designs are complete, export everything your implementation agent (or 
 
 You're ready to export when:
 
-- Product vision and roadmap are defined
+- Product vision and roadmap are defined (a tech stack is recommended; otherwise the defaults shadcn/ui and lucide-react apply)
 - At least one section has screen designs
 - You're satisfied with the design direction
 
 You can export at any point—it doesn't have to be "complete." Exporting generates a snapshot of your current designs. You can always export again later as you add more sections.
 
-## Running the Export (`@10-export-product`)
+## Running the Export (`@11-export-product`)
 
-Select the `@10-export-product` agent in Copilot Chat and start a conversation. The agent will:
+Select the `@11-export-product` agent in Copilot Chat and start a conversation. The agent will:
 
 1. **Check prerequisites** — Verify required files exist
 2. **Gather all design assets** — Components, types, data, tokens
@@ -40,6 +40,7 @@ These are pre-written prompts you copy/paste into your coding agent. They refere
 ```
 product-plan/
 ├── product-overview.md              # Product summary (always provide)
+├── techstack.md                     # Tech stack decisions
 └── instructions/
     ├── one-shot-instructions.md     # All milestones combined
     └── incremental/                 # Milestone-by-milestone implementation
@@ -48,11 +49,27 @@ product-plan/
         └── ...
 ```
 
-**product-overview.md** provides context about the full product—always include it with any implementation session.
+**product-overview.md** provides context about the full product—always include it with any implementation session. **techstack.md** records what the components are built with.
 
 **one-shot-instructions.md** combines all milestones into a single document. Use this with `one-shot-prompt.md` for full implementation.
 
 **Incremental instructions** break the work into milestones. Use these with `section-prompt.md` for step-by-step implementation.
+
+### Tech Stack
+
+```
+product-plan/techstack.md    # Tech stack decisions (copied from product/techstack/techstack.md)
+```
+
+Lists the UI library with base and style, icons, registries and reference repositories, packages, app patterns and tooling. The "My tech stack" section of the prompts is pre-filled from it, so the coding agent only asks about areas that are still undecided.
+
+### UI Primitives
+
+```
+product-plan/ui/         # Product UI primitives (button, dialog, ...) copied from src/ui/
+```
+
+The components in `sections/` and `shell/` import their primitives from here. The palette steps used in the prototype are mapped back to semantic utilities (e.g., `bg-primary`) with `tokens.css`. Install the packages listed in `techstack.md` and the dependencies of these files in your codebase.
 
 ### Design System
 
@@ -115,7 +132,7 @@ These instructions describe WHAT to test, not HOW—your coding agent adapts the
 Exported components are:
 
 - **Props-based** — Accept data and callbacks via props, never import data directly
-- **Portable** — Work with any React setup, no Design OS dependencies
+- **Portable** — Work with any React setup, no Design OS dependencies (UI primitives ship in `ui/`)
 - **Complete** — Full styling, responsive design, dark mode support
 - **Production-ready** — Not prototypes or mockups
 

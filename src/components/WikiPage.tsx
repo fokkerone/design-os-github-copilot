@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen, Search } from 'lucide-react'
-import { AppLayout } from '@/components/AppLayout'
+import { WikiLayout } from '@/components/WikiLayout'
 import { Input } from '@/components/ui/input'
+import type { WikiHeading } from '@/lib/wiki-markdown'
 import { getWikiDomains, getWikiLog, getWikiPage, hasWikiContent, type WikiPage as WikiPageData } from '@/lib/wiki-loader'
 
 const LOG_KIND_STYLES: Record<string, string> = {
-  ingest: 'bg-lime-100 text-lime-800 dark:bg-lime-900/40 dark:text-lime-300',
-  meta: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+  ingest: 'bg-brand-blue-100 text-brand-blue-800 dark:bg-energy-green-900/40 dark:text-energy-green-300',
+  meta: 'bg-stone-100 text-stone-600 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-400',
   lint: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
 }
 
@@ -28,26 +29,26 @@ function PageRow({ page }: { page: WikiPageData }) {
     <li>
       <Link
         to={`/wiki/${page.path}`}
-        className="group block rounded-md -mx-3 px-3 py-3 hover:bg-stone-100 dark:hover:bg-stone-800/60 focus-visible:outline-2 focus-visible:outline-lime-500"
+        className="group block rounded-md -mx-3 px-3 py-3 hover:bg-stone-100 dark:hover:bg-rwe-neutral-800/60 focus-visible:outline-2 focus-visible:outline-brand-blue-500"
       >
         <div className="flex items-baseline justify-between gap-3">
-          <span className="font-medium text-stone-900 dark:text-stone-100 underline decoration-transparent decoration-2 underline-offset-2 group-hover:decoration-lime-500">
+          <span className="font-medium text-stone-900 dark:text-rwe-neutral-100 underline decoration-transparent decoration-2 underline-offset-2 group-hover:decoration-brand-blue-500">
             {page.title}
           </span>
-          <span className="shrink-0 text-xs tabular-nums text-stone-400 dark:text-stone-500">{page.updated}</span>
+          <span className="shrink-0 text-xs tabular-nums text-stone-400 dark:text-rwe-neutral-500">{page.updated}</span>
         </div>
         {page.summary && (
-          <p className="mt-1 text-sm text-stone-600 dark:text-stone-400 leading-relaxed">{page.summary}</p>
+          <p className="mt-1 text-sm text-stone-600 dark:text-rwe-neutral-400 leading-relaxed">{page.summary}</p>
         )}
         {(status || page.tags.length > 0) && (
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {status && (
-              <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-lime-100 text-lime-800 dark:bg-lime-900/40 dark:text-lime-300">
+              <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-brand-blue-100 text-brand-blue-800 dark:bg-energy-green-900/40 dark:text-energy-green-300">
                 {status}
               </span>
             )}
             {page.tags.map((tag) => (
-              <span key={tag} className="text-xs text-stone-500 dark:text-stone-400">
+              <span key={tag} className="text-xs text-stone-500 dark:text-rwe-neutral-400">
                 #{tag}
               </span>
             ))}
@@ -70,28 +71,40 @@ export function WikiPage() {
     .map(({ domain, pages }) => ({ domain, pages: pages.filter((page) => matches(page, query)) }))
     .filter(({ pages }) => pages.length > 0)
 
+  // Sections of this page that the table of contents links to
+  const toc: WikiHeading[] = [
+    ...(hasWikiContent() && filtered.length > 0
+      ? filtered.map(({ domain }) => ({
+          id: `domain-${domain}`,
+          text: domain.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
+          depth: 2,
+        }))
+      : []),
+    ...(log.length > 0 ? [{ id: 'wiki-activity', text: 'Recent activity', depth: 2 }] : []),
+  ]
+
   return (
-    <AppLayout>
+    <WikiLayout currentPath="" toc={toc}>
       <div className="space-y-10">
         <div>
-          <h1 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 mb-2">Project brain</h1>
-          <p className="text-stone-600 dark:text-stone-400 leading-relaxed">
+          <h1 className="text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-2">Project brain</h1>
+          <p className="text-stone-600 dark:text-rwe-neutral-400 leading-relaxed">
             Decisions, user flows and research, compiled from your planning files. To edit pages or browse the
             graph, open the <code className="font-mono text-sm">wiki/</code> folder in Obsidian.
           </p>
         </div>
 
         {!hasWikiContent() ? (
-          <div className="rounded-lg border border-dashed border-stone-300 dark:border-stone-700 px-6 py-10 text-center">
+          <div className="rounded-lg border border-dashed border-stone-300 dark:border-rwe-neutral-700 px-6 py-10 text-center">
             <BookOpen className="w-6 h-6 mx-auto text-stone-400" strokeWidth={1.5} />
-            <p className="mt-3 font-medium text-stone-900 dark:text-stone-100">The wiki has no pages yet</p>
-            <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">
+            <p className="mt-3 font-medium text-stone-900 dark:text-rwe-neutral-100">The wiki has no pages yet</p>
+            <p className="mt-1 text-sm text-stone-600 dark:text-rwe-neutral-400">
               Compile your planning files with <code className="font-mono">/design-os:wiki-ingest --product</code>, or
               design a flow with <code className="font-mono">/design-os:userflow</code>.
             </p>
             <Link
               to="/wiki/how-to/Home"
-              className="mt-4 inline-block text-sm text-stone-900 dark:text-stone-100 underline decoration-lime-500 decoration-2 underline-offset-2"
+              className="mt-4 inline-block text-sm text-stone-900 dark:text-rwe-neutral-100 underline decoration-brand-blue-500 decoration-2 underline-offset-2"
             >
               Read the How To guides
             </Link>
@@ -112,7 +125,7 @@ export function WikiPage() {
             </div>
 
             {filtered.length === 0 ? (
-              <p className="text-sm text-stone-600 dark:text-stone-400">
+              <p className="text-sm text-stone-600 dark:text-rwe-neutral-400">
                 No pages match “{query}”. Try a tag such as <span className="font-medium">flows</span> or a section name.
               </p>
             ) : (
@@ -120,13 +133,13 @@ export function WikiPage() {
                 const domainHome = getWikiPage(`${domain}/Home`)
                 return (
                   <section key={domain} aria-labelledby={`domain-${domain}`}>
-                    <div className="flex items-baseline justify-between gap-3 border-b border-stone-200 dark:border-stone-800 pb-2">
-                      <h2 id={`domain-${domain}`} className="text-lg font-semibold text-stone-900 dark:text-stone-100 capitalize">
+                    <div className="flex items-baseline justify-between gap-3 border-b border-stone-200 dark:border-rwe-neutral-800 pb-2">
+                      <h2 id={`domain-${domain}`} className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100 capitalize">
                         {domain.replace(/-/g, ' ')}
-                        <span className="ml-2 text-sm font-normal text-stone-400 dark:text-stone-500">{pages.length}</span>
+                        <span className="ml-2 text-sm font-normal text-stone-400 dark:text-rwe-neutral-500">{pages.length}</span>
                       </h2>
                       {domainHome && (
-                        <Link to={`/wiki/${domainHome.path}`} className="text-sm text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100">
+                        <Link to={`/wiki/${domainHome.path}`} className="text-sm text-stone-500 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:text-rwe-neutral-100">
                           Domain index
                         </Link>
                       )}
@@ -145,17 +158,17 @@ export function WikiPage() {
 
         {log.length > 0 && (
           <section aria-labelledby="wiki-activity">
-            <h2 id="wiki-activity" className="text-lg font-semibold text-stone-900 dark:text-stone-100 border-b border-stone-200 dark:border-stone-800 pb-2">
+            <h2 id="wiki-activity" className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100 border-b border-stone-200 dark:border-rwe-neutral-800 pb-2">
               Recent activity
             </h2>
             <ol className="mt-3 space-y-2">
               {log.map((entry, index) => (
                 <li key={index} className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-baseline gap-3 text-sm">
-                  <span className="tabular-nums text-stone-400 dark:text-stone-500">{entry.date}</span>
+                  <span className="tabular-nums text-stone-400 dark:text-rwe-neutral-500">{entry.date}</span>
                   <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${LOG_KIND_STYLES[entry.kind] || LOG_KIND_STYLES.meta}`}>
                     {entry.kind}
                   </span>
-                  <span className="text-stone-700 dark:text-stone-300 break-words">{entry.text}</span>
+                  <span className="text-stone-700 dark:text-rwe-neutral-300 break-words">{entry.text}</span>
                 </li>
               ))}
             </ol>
@@ -165,13 +178,13 @@ export function WikiPage() {
         {vaultPages.length > 0 && (
           <nav aria-label="Vault pages" className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
             {vaultPages.map((page) => (
-              <Link key={page.path} to={`/wiki/${page.path}`} className="text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100">
+              <Link key={page.path} to={`/wiki/${page.path}`} className="text-stone-500 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:text-rwe-neutral-100">
                 {page.title}
               </Link>
             ))}
           </nav>
         )}
       </div>
-    </AppLayout>
+    </WikiLayout>
   )
 }

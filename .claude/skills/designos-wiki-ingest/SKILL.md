@@ -1,6 +1,6 @@
 ---
 name: designos-wiki-ingest
-description: Compile sources into the DesignOS project brain (wiki/). Ingests raw material from wiki/raw/, staged session captures, and DesignOS planning artifacts in product/ (vision, roadmap, data shape, design system, shell, section specs). Triggers on /design-os:wiki-ingest, "ingest into the wiki", "add to wiki", "update the project brain", "sync product to wiki".
+description: Compile sources into the DesignOS project brain (wiki/). Ingests raw material from wiki/raw/, staged session captures, and DesignOS planning artifacts in product/ (vision, tech stack, roadmap, data shape, design system, shell, section specs). Triggers on /design-os:wiki-ingest, "ingest into the wiki", "add to wiki", "update the project brain", "sync product to wiki".
 slash_command: wiki-ingest
 phase: "Project Brain › Ingest"
 ---
@@ -50,6 +50,7 @@ DesignOS product artifacts:
 | Artifact | Path | Usual domain |
 |----------|------|--------------|
 | Product overview | `product/product-overview.md` | `product` |
+| Tech stack | `product/techstack/techstack.md` | `techstack`, always as a **tech stack page** (see below) |
 | Roadmap | `product/product-roadmap.md` | `roadmap` |
 | Data shape | `product/data-shape/data-shape.md` | `data` |
 | Design system | `product/design-system/design-system.md` | `design-system` |
@@ -80,6 +81,7 @@ With no argument, run `npm run -s wiki -- pending` and ask which sources to comp
 | `npm run -s wiki -- record <path> --type … --disposition … --title "…" [--created …] [--updated …] [--note "…"]` | Writes the manifest entry **and** the log entry (Steps 10–11) |
 | `npm run -s wiki -- sync-meta product/flows/<id>.md` | Copies flow metadata (status, artifacts, personas) into the wiki without an ingest |
 | `npm run -s wiki -- sync-meta product/personas/<id>.md` | Copies persona metadata (status, confidence, flows, sections, artifacts) into the wiki without an ingest |
+| `npm run -s wiki -- sync-meta product/techstack/techstack.md` | Copies the tech stack status into the wiki without an ingest |
 
 **Compile one source at a time.** `Home.md`, `log.md`, `_manifest.json` and cascade updates are shared state, so do not parallelize compilation.
 
@@ -104,7 +106,7 @@ If `wiki/` structure is missing, create only what is missing, and never overwrit
 Run `npm run -s wiki -- pending`. It compares the **content hash** of each `product/` artifact with the latest manifest entry for that path:
 - `new` (no entry) or `changed` (content differs) → compile.
 - not listed → unchanged, skip.
-- `meta` → only the frontmatter of a flow or persona changed (e.g. `status`, `confidence`, `artifacts`, links). **This is not an ingest.** Run `npm run -s wiki -- sync-meta <path>` instead. It updates the metadata on the wiki page and the Status/Confidence columns in the domain `Home.md`, and logs a single `meta` line.
+- `meta` → only the frontmatter of a flow, persona or the tech stack changed (e.g. `status`, `confidence`, `artifacts`, links). **This is not an ingest.** Run `npm run -s wiki -- sync-meta <path>` instead. It updates the metadata on the wiki page and the Status/Confidence columns in the domain `Home.md`, and logs a single `meta` line.
 
 The content hash covers the body only. YAML frontmatter is metadata and never triggers a re-ingest. So put volatile metadata (status, links to artifacts, review dates) into frontmatter, not into the body.
 
@@ -131,15 +133,16 @@ Read `wiki/_meta/taxonomy.md` and use its routing rules. Summary:
 2. Vision, target users, problems, solutions, value proposition, features? → `product/`
 3. Sections, scope, sequencing, what's in/out? → `roadmap/`
 4. Entities, relationships, shared vocabulary? → `data/`
-5. Colors, typography, tokens, brand personality, voice, UI style? → `design-system/`
-6. Global navigation, layout, user menu? → `shell/`
-7. A concrete user flow (`product/flows/*.md`)? → `flows/`, one page per flow, file name = flow id
-8. A persona (`product/personas/*.md`)? → `personas/`, one page per persona, file name = persona id
-9. Reusable screen/interaction patterns, component conventions, responsive/dark-mode rules? → `ui/`
-10. User research findings, competitors, market, external articles? → `research/` (persona descriptions found in raw sources are proposed to `/design-os:persona research` instead of being compiled as research pages)
-11. Stakeholder or user feedback on screens/clickdummy? → `feedback/`
-12. Export, handoff, implementation notes for the target codebase? → `handoff/`
-13. Section-specific knowledge that fits none of the above? → domain named after the section id; register it under "Project Domains" in the taxonomy **before** creating the folder.
+5. The tech stack (`product/techstack/techstack.md`)? → `techstack/`, one page, file name `techstack`
+6. Colors, typography, tokens, brand personality, voice, UI style? → `design-system/`
+7. Global navigation, layout, user menu? → `shell/`
+8. A concrete user flow (`product/flows/*.md`)? → `flows/`, one page per flow, file name = flow id
+9. A persona (`product/personas/*.md`)? → `personas/`, one page per persona, file name = persona id
+10. Reusable screen/interaction patterns, component conventions, responsive/dark-mode rules? → `ui/`
+11. User research findings, competitors, market, external articles? → `research/` (persona descriptions found in raw sources are proposed to `/design-os:persona research` instead of being compiled as research pages)
+12. Stakeholder or user feedback on screens/clickdummy? → `feedback/`
+13. Export, handoff, implementation notes for the target codebase? → `handoff/`
+14. Section-specific knowledge that fits none of the above? → domain named after the section id; register it under "Project Domains" in the taxonomy **before** creating the folder.
 
 **One domain per page. Prefer existing domains. One knowledge unit = one page. Merge, don't proliferate.** Never write into `how-to/`: it is a system domain maintained in the repository.
 
@@ -172,6 +175,19 @@ Rules for persona pages:
 - On re-ingest of a changed persona, replace the content sections with the new version and add a `> **Status: Outdated** (YYYY-MM-DD)` note under Summary describing what changed (e.g. "A3 raised to firsthand, P2 removed").
 - `wiki/personas/Home.md` lists every persona with the personas table variant of `wiki/_templates/domain-home.md`, primary personas first.
 - A flow page whose source lists `personas:` gets `[[personas/<persona-id>]]` under Related and in its Context **User** line; the persona page links back.
+
+### 6c. Tech stack page (`product/techstack/techstack.md` → `wiki/techstack/techstack.md`)
+
+The tech stack is the knowledge unit itself, so its wiki page is a **standard tech stack entry**. **Use the template `wiki/_templates/techstack.md`**: Summary, Decisions, Registries and Repos, Packages, Constraints, Open Questions, Related.
+
+Rules for tech stack pages:
+- Copy the Summary, the tables, the constraints and the open questions **verbatim**. Never reword a choice, drop a source value (`default`, `chosen`, `existing`, `constraint`) or turn an open question into a decision.
+- Frontmatter: `techstack_status` comes from the source's `status` and is afterwards maintained by `sync-meta`. Remove the template's trailing `# maintained by` comment.
+- The page is the only one in `wiki/techstack/` besides `Home.md`. One page, one source.
+- `Related` links `[[design-system/<page>]]` when the design system page exists, and `[[decisions/<page>]]` for every decision page that names a rejected alternative of the stack.
+- On re-ingest of a changed file, replace Decisions, Registries and Repos, Packages, Constraints and Open Questions with the new version, and add a `> **Status: Outdated** (YYYY-MM-DD)` note under Summary naming what changed (e.g. "ui-base Radix UI → Base UI, registry @acme added"). Steps that already ran against the old stack are listed in that note.
+- `wiki/techstack/Home.md` uses the default table of `wiki/_templates/domain-home.md`.
+- Run `npm run -s wiki -- sync-meta product/techstack/techstack.md` right after the ingest.
 
 **Source fidelity (grounding invariant).** Every number, date, name, and direct quote must be located in the source (grep/read) *before* you write it, and written exactly as found (`42K` stays `42K`). Derived values must show their components. If you cannot locate a value, drop it or state it without precision.
 
@@ -223,7 +239,7 @@ npm run -s wiki -- record <source-path> --type <product|raw|capture> \
 
 For No material: `npm run -s wiki -- record <source-path> --type <type> --disposition "No material"` (writes the machine-readable `ingest | no material: <path>` log heading).
 
-Run it **after** the page is written and validated, because the hash is taken at that moment. For a flow or persona, run `npm run -s wiki -- sync-meta <path>` right after, so the page's metadata matches the source.
+Run it **after** the page is written and validated, because the hash is taken at that moment. For a flow, persona or the tech stack, run `npm run -s wiki -- sync-meta <path>` right after, so the page's metadata matches the source.
 
 ### 12. Handoff
 

@@ -39,7 +39,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
           startOnLoad: false,
           securityLevel: 'strict',
           theme: isDark ? 'dark' : 'neutral',
-          fontFamily: 'DM Sans, sans-serif',
+          fontFamily: 'Inter, sans-serif',
         })
         const { svg } = await mermaid.render(id, chart)
         if (!cancelled) {
@@ -61,7 +61,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
     return (
       <div className="space-y-2">
         <p className="text-sm text-red-600 dark:text-red-400">Diagram could not be rendered: {error}</p>
-        <pre className="text-xs font-mono text-stone-600 dark:text-stone-400 bg-stone-50 dark:bg-stone-900 rounded-md p-3 overflow-x-auto">
+        <pre className="text-xs font-mono text-stone-600 dark:text-rwe-neutral-400 bg-stone-50 dark:bg-rwe-neutral-900 rounded-md p-3 overflow-x-auto">
           {chart}
         </pre>
       </div>
@@ -69,7 +69,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
   }
 
   if (!svg) {
-    return <div className="h-32 rounded-md bg-stone-50 dark:bg-stone-900 animate-pulse" />
+    return <div className="h-32 rounded-md bg-stone-50 dark:bg-rwe-neutral-900 animate-pulse" />
   }
 
   return (

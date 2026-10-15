@@ -6,7 +6,7 @@ handoffs:
     agent: userflow
     prompt: "A persona is ready. Design a user flow for this persona."
   - label: Shape a Section
-    agent: 05-shape-section
+    agent: 06-shape-section
     prompt: "A persona is ready. Shape the section spec and link the persona."
 ---
 
@@ -21,4 +21,4 @@ Read `.claude/skills/designos-persona/SKILL.md` and follow it exactly, with thes
 - Use the `ask_questions` tool wherever the skill says `AskUserQuestion`. Follow the same rules: 2–4 options, recommendation first, multi-select for non-exclusive choices.
 - **Skip Step 13 (persona card artifact)**. Publishing artifacts is only available in Claude Code.
 - For Step 11 (wiki ingest), read and follow `.claude/skills/designos-wiki-ingest/SKILL.md` for the source `product/personas/<persona-id>.md`.
-- In handoff messages, refer to agents instead of slash commands: `@persona validate <persona-id>` instead of `/design-os:persona validate`, `@userflow` instead of `/design-os:userflow`, and `@05-shape-section` instead of `/shape-section`.
+- In handoff messages, refer to agents instead of slash commands: `@persona validate <persona-id>` instead of `/design-os:persona validate`, `@userflow` instead of `/design-os:userflow`, and `@06-shape-section` instead of `/shape-section`.

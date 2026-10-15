@@ -7,6 +7,7 @@ Single source of truth for every page the agent writes into the wiki. The `desig
 | `page.md` | Standard knowledge page in any domain | `/design-os:wiki-ingest`, `/design-os:wiki-capture --full`, archived query answers |
 | `flow.md` | User flow entry in `flows/` (Mermaid diagram + description + tables) | `/design-os:wiki-ingest` for `product/flows/*.md`, `/design-os:userflow` |
 | `persona.md` | Persona entry in `personas/` (job story, goals, thinking style, pain points, evidence) | `/design-os:wiki-ingest` for `product/personas/*.md`, `/design-os:persona` |
+| `techstack.md` | Tech stack entry in `techstack/` (decisions, registries and repos, packages, constraints) | `/design-os:wiki-ingest` for `product/techstack/techstack.md`, `/design-os:techstack` |
 | `domain-home.md` | `<domain>/Home.md` index (incl. the `flows/Home.md` and `personas/Home.md` table variants) | `/design-os:wiki-ingest` |
 | `raw-source.md` | Header for fetched sources in `raw/` | `/design-os:wiki-ingest <url>` |
 | `capture.md` | Session capture in `raw/` | `/design-os:wiki-capture` |

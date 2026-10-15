@@ -43,7 +43,7 @@ For simpler products or when you want to build everything in one session.
 **How it works:**
 
 1. Open `product-plan/prompts/one-shot-prompt.md`
-2. Add any additional notes (tech stack preferences, constraints)
+2. Review the pre-filled "My tech stack" section (from `techstack.md`) and add any additional notes (constraints, areas still undecided)
 3. Copy/paste the prompt into your coding agent
 4. Answer the agent's clarifying questions about auth, user modeling, etc.
 5. Let the agent plan and implement everything
@@ -85,7 +85,7 @@ This approach prevents wasted work from misunderstandings and ensures the implem
 
 Before finalizing any implementation plan, encourage your agent to review all provided files and ask clarifying questions about:
 
-- Your tech stack and any existing codebase conventions
+- Your tech stack (pre-filled from `techstack.md`; confirm it and answer anything still undecided) and any existing codebase conventions
 - Authentication and user management approach
 - How to extend the data shapes for your backend needs
 - Any product requirements that need clarification
@@ -96,6 +96,7 @@ Before finalizing any implementation plan, encourage your agent to review all pr
 The Design OS export provides:
 
 - **Finished UI components** — Props-based, fully styled, responsive, dark mode support
+- **UI primitives and tech stack** — `ui/` (the product UI layer the components import from) and `techstack.md` (library, icons, registries, packages)
 - **Product requirements** — Specs, user flows, and scope definitions
 - **Design system tokens** — Colors, typography, CSS custom properties
 - **Sample data** — Showing the shape of data components expect

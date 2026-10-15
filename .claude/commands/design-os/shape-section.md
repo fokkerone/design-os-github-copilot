@@ -2,6 +2,8 @@
 
 You are helping the user define the specification for a section of their product. This is a conversational process to establish the scope of functionality, user flows, and UI requirements — then generate the spec file.
 
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
+
 **Golden rule: NEVER generate a file without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
 
 ## Your Scope — ONLY the Section Spec
@@ -15,18 +17,27 @@ You create ONE file: `product/sections/[section-id]/spec.md`. This file captures
 Exception: when the user chooses to create a flow inline (Step 4b.2) or a persona inline (Step 4c), the `designos-userflow` or `designos-persona` skill also writes `product/flows/<flow-id>.md` or `product/personas/<persona-id>.md` and its wiki page. Linking a flow changes only its metadata: set `status: in-spec` in the frontmatter of each linked flow in `product/flows/`, then run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md` once per flow. Never edit the body of a flow file from here. Linking a persona changes only its metadata too: add this section id to `sections:` in the frontmatter of each linked `product/personas/<persona-id>.md`, set `status: active` if it was `draft`, then run `npm run -s wiki -- sync-meta product/personas/<persona-id>.md` once per persona. Never edit the body of a persona file from here.
 
 **You do NOT:**
-- Create or modify `data.json` — that's the `/sample-data` command
-- Create or modify `types.ts` — that's the `/sample-data` command
-- Create screen design components — that's the `/design-screen` command
+- Create or modify `data.json` — that's the `/design-os:sample-data` command
+- Create or modify `types.ts` — that's the `/design-os:sample-data` command
+- Create screen design components — that's the `/design-os:design-screen` command
 - Ask questions about data entities, fields, or TypeScript types
 
 ## Step 1: Check Prerequisites
 
 First, verify that `product/product-roadmap.md` exists. If it doesn't:
 
-"I don't see a product roadmap defined yet. Please run `/product-roadmap` first to define your product sections, then come back to shape individual sections."
+"I don't see a product roadmap defined yet. Please run `/design-os:product-roadmap` first to define your product sections, then come back to shape individual sections."
 
 Stop here if the roadmap doesn't exist.
+
+## Step 1b: Load the Tech Stack
+
+Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`).
+
+- Tell the user in one line which stack applies: `product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react".
+- The decisions are binding. Undecided means no new dependency.
+- A request the stack cannot serve is a conflict: show it to the user and offer `/design-os:techstack update`. Never edit `product/techstack/techstack.md` from this step.
+- **This step:** you ask no technology questions (see Step 4). If the UI requirements need something the stack lacks (for example a data table while `tables` is undecided), report the gap to the user. Do not decide it, and do not write a technology choice into the spec.
 
 ## Step 2: Identify the Target Section
 
@@ -68,7 +79,9 @@ Example questions (adapt based on their input and the section):
 
 Ask questions one or two at a time, conversationally. Focus on user experience and interface requirements - no backend or database details.
 
-**Do NOT ask about:** data entities, fields, TypeScript types, or sample data structure — that's handled by the `/sample-data` command.
+**Do NOT ask about:** data entities, fields, TypeScript types, or sample data structure — that's handled by the `/design-os:sample-data` command. Also do not ask about technology (libraries, frameworks, packages) — that's decided in the tech stack (`/design-os:techstack`).
+
+Once the UI requirements are clear, compare them with the tech stack from Step 1b. Name every requirement the stack cannot serve (area and requirement, for example "data table: `tables` is undecided") and leave the decision to the user.
 
 ## Step 4b: Define User Flows
 
@@ -201,7 +214,7 @@ After the spec file is created, present a summary:
 
 **Personas:** [list of persona ids, or "none"]
 
-Review the spec and let me know if you'd like to adjust anything. When you're happy with it, run `/sample-data` to generate sample data and TypeScript types for this section."
+Review the spec and let me know if you'd like to adjust anything. When you're happy with it, run `/design-os:sample-data` to generate sample data and TypeScript types for this section."
 
 **Stop here.** Do not proceed to create sample data, types, or screen designs.
 
@@ -217,4 +230,4 @@ Review the spec and let me know if you'd like to adjust anything. When you're ha
 - The format must match exactly for the app to parse it correctly
 - If the user requests changes after reviewing, update the file immediately
 - After the spec is written, suggest that the user run `/design-os:wiki-ingest --product` so the project brain picks up the section and its flow links
-- **NEVER create data.json or types.ts** — redirect to the `/sample-data` command
+- **NEVER create data.json or types.ts** — redirect to the `/design-os:sample-data` command

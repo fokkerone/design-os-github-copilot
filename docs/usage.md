@@ -20,21 +20,22 @@ Design OS follows a structured sequence. Each step builds on the previous one.
 Before designing any screens, establish the foundation:
 
 1. **Product Vision** (`@00-product-vision`) — Define your product name, description, problems, and features
-2. **Product Roadmap** (`@01-product-roadmap`) — Define the main sections/areas of your product
-3. **Data Shape** (`@02-data-shape`) — Sketch out core entities and relationships
-4. **Design System** (`@03-design-system`) — Define visual identity and brand personality
-5. **Application Shell** (`@04-design-shell`) — Design navigation and layout
+2. **Tech Stack** (`@01-techstack`) — Decide what the prototype is built with: UI library (shadcn/ui is the default), icons, registries, packages (recommended; without it the defaults apply)
+3. **Product Roadmap** (`@02-product-roadmap`) — Define the main sections/areas of your product
+4. **Data Shape** (`@03-data-shape`) — Sketch out core entities and relationships
+5. **Design System** (`@04-design-system`) — Define visual identity and brand personality
+6. **Application Shell** (`@05-design-shell`) — Design navigation and layout
 
-See [Product Planning](product-planning.md) for details on each agent.
+See [Product Planning](product-planning.md) for details on each agent. Every later step loads the tech stack and follows it.
 
 ### Phase 2: Section Design
 
 Once the foundation is set, work through each section:
 
-1. **Shape the Section** (`@05-shape-section`) — Define scope and requirements
-2. **Sample Data** (`@06-sample-data`) — Generate sample data and TypeScript types
-3. **Design the Screen** (`@07-design-screen`) — Build the actual React components
-4. **Capture Screenshots** (`@08-screenshot-design`) — Document the design (optional)
+1. **Shape the Section** (`@06-shape-section`) — Define scope and requirements
+2. **Sample Data** (`@07-sample-data`) — Generate sample data and TypeScript types
+3. **Design the Screen** (`@08-design-screen`) — Build the actual React components
+4. **Capture Screenshots** (`@09-screenshot-design`) — Document the design (optional)
 
 Repeat for each section in your roadmap.
 
@@ -44,15 +45,15 @@ See [Designing Sections](design-section.md) for details on each agent.
 
 Once all sections are designed, assemble a clickdummy for stakeholder feedback:
 
-1. **Clickdummy** (`@09-clickdummy`) — Assemble a navigable prototype with all sections
+1. **Clickdummy** (`@10-clickdummy`) — Assemble a navigable prototype with all sections
 
-Share `/clickdummy` with stakeholders (POs, UI/UX designers) to gather feedback. Iterate on designs as needed before final export.
+Share `/prototype/preview` with stakeholders (POs, UI/UX designers) to gather feedback. Iterate on designs as needed before final export.
 
 ### Phase 4: Export
 
 When stakeholders have signed off:
 
-1. **Export** (`@10-export-product`) — Generate the complete handoff package
+1. **Export** (`@11-export-product`) — Generate the complete handoff package
 
 See [Export](export.md) for details on what's included and how to use it.
 
@@ -61,16 +62,17 @@ See [Export](export.md) for details on what's included and how to use it.
 | Agent                   | Purpose                                                  |
 | ----------------------- | -------------------------------------------------------- |
 | `@00-product-vision`    | Define product name, description, problems, and features |
-| `@01-product-roadmap`   | Define main sections/areas of the product                |
-| `@02-data-shape`        | Sketch out core entities and relationships               |
-| `@03-design-system`     | Define visual identity and brand personality             |
-| `@04-design-shell`      | Design navigation and layout                             |
-| `@05-shape-section`     | Define a section's scope and requirements                |
-| `@06-sample-data`       | Generate sample data and TypeScript types                |
-| `@07-design-screen`     | Create screen design components                          |
-| `@08-screenshot-design` | Capture screenshots                                      |
-| `@09-clickdummy`        | Assemble navigable clickdummy for stakeholder demos      |
-| `@10-export-product`    | Generate the complete handoff package                    |
+| `@01-techstack`         | Decide UI library, icons, registries, packages, patterns |
+| `@02-product-roadmap`   | Define main sections/areas of the product                |
+| `@03-data-shape`        | Sketch out core entities and relationships               |
+| `@04-design-system`     | Define visual identity and brand personality             |
+| `@05-design-shell`      | Design navigation and layout                             |
+| `@06-shape-section`     | Define a section's scope and requirements                |
+| `@07-sample-data`       | Generate sample data and TypeScript types                |
+| `@08-design-screen`     | Create screen design components                          |
+| `@09-screenshot-design` | Capture screenshots                                      |
+| `@10-clickdummy`        | Assemble navigable clickdummy for stakeholder demos      |
+| `@11-export-product`    | Generate the complete handoff package                    |
 
 ## Tips
 

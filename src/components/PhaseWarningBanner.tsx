@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, X } from 'lucide-react'
 import { loadProductData } from '@/lib/product-loader'
+import { paths } from '@/lib/paths'
 
 /**
  * Get a storage key based on the product name to track dismissed warnings per product
@@ -51,10 +52,10 @@ export function PhaseWarningBanner() {
   // Build the warning message
   const missingPhases: { name: string; path: string }[] = []
   if (!hasDataShape) {
-    missingPhases.push({ name: 'Data Shape', path: '/data-shape' })
+    missingPhases.push({ name: 'Data Shape', path: paths.dataShape })
   }
   if (!hasDesign) {
-    missingPhases.push({ name: 'Design', path: '/design' })
+    missingPhases.push({ name: 'Design System', path: paths.designSystem })
   }
 
   return (

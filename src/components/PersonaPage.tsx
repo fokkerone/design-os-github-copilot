@@ -5,10 +5,11 @@ import { AppLayout } from '@/components/AppLayout'
 import { CommandHint, CoverageBar, FlowChip, IssueList, SectionChip } from '@/components/PlanningContext'
 import { getProjectModel, sectionTitle } from '@/lib/project-model'
 import { getWikiPage } from '@/lib/wiki-loader'
+import { paths } from '@/lib/paths'
 
-const cardClass = 'border-stone-200 dark:border-stone-700 shadow-sm'
-const titleClass = 'text-lg font-semibold text-stone-900 dark:text-stone-100'
-const labelClass = 'text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-stone-400'
+const cardClass = 'border-stone-200 dark:border-rwe-neutral-700 shadow-sm'
+const titleClass = 'text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100'
+const labelClass = 'text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400'
 
 function capitalize(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1)
@@ -16,11 +17,11 @@ function capitalize(text: string): string {
 
 function LabeledList({ items }: { items: Record<string, string> }) {
   return (
-    <dl className="grid grid-cols-1 sm:grid-cols-[11rem_1fr] gap-x-4 gap-y-2">
+    <dl className="grid grid-cols-1 @2xl:grid-cols-[11rem_1fr] gap-x-4 gap-y-2">
       {Object.entries(items).map(([label, value]) => (
         <div key={label} className="contents">
-          <dt className="text-sm text-stone-500 dark:text-stone-400">{capitalize(label)}</dt>
-          <dd className="text-sm text-stone-700 dark:text-stone-300">{value}</dd>
+          <dt className="text-sm text-stone-500 dark:text-rwe-neutral-400">{capitalize(label)}</dt>
+          <dd className="text-sm text-stone-700 dark:text-rwe-neutral-300">{value}</dd>
         </div>
       ))}
     </dl>
@@ -38,9 +39,9 @@ export function PersonaPage() {
 
   if (!persona) {
     return (
-      <AppLayout backTo="/" backLabel="Product">
+      <AppLayout backTo={paths.personas} backLabel="Personas">
         <div className="text-center py-12">
-          <p className="text-stone-600 dark:text-stone-400">
+          <p className="text-stone-600 dark:text-rwe-neutral-400">
             Persona not found: <span className="font-mono">product/personas/{personaId}.md</span>
           </p>
         </div>
@@ -55,19 +56,19 @@ export function PersonaPage() {
   const toValidate = persona.assumptions.filter((item) => ['assumption', 'hypothesis'].includes(item.evidenceLevel)).length
 
   return (
-    <AppLayout backTo="/" backLabel="Product" title={persona.name}>
+    <AppLayout backTo={paths.personas} backLabel="Personas" title={persona.name}>
       <div className="space-y-6">
         <div className="mb-8">
           <p className={labelClass}>
             {['Persona', persona.priority, persona.kind, `${persona.confidence} confidence`, persona.status].filter(Boolean).join(' · ')}
           </p>
-          <h1 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 mt-1 mb-2">
+          <h1 className="text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 mt-1 mb-2">
             {persona.name}
             {persona.archetype && persona.archetype !== persona.name && (
-              <span className="font-normal text-stone-500 dark:text-stone-400"> — {persona.archetype}</span>
+              <span className="font-normal text-stone-500 dark:text-rwe-neutral-400"> — {persona.archetype}</span>
             )}
           </h1>
-          {persona.quote && <p className="text-stone-600 dark:text-stone-400 italic">“{persona.quote}”</p>}
+          {persona.quote && <p className="text-stone-600 dark:text-rwe-neutral-400 italic">“{persona.quote}”</p>}
           {persona.kind === 'proto' && (
             <p className="mt-4 rounded-md border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 px-3 py-2 text-sm text-amber-900 dark:text-amber-200">
               Proto-persona: assumptions, not research. Check the evidence levels below before treating anything here as fact.
@@ -81,7 +82,7 @@ export function PersonaPage() {
             <CardTitle className={titleClass}>Job story</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-stone-700 dark:text-stone-300 leading-relaxed">{persona.jobStory || persona.overview}</p>
+            <p className="text-stone-700 dark:text-rwe-neutral-300 leading-relaxed">{persona.jobStory || persona.overview}</p>
             {Object.keys(persona.goals).length > 0 && <LabeledList items={persona.goals} />}
           </CardContent>
         </Card>
@@ -95,7 +96,7 @@ export function PersonaPage() {
             <div>
               <p className={`${labelClass} mb-2`}>Sections ({sections.length})</p>
               {sections.length === 0 ? (
-                <p className="text-sm text-stone-500 dark:text-stone-400">No section links this persona yet.</p>
+                <p className="text-sm text-stone-500 dark:text-rwe-neutral-400">No section links this persona yet.</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {sections.map((sectionId) => (
@@ -107,7 +108,7 @@ export function PersonaPage() {
             <div>
               <p className={`${labelClass} mb-2`}>User flows ({flows.length})</p>
               {flows.length === 0 ? (
-                <p className="text-sm text-stone-500 dark:text-stone-400">No flow is designed for this persona yet.</p>
+                <p className="text-sm text-stone-500 dark:text-rwe-neutral-400">No flow is designed for this persona yet.</p>
               ) : (
                 <ul className="space-y-2">
                   {flows.map((flow) => (
@@ -122,14 +123,14 @@ export function PersonaPage() {
             <div>
               <p className={`${labelClass} mb-2`}>Screens in those flows ({screens.length})</p>
               {screens.length === 0 ? (
-                <p className="text-sm text-stone-500 dark:text-stone-400">No screen design is part of a flow for this persona yet.</p>
+                <p className="text-sm text-stone-500 dark:text-rwe-neutral-400">No screen design is part of a flow for this persona yet.</p>
               ) : (
                 <div className="flex flex-wrap gap-x-4 gap-y-2">
                   {screens.map((screen) => (
                     <Link
                       key={`${screen.sectionId}/${screen.name}`}
-                      to={`/sections/${screen.sectionId}/screen-designs/${screen.name}`}
-                      className="inline-flex items-center gap-1.5 font-mono text-xs text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 underline decoration-stone-300 dark:decoration-stone-600 underline-offset-2"
+                      to={paths.screen(screen.sectionId, screen.name)}
+                      className="inline-flex items-center gap-1.5 font-mono text-xs text-stone-700 dark:text-rwe-neutral-300 hover:text-stone-900 dark:hover:text-rwe-neutral-100 underline decoration-stone-300 dark:decoration-rwe-neutral-600 underline-offset-2"
                     >
                       <Layout className="w-3.5 h-3.5" strokeWidth={1.5} />
                       {screen.sectionId}/{screen.name}
@@ -149,16 +150,16 @@ export function PersonaPage() {
               <CardTitle className={titleClass}>Needs and pain points</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <ul className="divide-y divide-stone-200 dark:divide-stone-700">
+              <ul className="divide-y divide-stone-200 dark:divide-rwe-neutral-700">
                 {persona.painPoints.map((point) => (
                   <li key={point.id} className="px-6 py-4 flex items-start gap-3">
-                    <span className="font-mono text-xs text-stone-400 dark:text-stone-500 mt-1 w-6 shrink-0">{point.id}</span>
+                    <span className="font-mono text-xs text-stone-400 dark:text-rwe-neutral-500 mt-1 w-6 shrink-0">{point.id}</span>
                     <div className="min-w-0 space-y-0.5">
-                      <p className="font-medium text-stone-900 dark:text-stone-100">{point.painPoint}</p>
+                      <p className="font-medium text-stone-900 dark:text-rwe-neutral-100">{point.painPoint}</p>
                       {point.workaround && (
-                        <p className="text-sm text-stone-600 dark:text-stone-400">Today: {point.workaround}</p>
+                        <p className="text-sm text-stone-600 dark:text-rwe-neutral-400">Today: {point.workaround}</p>
                       )}
-                      {point.need && <p className="text-sm text-stone-600 dark:text-stone-400">Needs: {point.need}</p>}
+                      {point.need && <p className="text-sm text-stone-600 dark:text-rwe-neutral-400">Needs: {point.need}</p>}
                     </div>
                   </li>
                 ))}
@@ -179,12 +180,12 @@ export function PersonaPage() {
                   <li key={index} className="flex items-start gap-3 text-sm">
                     <span
                       className={`shrink-0 w-12 font-medium ${
-                        item.kind === 'do' ? 'text-lime-700 dark:text-lime-400' : 'text-red-700 dark:text-red-400'
+                        item.kind === 'do' ? 'text-brand-blue-700 dark:text-energy-green-400' : 'text-red-700 dark:text-red-400'
                       }`}
                     >
                       {item.kind === 'do' ? 'Do' : "Don't"}
                     </span>
-                    <span className="text-stone-700 dark:text-stone-300">{item.text}</span>
+                    <span className="text-stone-700 dark:text-rwe-neutral-300">{item.text}</span>
                   </li>
                 ))}
               </ul>
@@ -220,7 +221,7 @@ export function PersonaPage() {
               {persona.behaviors.length > 0 && (
                 <ul className="space-y-1.5 list-disc pl-5">
                   {persona.behaviors.map((behavior, index) => (
-                    <li key={index} className="text-sm text-stone-700 dark:text-stone-300">
+                    <li key={index} className="text-sm text-stone-700 dark:text-rwe-neutral-300">
                       {behavior}
                     </li>
                   ))}
@@ -228,22 +229,22 @@ export function PersonaPage() {
               )}
               {persona.dimensions.map((dimension) => (
                 <div key={dimension.dimension}>
-                  <p className="text-sm text-stone-700 dark:text-stone-300 mb-1">{dimension.dimension}</p>
+                  <p className="text-sm text-stone-700 dark:text-rwe-neutral-300 mb-1">{dimension.dimension}</p>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-stone-500 dark:text-stone-400 w-24 text-right shrink-0">{dimension.low}</span>
+                    <span className="text-xs text-stone-500 dark:text-rwe-neutral-400 w-16 @2xl:w-24 text-right shrink-0">{dimension.low}</span>
                     <div className="flex gap-1" aria-label={`${dimension.position ?? '?'} of 5`}>
                       {[1, 2, 3, 4, 5].map((value) => (
                         <span
                           key={value}
                           className={`w-6 h-1.5 rounded-full ${
                             dimension.position !== null && value <= dimension.position
-                              ? 'bg-stone-700 dark:bg-stone-300'
-                              : 'bg-stone-200 dark:bg-stone-700'
+                              ? 'bg-stone-700 dark:bg-rwe-neutral-300'
+                              : 'bg-stone-200 dark:bg-rwe-neutral-700'
                           }`}
                         />
                       ))}
                     </div>
-                    <span className="text-xs text-stone-500 dark:text-stone-400">{dimension.high}</span>
+                    <span className="text-xs text-stone-500 dark:text-rwe-neutral-400">{dimension.high}</span>
                   </div>
                 </div>
               ))}
@@ -257,26 +258,26 @@ export function PersonaPage() {
             <CardHeader className="pb-4">
               <CardTitle className={titleClass}>
                 Assumptions and evidence
-                <span className="ml-2 text-sm font-normal text-stone-500 dark:text-stone-400">
+                <span className="ml-2 text-sm font-normal text-stone-500 dark:text-rwe-neutral-400">
                   ({toValidate} of {persona.assumptions.length} to validate)
                 </span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <ul className="divide-y divide-stone-200 dark:divide-stone-700">
+              <ul className="divide-y divide-stone-200 dark:divide-rwe-neutral-700">
                 {persona.assumptions.map((item) => (
                   <li key={item.id} className="px-6 py-4 flex items-start gap-3">
-                    <span className="font-mono text-xs text-stone-400 dark:text-stone-500 mt-1 w-6 shrink-0">{item.id}</span>
+                    <span className="font-mono text-xs text-stone-400 dark:text-rwe-neutral-500 mt-1 w-6 shrink-0">{item.id}</span>
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex flex-wrap items-start justify-between gap-2">
-                        <p className="text-sm text-stone-900 dark:text-stone-100">{item.assumption}</p>
-                        <span className="rounded-full bg-stone-100 dark:bg-stone-800 px-2 py-0.5 text-xs text-stone-600 dark:text-stone-400 whitespace-nowrap">
+                        <p className="text-sm text-stone-900 dark:text-rwe-neutral-100">{item.assumption}</p>
+                        <span className="rounded-full bg-stone-100 dark:bg-rwe-neutral-800 px-2 py-0.5 text-xs text-stone-600 dark:text-rwe-neutral-400 whitespace-nowrap">
                           {item.evidenceLevel || 'assumption'}
                         </span>
                       </div>
-                      {item.source && <p className="text-xs text-stone-500 dark:text-stone-400">Source: {item.source}</p>}
+                      {item.source && <p className="text-xs text-stone-500 dark:text-rwe-neutral-400">Source: {item.source}</p>}
                       {item.howToValidate && (
-                        <p className="text-xs text-stone-500 dark:text-stone-400">Validate: {item.howToValidate}</p>
+                        <p className="text-xs text-stone-500 dark:text-rwe-neutral-400">Validate: {item.howToValidate}</p>
                       )}
                     </div>
                   </li>
@@ -290,16 +291,16 @@ export function PersonaPage() {
         <div className="space-y-3">
           <CommandHint
             label="New evidence arrived? Update the evidence levels"
-            command={`/design-os:persona validate ${persona.id}`}
-            agent="@persona"
+            step="persona"
+            args={`validate ${persona.id}`}
           />
-          <CommandHint label="Design a flow for this persona" command="/design-os:userflow" agent="@userflow" />
+          <CommandHint label="Design a flow for this persona" step="userflow" />
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="font-mono text-xs text-stone-400 dark:text-stone-500">product/personas/{persona.id}.md</p>
+            <p className="font-mono text-xs text-stone-400 dark:text-rwe-neutral-500">product/personas/{persona.id}.md</p>
             {getWikiPage(`personas/${persona.id}`) && (
               <Link
                 to={`/wiki/personas/${persona.id}`}
-                className="inline-flex items-center gap-1 text-xs text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
+                className="inline-flex items-center gap-1 text-xs text-stone-600 dark:text-rwe-neutral-400 hover:text-stone-900 dark:hover:text-rwe-neutral-100"
               >
                 <BookOpen className="w-3.5 h-3.5" strokeWidth={1.5} />
                 Open in wiki

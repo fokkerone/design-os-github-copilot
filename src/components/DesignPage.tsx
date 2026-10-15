@@ -3,9 +3,13 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AppLayout } from "@/components/AppLayout";
+import { AgentPrompt, StepName } from "@/components/AgentPrompt";
 import { EmptyState } from "@/components/EmptyState";
 import { StepIndicator, type StepStatus } from "@/components/StepIndicator";
 import { NextPhaseButton } from "@/components/NextPhaseButton";
+import { PageTabs } from "@/components/PageTabs";
+import { designSystemTabs } from "@/components/tabs";
+import { paths } from "@/lib/paths";
 import { loadProductData } from "@/lib/product-loader";
 import {
   hasDesignResources,
@@ -141,13 +145,14 @@ export function DesignPage() {
 
   return (
     <AppLayout width='wide'>
+      <PageTabs label="Design system views" tabs={designSystemTabs} />
       <div className='space-y-6'>
         {/* Page intro */}
         <div className='mb-8'>
-          <h1 className='text-2xl font-semibold text-stone-900 dark:text-stone-100 mb-2'>
+          <h1 className='text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-2'>
             Design System
           </h1>
-          <p className='text-stone-600 dark:text-stone-400'>
+          <p className='text-stone-600 dark:text-rwe-neutral-400'>
             Define the visual foundation and application shell for your product.
           </p>
         </div>
@@ -169,10 +174,10 @@ export function DesignPage() {
             )
           ) : (
             <Card
-              className={`border-stone-200 dark:border-stone-700 shadow-sm ${tokensState.status === "ok" ? "mt-6" : ""}`}
+              className={`border-stone-200 dark:border-rwe-neutral-700 shadow-sm ${tokensState.status === "ok" ? "mt-6" : ""}`}
             >
               <CardHeader className='pb-4'>
-                <CardTitle className='text-lg font-semibold text-stone-900 dark:text-stone-100'>
+                <CardTitle className='text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100'>
                   {tokensState.status === "ok" ? "Brand Identity" : "Design System"}
                 </CardTitle>
               </CardHeader>
@@ -180,7 +185,7 @@ export function DesignPage() {
                 {/* Colors */}
                 {designSystem?.colors && (
                   <div>
-                    <h4 className='text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-4'>
+                    <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-4'>
                       Colors
                     </h4>
                     {typeof designSystem.colors.primary === "string" ? (
@@ -209,31 +214,31 @@ export function DesignPage() {
                 {/* Typography */}
                 {designSystem?.typography && (
                   <div>
-                    <h4 className='text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-4'>
+                    <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-4'>
                       Typography
                     </h4>
                     <div className='grid grid-cols-3 gap-6'>
                       <div>
-                        <p className='text-xs text-stone-500 dark:text-stone-400 mb-1'>
+                        <p className='text-xs text-stone-500 dark:text-rwe-neutral-400 mb-1'>
                           Heading
                         </p>
-                        <p className='font-semibold text-stone-900 dark:text-stone-100'>
+                        <p className='font-semibold text-stone-900 dark:text-rwe-neutral-100'>
                           {designSystem.typography.heading}
                         </p>
                       </div>
                       <div>
-                        <p className='text-xs text-stone-500 dark:text-stone-400 mb-1'>
+                        <p className='text-xs text-stone-500 dark:text-rwe-neutral-400 mb-1'>
                           Body
                         </p>
-                        <p className='text-stone-900 dark:text-stone-100'>
+                        <p className='text-stone-900 dark:text-rwe-neutral-100'>
                           {designSystem.typography.body}
                         </p>
                       </div>
                       <div>
-                        <p className='text-xs text-stone-500 dark:text-stone-400 mb-1'>
+                        <p className='text-xs text-stone-500 dark:text-rwe-neutral-400 mb-1'>
                           Mono
                         </p>
-                        <p className='font-mono text-stone-900 dark:text-stone-100'>
+                        <p className='font-mono text-stone-900 dark:text-rwe-neutral-100'>
                           {designSystem.typography.mono}
                         </p>
                       </div>
@@ -244,7 +249,7 @@ export function DesignPage() {
                 {/* Brand Personality */}
                 {designSystem?.personality && (
                   <div>
-                    <h4 className='text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-3'>
+                    <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-3'>
                       Brand Personality
                     </h4>
                     <div className='flex flex-wrap gap-2 mb-2'>
@@ -255,7 +260,7 @@ export function DesignPage() {
                       ))}
                     </div>
                     {designSystem.personality.mood && (
-                      <p className='text-sm text-stone-600 dark:text-stone-400'>
+                      <p className='text-sm text-stone-600 dark:text-rwe-neutral-400'>
                         {designSystem.personality.mood}
                       </p>
                     )}
@@ -265,17 +270,17 @@ export function DesignPage() {
                 {/* Brand Voice */}
                 {designSystem?.voice && (
                   <div>
-                    <h4 className='text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-3'>
+                    <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-3'>
                       Brand Voice
                     </h4>
-                    <p className='text-sm text-stone-700 dark:text-stone-300 font-medium mb-2'>
+                    <p className='text-sm text-stone-700 dark:text-rwe-neutral-300 font-medium mb-2'>
                       {designSystem.voice.tone}
                     </p>
                     <div className='flex flex-wrap gap-2'>
                       {designSystem.voice.characteristics?.map((char, i) => (
                         <span
                           key={i}
-                          className='text-xs text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded'
+                          className='text-xs text-stone-500 dark:text-rwe-neutral-400 bg-stone-100 dark:bg-rwe-neutral-800 px-2 py-1 rounded'
                         >
                           {char}
                         </span>
@@ -287,16 +292,16 @@ export function DesignPage() {
                 {/* UI Style Preferences */}
                 {designSystem?.uiStyle && (
                   <div>
-                    <h4 className='text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-3'>
+                    <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-3'>
                       UI Style
                     </h4>
-                    <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
+                    <div className='grid grid-cols-2 @2xl:grid-cols-3 gap-3'>
                       {designSystem.uiStyle.borderRadius && (
-                        <div className='bg-stone-50 dark:bg-stone-800/50 rounded px-3 py-2'>
-                          <p className='text-xs text-stone-500 dark:text-stone-400 mb-0.5'>
+                        <div className='bg-stone-50 dark:bg-rwe-neutral-800/50 rounded px-3 py-2'>
+                          <p className='text-xs text-stone-500 dark:text-rwe-neutral-400 mb-0.5'>
                             Radius
                           </p>
-                          <p className='text-sm text-stone-700 dark:text-stone-300'>
+                          <p className='text-sm text-stone-700 dark:text-rwe-neutral-300'>
                             {typeof designSystem.uiStyle.borderRadius ===
                             "string"
                               ? designSystem.uiStyle.borderRadius
@@ -312,11 +317,11 @@ export function DesignPage() {
                         </div>
                       )}
                       {designSystem.uiStyle.shadows && (
-                        <div className='bg-stone-50 dark:bg-stone-800/50 rounded px-3 py-2'>
-                          <p className='text-xs text-stone-500 dark:text-stone-400 mb-0.5'>
+                        <div className='bg-stone-50 dark:bg-rwe-neutral-800/50 rounded px-3 py-2'>
+                          <p className='text-xs text-stone-500 dark:text-rwe-neutral-400 mb-0.5'>
                             Shadows
                           </p>
-                          <p className='text-sm text-stone-700 dark:text-stone-300'>
+                          <p className='text-sm text-stone-700 dark:text-rwe-neutral-300'>
                             {typeof designSystem.uiStyle.shadows === "string"
                               ? designSystem.uiStyle.shadows
                               : Object.entries(
@@ -331,11 +336,11 @@ export function DesignPage() {
                         </div>
                       )}
                       {designSystem.uiStyle.density && (
-                        <div className='bg-stone-50 dark:bg-stone-800/50 rounded px-3 py-2'>
-                          <p className='text-xs text-stone-500 dark:text-stone-400 mb-0.5'>
+                        <div className='bg-stone-50 dark:bg-rwe-neutral-800/50 rounded px-3 py-2'>
+                          <p className='text-xs text-stone-500 dark:text-rwe-neutral-400 mb-0.5'>
                             Density
                           </p>
-                          <p className='text-sm text-stone-700 dark:text-stone-300'>
+                          <p className='text-sm text-stone-700 dark:text-rwe-neutral-300'>
                             {designSystem.uiStyle.density}
                           </p>
                         </div>
@@ -347,10 +352,10 @@ export function DesignPage() {
                 {/* Brand Resources */}
                 {hasResources && (
                   <div>
-                    <h4 className='text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-3'>
+                    <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-3'>
                       Source Resources
                     </h4>
-                    <div className='flex flex-wrap gap-4 text-xs text-stone-500 dark:text-stone-400'>
+                    <div className='flex flex-wrap gap-4 text-xs text-stone-500 dark:text-rwe-neutral-400'>
                       {categories.images.length > 0 && (
                         <div className='flex items-center gap-1.5'>
                           <FileImage className='w-3.5 h-3.5' />
@@ -383,13 +388,9 @@ export function DesignPage() {
                 )}
 
                 {/* Edit hint */}
-                <div className='bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-2.5'>
-                  <p className='text-xs text-stone-500 dark:text-stone-400'>
-                    Use the{" "}
-                    <code className='font-mono text-stone-700 dark:text-stone-300'>
-                      @design-system
-                    </code>{" "}
-                    agent to update
+                <div className='bg-stone-100 dark:bg-rwe-neutral-800 rounded-md px-4 py-2.5'>
+                  <p className='text-xs text-stone-500 dark:text-rwe-neutral-400'>
+                    Use <StepName step='design-system' /> to update
                   </p>
                 </div>
               </CardContent>
@@ -406,16 +407,16 @@ export function DesignPage() {
           {!shell?.spec ? (
             <EmptyState type='shell' />
           ) : (
-            <Card className='border-stone-200 dark:border-stone-700 shadow-sm'>
+            <Card className='border-stone-200 dark:border-rwe-neutral-700 shadow-sm'>
               <CardHeader className='pb-4'>
-                <CardTitle className='text-lg font-semibold text-stone-900 dark:text-stone-100'>
+                <CardTitle className='text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100'>
                   Application Shell
                 </CardTitle>
               </CardHeader>
               <CardContent className='space-y-4'>
                 {/* Overview */}
                 {shell.spec.overview && (
-                  <p className='text-stone-600 dark:text-stone-400 leading-relaxed'>
+                  <p className='text-stone-600 dark:text-rwe-neutral-400 leading-relaxed'>
                     {shell.spec.overview}
                   </p>
                 )}
@@ -423,7 +424,7 @@ export function DesignPage() {
                 {/* Navigation items */}
                 {shell.spec.navigationItems.length > 0 && (
                   <div>
-                    <h4 className='text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-2'>
+                    <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-2'>
                       Navigation
                     </h4>
                     <ul className='space-y-1'>
@@ -433,9 +434,9 @@ export function DesignPage() {
                         return (
                           <li
                             key={index}
-                            className='flex items-center gap-2 text-stone-700 dark:text-stone-300'
+                            className='flex items-center gap-2 text-stone-700 dark:text-rwe-neutral-300'
                           >
-                            <span className='w-1 h-1 rounded-full bg-stone-400 dark:bg-stone-500' />
+                            <span className='w-1 h-1 rounded-full bg-stone-400 dark:bg-rwe-neutral-500' />
                             {parts.map((part, i) =>
                               i % 2 === 1 ? (
                                 <strong key={i} className='font-semibold'>
@@ -454,24 +455,24 @@ export function DesignPage() {
 
                 {/* View Shell Design Link */}
                 {shell.hasComponents && (
-                  <div className='pt-2 border-t border-stone-100 dark:border-stone-800'>
+                  <div className='pt-2 border-t border-stone-100 dark:border-rwe-neutral-800'>
                     <Link
-                      to='/shell/design'
-                      className='flex items-center justify-between gap-4 py-2 hover:text-stone-900 dark:hover:text-stone-100 transition-colors group'
+                      to={paths.shell}
+                      className='flex items-center justify-between gap-4 py-2 hover:text-stone-900 dark:hover:text-rwe-neutral-100 transition-colors group'
                     >
                       <div className='flex items-center gap-3'>
-                        <div className='w-8 h-8 rounded-md bg-stone-200 dark:bg-stone-700 flex items-center justify-center'>
+                        <div className='w-8 h-8 rounded-md bg-stone-200 dark:bg-rwe-neutral-700 flex items-center justify-center'>
                           <Layout
-                            className='w-4 h-4 text-stone-600 dark:text-stone-300'
+                            className='w-4 h-4 text-stone-600 dark:text-rwe-neutral-300'
                             strokeWidth={1.5}
                           />
                         </div>
-                        <span className='font-medium text-stone-700 dark:text-stone-300 group-hover:text-stone-900 dark:group-hover:text-stone-100'>
+                        <span className='font-medium text-stone-700 dark:text-rwe-neutral-300 group-hover:text-stone-900 dark:group-hover:text-rwe-neutral-100'>
                           View Shell Design
                         </span>
                       </div>
                       <ChevronRight
-                        className='w-4 h-4 text-stone-400 dark:text-stone-500'
+                        className='w-4 h-4 text-stone-400 dark:text-rwe-neutral-500'
                         strokeWidth={1.5}
                       />
                     </Link>
@@ -479,13 +480,9 @@ export function DesignPage() {
                 )}
 
                 {/* Edit hint */}
-                <div className='bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-2.5'>
-                  <p className='text-xs text-stone-500 dark:text-stone-400'>
-                    Use the{" "}
-                    <code className='font-mono text-stone-700 dark:text-stone-300'>
-                      @design-shell
-                    </code>{" "}
-                    agent to update
+                <div className='bg-stone-100 dark:bg-rwe-neutral-800 rounded-md px-4 py-2.5'>
+                  <p className='text-xs text-stone-500 dark:text-rwe-neutral-400'>
+                    Use <StepName step='design-shell' /> to update
                   </p>
                 </div>
               </CardContent>
@@ -531,10 +528,10 @@ function ColorSwatch({ label, colorName }: ColorSwatchProps) {
           title={`${colorName}-600`}
         />
       </div>
-      <p className='text-sm font-medium text-stone-900 dark:text-stone-100'>
+      <p className='text-sm font-medium text-stone-900 dark:text-rwe-neutral-100'>
         {label}
       </p>
-      <p className='text-xs text-stone-500 dark:text-stone-400'>{colorName}</p>
+      <p className='text-xs text-stone-500 dark:text-rwe-neutral-400'>{colorName}</p>
     </div>
   );
 }
@@ -548,19 +545,19 @@ function ColorPalette({ colors }: { colors: object }) {
         const entries = Object.entries(group as Record<string, string>);
         return (
           <div key={groupName}>
-            <p className='text-xs font-medium text-stone-500 dark:text-stone-400 mb-2 capitalize'>
+            <p className='text-xs font-medium text-stone-500 dark:text-rwe-neutral-400 mb-2 capitalize'>
               {groupName}
             </p>
             <div className='flex flex-wrap gap-2'>
               {entries.map(([name, hex]) => (
                 <div key={name} className='flex items-center gap-2'>
                   <div
-                    className='w-8 h-8 rounded-md border border-stone-200 dark:border-stone-700'
+                    className='w-8 h-8 rounded-md border border-stone-200 dark:border-rwe-neutral-700'
                     style={{ backgroundColor: hex }}
                     title={hex}
                   />
                   <div>
-                    <p className='text-xs font-medium text-stone-700 dark:text-stone-300'>
+                    <p className='text-xs font-medium text-stone-700 dark:text-rwe-neutral-300'>
                       {name}
                     </p>
                     <p className='text-[10px] text-stone-400 font-mono'>
@@ -588,17 +585,17 @@ function TokenImportNotice({ state }: { state: DesignTokensState }) {
         <div className='flex items-start gap-3'>
           <AlertTriangle className='w-4 h-4 mt-0.5 text-amber-600 shrink-0' />
           <div className='space-y-1 text-sm'>
-            <p className='font-medium text-stone-900 dark:text-stone-100'>
+            <p className='font-medium text-stone-900 dark:text-rwe-neutral-100'>
               {invalid
                 ? "Design tokens could not be loaded"
                 : "Design tokens are waiting to be imported"}
             </p>
-            <p className='text-stone-600 dark:text-stone-400'>
+            <p className='text-stone-600 dark:text-rwe-neutral-400'>
               {state.status === "invalid"
                 ? `product/design-system/tokens/tokens.json: ${state.reason}. `
                 : "product/design-system/import/tokens.json exists, but no token model has been generated yet. "}
               Run{" "}
-              <code className='font-mono text-xs bg-white/70 dark:bg-stone-800 px-1.5 py-0.5 rounded'>
+              <code className='font-mono text-xs bg-rwe-sand-25/70 dark:bg-rwe-neutral-800 px-1.5 py-0.5 rounded'>
                 npm run tokens:build
               </code>{" "}
               and reload.
@@ -615,60 +612,47 @@ function TokenImportNotice({ state }: { state: DesignTokensState }) {
  */
 function DesignSystemEmptyState({ hasResources }: { hasResources: boolean }) {
   return (
-    <Card className='border-stone-200 dark:border-stone-700 shadow-sm border-dashed'>
+    <Card className='border-stone-200 dark:border-rwe-neutral-700 shadow-sm border-dashed'>
       <CardContent className='py-8'>
         <div className='flex flex-col items-center text-center max-w-sm mx-auto'>
-          <div className='w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mb-3'>
+          <div className='w-10 h-10 rounded-full bg-stone-100 dark:bg-rwe-neutral-800 flex items-center justify-center mb-3'>
             <Layout
-              className='w-5 h-5 text-stone-400 dark:text-stone-500'
+              className='w-5 h-5 text-stone-400 dark:text-rwe-neutral-500'
               strokeWidth={1.5}
             />
           </div>
-          <h3 className='text-base font-medium text-stone-600 dark:text-stone-400 mb-1'>
+          <h3 className='text-base font-medium text-stone-600 dark:text-rwe-neutral-400 mb-1'>
             No design system defined yet
           </h3>
-          <p className='text-sm text-stone-500 dark:text-stone-400 mb-4'>
+          <p className='text-sm text-stone-500 dark:text-rwe-neutral-400 mb-4'>
             Define colors, typography, and brand identity for your product
           </p>
-          <div className='bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-2.5 w-full space-y-2'>
-            <div>
-              <p className='text-xs text-stone-500 dark:text-stone-400 mb-0.5'>
-                Select Copilot agent:
-              </p>
-              <code className='text-sm font-mono text-stone-700 dark:text-stone-300'>
-                @design-system
-              </code>
-            </div>
-            <div className='border-t border-stone-200 dark:border-stone-700 pt-2'>
-              <p className='text-xs text-stone-500 dark:text-stone-400 mb-0.5'>
-                Then say:
-              </p>
-              <p className='text-sm text-stone-600 dark:text-stone-300 italic'>
-                "Help me define my design system"
-              </p>
-            </div>
-          </div>
+          <AgentPrompt
+            step='design-system'
+            prompt='Help me define my design system'
+            compact
+          />
 
           {/* Token import hint */}
           <div className='mt-4 w-full'>
-            <div className='bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-md px-4 py-3'>
+            <div className='bg-stone-50 dark:bg-rwe-neutral-900 border border-stone-200 dark:border-rwe-neutral-700 rounded-md px-4 py-3'>
               <div className='flex items-start gap-3'>
-                <Upload className='w-4 h-4 text-stone-400 dark:text-stone-500 mt-0.5 shrink-0' />
+                <Upload className='w-4 h-4 text-stone-400 dark:text-rwe-neutral-500 mt-0.5 shrink-0' />
                 <div className='space-y-1.5 text-left'>
-                  <p className='text-xs font-medium text-stone-600 dark:text-stone-300'>
+                  <p className='text-xs font-medium text-stone-600 dark:text-rwe-neutral-300'>
                     Or import design tokens (DTCG)
                   </p>
-                  <p className='text-xs text-stone-500 dark:text-stone-400'>
+                  <p className='text-xs text-stone-500 dark:text-rwe-neutral-400'>
                     Put <code className='font-mono'>tokens.json</code>, optional{" "}
                     <code className='font-mono'>DESIGN.md</code> and{" "}
                     <code className='font-mono'>skill.md</code> into
                   </p>
-                  <code className='inline-block text-xs font-mono text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-1.5 py-0.5 rounded'>
+                  <code className='inline-block text-xs font-mono text-stone-500 dark:text-rwe-neutral-400 bg-stone-100 dark:bg-rwe-neutral-800 px-1.5 py-0.5 rounded'>
                     product/design-system/import/
                   </code>
-                  <p className='text-xs text-stone-500 dark:text-stone-400'>
+                  <p className='text-xs text-stone-500 dark:text-rwe-neutral-400'>
                     then run{" "}
-                    <code className='font-mono text-stone-700 dark:text-stone-300'>
+                    <code className='font-mono text-stone-700 dark:text-rwe-neutral-300'>
                       npm run tokens:build
                     </code>
                   </p>
@@ -679,23 +663,23 @@ function DesignSystemEmptyState({ hasResources }: { hasResources: boolean }) {
 
           {/* Brand resources hint */}
           <div className='mt-4 w-full'>
-            <div className='bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-md px-4 py-3'>
+            <div className='bg-stone-50 dark:bg-rwe-neutral-900 border border-stone-200 dark:border-rwe-neutral-700 rounded-md px-4 py-3'>
               <div className='flex items-start gap-3'>
-                <FolderOpen className='w-4 h-4 text-stone-400 dark:text-stone-500 mt-0.5 shrink-0' />
+                <FolderOpen className='w-4 h-4 text-stone-400 dark:text-rwe-neutral-500 mt-0.5 shrink-0' />
                 <div className='space-y-2 text-left'>
                   <div>
-                    <p className='text-xs font-medium text-stone-600 dark:text-stone-300 mb-1'>
+                    <p className='text-xs font-medium text-stone-600 dark:text-rwe-neutral-300 mb-1'>
                       {hasResources
                         ? "Brand resources found"
                         : "Optional: Add brand resources first"}
                     </p>
-                    <code className='text-xs font-mono text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-1.5 py-0.5 rounded'>
+                    <code className='text-xs font-mono text-stone-500 dark:text-rwe-neutral-400 bg-stone-100 dark:bg-rwe-neutral-800 px-1.5 py-0.5 rounded'>
                       product/design-system/resources/
                     </code>
                   </div>
                   {!hasResources && (
-                    <div className='text-xs text-stone-500 dark:text-stone-400 space-y-1'>
-                      <p className='font-medium text-stone-600 dark:text-stone-300'>
+                    <div className='text-xs text-stone-500 dark:text-rwe-neutral-400 space-y-1'>
+                      <p className='font-medium text-stone-600 dark:text-rwe-neutral-300'>
                         What to add:
                       </p>
                       <ul className='space-y-0.5 ml-1'>

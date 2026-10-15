@@ -2,6 +2,8 @@
 
 You are helping the user define the complete visual identity for their product. This includes:
 
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
+
 - **Colors** — Primary, secondary, and neutral palettes (required)
 - **Typography** — Heading, body, and mono fonts (required)
 - **Brand Personality** — Adjectives and mood (optional)
@@ -17,9 +19,19 @@ Read `product/product-overview.md` to understand what the product is.
 
 If it doesn't exist:
 
-"Before defining your design system, you'll need to establish your product vision. Please run `/product-vision` first."
+"Before defining your design system, you'll need to establish your product vision. Please run `/design-os:product-vision` first."
 
 Stop here if the prerequisite is missing.
+
+## Step 1a: Load the Tech Stack
+
+Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`).
+
+- Tell the user in one line which stack applies: `product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react".
+- The decisions are binding. Undecided means no new dependency.
+- A request the stack cannot serve is a conflict: show it to the user and offer `/design-os:techstack update`. Never edit `product/techstack/techstack.md` from this step.
+- **This step:** the colors must cover the semantic roles the UI library expects, so `DESIGN.md` maps one to one. For shadcn/ui: primary, secondary, muted, accent, destructive, background, foreground, card, popover, border, input, ring. On the token import path, check this against `DESIGN.md` and report missing roles to the user. On the interview path, pick palettes from which every role can be assigned.
+- Fonts and radius are the design system's. The stack's `ui-style` never overrides them.
 
 ## Step 1b: Check for Imported Design Tokens (DTCG)
 
@@ -375,7 +387,7 @@ Once approved, create:
 
 ---
 
-_This design system informs all screen designs and the application shell. The `/design-shell` and `/design-screen` commands will reference these tokens and preferences._
+_This design system informs all screen designs and the application shell. The `/design-os:design-shell` and `/design-os:design-screen` commands will reference these tokens and preferences._
 ```
 
 ## Step 7b: Update Google Fonts in index.html
@@ -408,7 +420,7 @@ Let the user know:
 
 These will be used when creating screen designs for your sections.
 
-Next step: Run `/design-shell` to design your application's navigation and layout."
+Next step: Run `/design-os:design-shell` to design your application's navigation and layout."
 
 ---
 

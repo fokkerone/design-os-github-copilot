@@ -2,6 +2,8 @@
 
 You are helping the user design the application shell — the persistent navigation and layout that wraps all sections. This is a screen design, not implementation code.
 
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
+
 ## Step 1: Check Prerequisites
 
 First, verify prerequisites exist:
@@ -13,14 +15,14 @@ First, verify prerequisites exist:
 If overview or roadmap are missing:
 
 "Before designing the shell, you need to define your product and sections. Please run:
-1. `/product-vision` — Define your product
-2. `/product-roadmap` — Define your sections"
+1. `/design-os:product-vision` — Define your product
+2. `/design-os:product-roadmap` — Define your sections"
 
 Stop here if overview or roadmap are missing.
 
 If design system is missing, show a warning but continue:
 
-"Note: Design system hasn't been defined yet. I'll proceed with default styling, but you may want to run `/design-tokens` first for consistent colors and typography."
+"Note: Design system hasn't been defined yet. I'll proceed with default styling, but you may want to run `/design-os:design-tokens` first for consistent colors and typography."
 
 ## Step 1b: Check for Brand Identity in Design System
 
@@ -61,6 +63,15 @@ Run `npm run -s context` (see the `designos-context` skill, `.claude/skills/desi
 - **Flows:** flows that cross sections show which sections users move between most. Keep those one step apart in the navigation.
 
 These are inputs for your recommendation. The user decides.
+
+## Step 1d: Load the Tech Stack
+
+Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`).
+
+- Tell the user in one line which stack applies: `product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react".
+- The decisions are binding. Undecided means no new dependency.
+- A request the stack cannot serve is a conflict: show it to the user and offer `/design-os:techstack update`. Never edit `product/techstack/techstack.md` from this step.
+- **This step:** build the shell from `src/ui/` primitives (the product-owned UI layer, ported per rule 3 of the skill, see Step 6) and the stack's `icons`. List the primitives you create in `product/shell/spec.md` under "UI Components".
 
 ## Step 2: Analyze Product Structure
 
@@ -148,6 +159,10 @@ Create `product/shell/spec.md`:
 - **Tablet:** [Behavior]
 - **Mobile:** [Behavior]
 
+## UI Components
+Primitives from `src/ui/` used by the shell:
+- `src/ui/[primitive].tsx` — [Primitive name], used for [where in the shell]
+
 ## Design Notes
 [Any additional design decisions or notes]
 ```
@@ -178,13 +193,21 @@ The user menu with avatar and dropdown.
 ### index.ts
 Export all components.
 
+### UI primitives (`src/ui/`)
+The shell imports UI primitives (button, avatar, dropdown menu, sheet, ...) only from `src/ui/`, with relative imports (for example `../../ui/button`). Never import `@/components/*`. Port a primitive only when the shell needs it, and compose from what `src/ui/` already has first. For shadcn/ui (the `designos-techstack` skill, "Applying the stack", rule 3):
+- Read the source with `npx shadcn@latest view @shadcn/<name>` and create `src/ui/<name>.tsx` from it. Never run `npx shadcn@latest add`.
+- Imports become relative; `cn` comes from `src/ui/utils.ts`.
+- Semantic utilities become palette steps from `product/design-system/DESIGN.md` (with the `dark:` pair), with the role in a comment: `// token: primary`.
+- Respect the stack's `ui-base` and `ui-style`, and keep the primitives accessible.
+- Ask before installing an npm package a ported file needs, and report it.
+
 **Component Requirements:**
 - Use props for all data and callbacks (portable)
 - Apply design tokens if they exist (colors, fonts)
 - Support light and dark mode with `dark:` variants
 - Be mobile responsive
-- Use Tailwind CSS for styling
-- Use lucide-react for icons
+- Style with Tailwind CSS (fixed runtime), using the product's palette steps
+- Take icons from the stack's `icons` area (default: `lucide-react`), imported in one place per file
 
 ## Step 7: Create Shell Preview
 
@@ -252,6 +275,7 @@ Let the user know:
 - `src/shell/components/UserMenu.tsx` — User menu component
 - `src/shell/components/index.ts` — Component exports
 - `src/shell/ShellPreview.tsx` — Preview wrapper
+- `src/ui/[primitive].tsx` — UI primitives the shell uses (listed in the shell spec under "UI Components")
 
 **Shell features:**
 - [Layout pattern] layout
@@ -262,9 +286,9 @@ Let the user know:
 
 **Important:** Restart your dev server to see the changes.
 
-When you design section screens with `/design-screen`, they will render inside this shell, showing the full app experience.
+When you design section screens with `/design-os:design-screen`, they will render inside this shell, showing the full app experience.
 
-Next: Run `/shape-section` to start designing your first section."
+Next: Run `/design-os:shape-section` to start designing your first section."
 
 ## Important Notes
 
@@ -272,5 +296,6 @@ Next: Run `/shape-section` to start designing your first section."
 - Components are props-based and portable to the user's codebase
 - The preview wrapper is for Design OS only — not exported
 - Apply design tokens when available for consistent styling
+- UI primitives live in `src/ui/` and follow the tech stack; icons come from the stack's `icons` area
 - Keep the shell focused on navigation chrome — no authentication UI
 - Section screen designs will render inside the shell's content area

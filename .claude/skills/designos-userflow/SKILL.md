@@ -35,7 +35,7 @@ A flow is designed through a fixed pipeline that forces structural thinking:
   - Free-text answers come through the automatic "Other" option. Don't add your own "Other".
   - These prompts are also answerable via hardware like Stream Deck integrations: keep labels short (1–5 words) and put detail in the description.
 - **Never write a file before the user confirmed the review step.**
-- **Stay in scope.** You create flows. You do not create section specs (`/shape-section`), sample data, or screen designs. Point to those commands instead.
+- **Stay in scope.** You create flows. You do not create section specs (`/design-os:shape-section`), sample data, or screen designs. Point to those commands instead.
 
 ---
 
@@ -46,7 +46,7 @@ A flow is designed through a fixed pipeline that forces structural thinking:
 | `plan` | Planning ahead: sections or screens may not exist yet | Mapping is optional; unmapped steps are listed as *planned* |
 | `prototype` | Adding a flow to an existing prototype | Mapping is mandatory; produces a gap list of missing screens and states |
 | `update <flow-id>` | Revise an existing flow | Loads `product/flows/<flow-id>.md`, asks what to change, re-runs affected stages only |
-| `inline` | Called from `/shape-section` | Section is preset, Context questions are pre-filled from the section conversation, and no spec linking happens (shape-section does that) |
+| `inline` | Called from `/design-os:shape-section` | Section is preset, Context questions are pre-filled from the section conversation, and no spec linking happens (shape-section does that) |
 
 No mode given: if `src/sections/*/` contains screen designs, ask `prototype` vs `plan` (recommend `prototype`); otherwise use `plan`.
 
@@ -166,7 +166,7 @@ Map every step to `section-id` + screen design (`src/sections/<section-id>/<Scre
 - `planned`: the section is in the roadmap but not designed yet (plan mode)
 - `new-section`: the step needs a section that is not in the roadmap
 
-`prototype` mode: mapping is mandatory and you must show the **gap list** with next commands (`/shape-section`, `/design-screen`). `plan` mode: ask whether to map now (Recommended if sections exist) or leave steps `planned`.
+`prototype` mode: mapping is mandatory and you must show the **gap list** with next commands (`/design-os:shape-section`, `/design-os:design-screen`). `plan` mode: ask whether to map now (Recommended if sections exist) or leave steps `planned`.
 
 Group Mermaid nodes into `subgraph` blocks per section.
 
@@ -192,7 +192,7 @@ Ask (multiSelect) which existing section specs should list this flow, with the m
 - <Flow title> — <one-line summary> (flow: <flow-id>)
 ```
 
-Do not change anything else in the spec. Sections without a `spec.md` are listed with the hint to run `/shape-section`, which can link the flow from the wiki.
+Do not change anything else in the spec. Sections without a `spec.md` are listed with the hint to run `/design-os:shape-section`, which can link the flow from the wiki.
 
 If at least one spec now links the flow, set `status: in-spec` in the flow file's **frontmatter** and run `npm run -s wiki -- sync-meta product/flows/<flow-id>.md`. A status change is metadata: it is synced, not re-ingested.
 
@@ -216,8 +216,8 @@ Steps: N · Edge cases: M · Rules: K
 Sections: <ids> · Gaps: <count>
 
 Next:
-  /shape-section          Define a missing section (can link this flow)
-  /design-screen          Design screens for the gaps
+  /design-os:shape-section          Define a missing section (can link this flow)
+  /design-os:design-screen          Design screens for the gaps
   /design-os:wiki-query   Ask the brain about related flows
 ```
 

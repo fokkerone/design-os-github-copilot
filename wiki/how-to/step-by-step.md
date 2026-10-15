@@ -2,9 +2,9 @@
 title: Step-by-Step Guide
 summary: The complete walkthrough for using Design OS, from installing the app to handing off the export package, with what each command asks, what it creates and where to check the result.
 tags: [how-to]
-sources: [agents.md, .claude/commands/design-os/, .claude/skills/designos-persona/SKILL.md, .claude/skills/designos-userflow/SKILL.md]
+sources: [agents.md, .claude/commands/design-os/, .claude/skills/designos-techstack/SKILL.md, .claude/skills/designos-persona/SKILL.md, .claude/skills/designos-userflow/SKILL.md]
 created: 2026-10-09
-updated: 2026-10-09
+updated: 2026-10-14
 ---
 
 # Step-by-Step Guide
@@ -61,9 +61,31 @@ This guide takes you through a complete Design OS project in order. Every step f
 
 ---
 
-## Step 2 — Product Roadmap
+## Step 2 — Tech Stack
 
-- **Run:** `/product-roadmap` · `@01-product-roadmap`
+- **Run:** `/design-os:techstack` · `@01-techstack` — optionally with a mode: `quick`, `update`, `add-registry`.
+- **Needs:** the product overview.
+- **Prepare:** whether the export goes into an existing codebase (and its repository URL), which registries or reference repositories you want to use, and any company constraints (UI library, package manager, accessibility level). Recommended, not blocking: if you skip this step, the defaults apply (shadcn/ui, lucide-react) and every later step still works.
+
+**What happens**
+1. The agent reads the overview, personas, `package.json` and the wiki, and tells you what it found. The prototype runtime (React 19 + Vite, TypeScript strict, Tailwind CSS v4) is fixed and never asked.
+2. **Target codebase:** greenfield, existing codebase or not decided yet, and the target framework (Next.js, Vite + React, React Router / Remix). Without a mode it also asks whether you want only the defaults and the UI library (`quick`) or a walk through all areas (`full`).
+3. **UI library:** shadcn/ui (recommended), headless primitives, another component library, or none. With shadcn/ui: component base (Radix UI or Base UI), UI style and icons (`lucide-react` by default).
+4. **Registries, repositories and packages:** official shadcn registry only, community or private registries, GitHub repositories to copy patterns from, and extra packages the product hints at. Registries are checked read-only where possible; anything unchecked is marked `unverified`.
+5. **App patterns** (full mode): forms and validation, data fetching, state, tables, charts, animation, routing, i18n. Only areas the product gives a reason for are asked.
+6. **Tooling** (full mode): package manager, testing and linting, accessibility level, browser support.
+7. **Compatibility check:** a critic looks for conflicts (a library that brings its own styling against Tailwind and the tokens, a base that differs from the target codebase, too many packages, undecided areas a section needs) and you choose what to fix.
+8. You confirm the summary, the file is written, validated with `npm run -s techstack -- --check` and compiled into the wiki.
+
+- **Result:** `product/techstack/techstack.md` (decisions, registries and repos, packages, constraints, open questions) and `wiki/techstack/techstack.md`. Nothing is installed.
+- **Check:** `npm run techstack` prints the decisions that apply; **Wiki** → Techstack shows the page.
+- **Why it matters:** every later step loads the stack and follows it. Screens, shell and clickdummy import UI primitives only from the product UI layer `src/ui/` (never from `@/components/*`), and an area left undecided gets no dependency. Details: [[how-to/tech-stack]].
+
+---
+
+## Step 3 — Product Roadmap
+
+- **Run:** `/product-roadmap` · `@02-product-roadmap`
 - **Needs:** the product overview.
 - **Prepare:** the main areas of the product, and which one matters most.
 
@@ -77,9 +99,9 @@ This guide takes you through a complete Design OS project in order. Every step f
 
 ---
 
-## Step 3 — Data Shape
+## Step 4 — Data Shape
 
-- **Run:** `/data-shape` · `@02-data-shape`
+- **Run:** `/data-shape` · `@03-data-shape`
 - **Needs:** overview and roadmap.
 - **Prepare:** the "things" users create, view or manage, and how they relate.
 
@@ -93,10 +115,10 @@ This guide takes you through a complete Design OS project in order. Every step f
 
 ---
 
-## Step 4 — Design System
+## Step 5 — Design System
 
-- **Run:** `/design-tokens` · `@03-design-system`
-- **Needs:** the product overview.
+- **Run:** `/design-tokens` · `@04-design-system`
+- **Needs:** the product overview. The tech stack is recommended: the colors then cover the semantic roles of the UI library (shadcn/ui: primary, secondary, muted, accent, destructive, background, foreground, card, popover, border, input, ring).
 - **Prepare (optional):** brand assets in `product/design-system/resources/`: logos (SVG, PNG), style-guide PDFs or images, color swatches, font names, mood boards.
 
 **What happens**
@@ -113,17 +135,17 @@ This guide takes you through a complete Design OS project in order. Every step f
 
 ---
 
-## Step 5 — Application Shell
+## Step 6 — Application Shell
 
-- **Run:** `/design-shell` · `@04-design-shell`
-- **Needs:** overview and roadmap. The design system is recommended (otherwise default styling).
+- **Run:** `/design-shell` · `@05-design-shell`
+- **Needs:** overview and roadmap. The design system is recommended (otherwise default styling). The tech stack decides the icons and the UI primitives.
 
 **What happens**
 1. The agent lists your sections and proposes layouts: **A** sidebar, **B** top navigation, **C** minimal header. Brand personality and UI style inform the recommendation.
 2. Questions: where the user menu sits, mobile behavior (collapsible sidebar or hamburger), extra nav items (Settings, Help), the default view.
 3. You approve navigation, user menu and responsive behavior.
 
-- **Result:** `product/shell/spec.md` and the components `src/shell/components/AppShell.tsx`, `MainNav.tsx`, `UserMenu.tsx`, `index.ts`, plus `src/shell/ShellPreview.tsx` (preview only, not exported).
+- **Result:** `product/shell/spec.md` (including the UI primitives it uses) and the components `src/shell/components/AppShell.tsx`, `MainNav.tsx`, `UserMenu.tsx`, `index.ts`, plus `src/shell/ShellPreview.tsx` (preview only, not exported).
 - **Check:** **Design** page → shell preview (`/shell/design`). Restart the dev server if it does not appear.
 
 ---
@@ -152,7 +174,7 @@ This guide takes you through a complete Design OS project in order. Every step f
 
 ---
 
-## User Flows (any time after Step 2)
+## User Flows (any time after Step 3)
 
 - **Run:** `/design-os:userflow` · `@userflow` — optionally `plan`, `prototype` or `update <flow-id>`, plus the goal.
 - **Needs:** the roadmap. For `prototype` mode, existing screen designs.
@@ -173,13 +195,13 @@ This guide takes you through a complete Design OS project in order. Every step f
 
 ---
 
-## Step 6 — For each section
+## Step 7 — For each section
 
-Repeat 6a–6d for every section in roadmap order.
+Repeat 7a–7d for every section in roadmap order.
 
-### 6a — Shape Section
+### 7a — Shape Section
 
-- **Run:** `/shape-section` · `@05-shape-section`
+- **Run:** `/shape-section` · `@06-shape-section`
 - **Needs:** the roadmap.
 
 **What happens**
@@ -193,9 +215,9 @@ Repeat 6a–6d for every section in roadmap order.
 - **Result:** `product/sections/<section-id>/spec.md` with Overview, User Flows, Personas, UI Requirements and Configuration.
 - **Check:** the section page (`/sections/<section-id>`) shows the spec card.
 
-### 6b — Sample Data
+### 7b — Sample Data
 
-- **Run:** `/sample-data` · `@06-sample-data`
+- **Run:** `/sample-data` · `@07-sample-data`
 - **Needs:** the section spec.
 
 **What happens**
@@ -205,22 +227,22 @@ Repeat 6a–6d for every section in roadmap order.
 - **Result:** `product/sections/<section-id>/data.json` (realistic records, edge cases such as empty lists and long texts, and a `_meta` block describing the entities) and `types.ts` (TypeScript interfaces including the component's props and callbacks).
 - **Check:** the section page shows the data card.
 
-### 6c — Design Screen
+### 7c — Design Screen
 
-- **Run:** `/design-screen` · `@07-design-screen`
+- **Run:** `/design-screen` · `@08-design-screen`
 - **Needs:** spec, `data.json` and `types.ts`. Design system and shell are recommended.
 
 **What happens**
 1. If the spec suggests several views (list, detail, form), you pick which one to design first.
-2. The agent applies your design system (colors, fonts, voice for labels and empty states, UI style) and builds the screen.
+2. The agent applies your design system (colors, fonts, voice for labels and empty states, UI style) and builds the screen from `src/ui/` primitives and the icons of your tech stack. A missing primitive is ported into `src/ui/`; only packages from the stack are used, and installing one is asked first.
 3. Run the command again for every further view.
 
 - **Result:** props-based components in `src/sections/<section-id>/components/` (no imported data, all actions as callbacks, responsive, light and dark mode) and a preview wrapper `src/sections/<section-id>/<ViewName>.tsx` that feeds the sample data.
 - **Check:** the section page lists the screen design; open it to see it inside the shell, with a fullscreen option. Restart the dev server if it does not appear. Callback clicks are logged to the browser console.
 
-### 6d — Screenshot
+### 7d — Screenshot
 
-- **Run:** `/screenshot-design` · `@08-screenshot-design`
+- **Run:** `/screenshot-design` · `@09-screenshot-design`
 - **Needs:** a screen design, and the Playwright MCP server in Claude Code (`claude mcp add playwright npx @playwright/mcp@latest`, then restart the session).
 
 **What happens**
@@ -231,9 +253,9 @@ Repeat 6a–6d for every section in roadmap order.
 
 ---
 
-## Step 7 — Clickdummy
+## Step 8 — Clickdummy
 
-- **Run:** `/clickdummy` · `@09-clickdummy`
+- **Run:** `/clickdummy` · `@10-clickdummy`
 - **Needs:** overview, roadmap, the shell, and a screen design for every section.
 
 **What happens**
@@ -245,9 +267,9 @@ Repeat 6a–6d for every section in roadmap order.
 
 ---
 
-## Step 8 — Export
+## Step 9 — Export
 
-- **Run:** `/export-product` · `@10-export-product`
+- **Run:** `/export-product` · `@11-export-product`
 - **Needs:** overview, roadmap and at least one section with screen designs. Data shape, design system and shell are recommended.
 
 - **What happens:** the agent collects everything and generates the handoff package. No questions unless something required is missing.
@@ -256,11 +278,12 @@ Repeat 6a–6d for every section in roadmap order.
   - `README.md`, `product-overview.md` (including personas) and `design-system.md`
   - `prompts/`: `one-shot-prompt.md` and `section-prompt.md`, ready to paste into a coding agent
   - `instructions/`: one-shot and milestone-by-milestone instructions (shell first, then each section)
+  - `techstack.md` (the stack decisions) and `ui/` (the product UI primitives from `src/ui/`)
   - `design-system/`, `data-shapes/`, `shell/` and `sections/` with portable components, types, sample data, screenshots and a `tests.md` per section
   - `flows/` and `personas/` if they exist; flows become test groups in `tests.md`
 
 - **Check:** **Export** page (download the zip). Restart the dev server if the page does not list the new package.
-- **Hand off:** give `product-plan/` to the implementation team and start with `prompts/one-shot-prompt.md` or the section prompt. The coding agent asks about tech stack and backend before building.
+- **Hand off:** give `product-plan/` to the implementation team and start with `prompts/one-shot-prompt.md` or the section prompt. The "My tech stack" section of the prompts is pre-filled from `techstack.md`, so the coding agent confirms it, asks only about areas that are still undecided, and asks about the backend before building.
 
 ---
 
@@ -280,7 +303,8 @@ How the wiki works: [[how-to/project-brain]].
 | You want to | Do this |
 |-------------|---------|
 | Change the overview, roadmap, data shape or design system | Run the same command again; it shows the current state and asks what to change |
-| Add a section | `/product-roadmap`, then 6a–6d for the new section, then `/clickdummy` again |
+| Change the UI library, icons, registries, packages or target framework | `/design-os:techstack update`; add a registry, repository or package with `/design-os:techstack add-registry`. Steps that already ran are not redone: the command tells you which ones are affected |
+| Add a section | `/product-roadmap`, then 7a–7d for the new section, then `/clickdummy` again |
 | Change a section's scope | `/shape-section` for that section, then update data and screens as needed |
 | Add another view to a section | `/design-screen` again for that section |
 | Revise a flow or persona | `/design-os:userflow update <flow-id>` · `/design-os:persona update <persona-id>` |
@@ -305,4 +329,4 @@ After any change, run `/design-os:wiki-ingest --product` so the wiki reflects it
 ## Related
 - [[how-to/getting-started]] — the short version
 - [[how-to/planning-flow]] — the flow as a diagram and table
-- [[how-to/personas]] · [[how-to/user-flows]] · [[how-to/project-brain]]
+- [[how-to/tech-stack]] · [[how-to/personas]] · [[how-to/user-flows]] · [[how-to/project-brain]]

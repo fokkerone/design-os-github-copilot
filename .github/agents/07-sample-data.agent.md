@@ -1,0 +1,269 @@
+---
+name: 07-sample-data
+description: "Step 7: Create or update realistic sample data and TypeScript types for a product section. Generates data.json and types.ts used to populate screen designs."
+handoffs:
+  - label: Design Screen
+    agent: 08-design-screen
+    prompt: "Sample data and types are ready. Create the screen design for this section."
+---
+
+Refer to @agents.md for the full Design OS context, file structure, and conventions.
+
+**Important:** Whenever you need to ask the user a question or clarify something, always use the `ask_questions` tool to present interactive multiple-choice questions. Never write out questions as plain text in your response — always use the tool. This keeps the conversation efficient and easy to respond to.
+
+# Sample Data
+
+You are helping the user create or update realistic sample data for a section of their product. This data will be used to populate screen designs. You will also generate TypeScript types based on the data structure.
+
+**Golden rule: NEVER generate files without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
+
+## Step 0: Load the Tech Stack
+
+Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`).
+
+- Tell the user in one line which stack applies: `product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react".
+- The decisions are binding. Undecided means no new dependency.
+- A request the stack cannot serve is a conflict: show it to the user and offer `@01-techstack` (mode `update`). Never edit `product/techstack/techstack.md` from this step.
+- **This step:** types stay plain TypeScript interfaces. When `validation` is decided, note in a comment which fields would be validated (for example `/** validated: required, email */`) without importing the library or generating schemas. The prototype adds no data-fetching library: the screens read `data.json` through props.
+
+## Step 1: Check Prerequisites
+
+First, identify the target section and verify that `spec.md` exists for it.
+
+Read `product/product-roadmap.md` to get the list of available sections.
+
+If there's only one section, auto-select it. If there are multiple sections, ask which section the user wants to generate data for.
+
+Then check if `product/sections/[section-id]/spec.md` exists. If it doesn't:
+
+"I don't see a specification for **[Section Title]** yet. Please use the `@06-shape-section` agent first to define the section's requirements, then come back to generate sample data."
+
+Stop here if the spec doesn't exist.
+
+## Step 2: Check for Existing Sample Data
+
+Check if `product/sections/[section-id]/data.json` already exists.
+
+**If sample data already exists:**
+
+Read the existing `data.json` and `types.ts` files, then ask the user:
+
+"Sample data already exists for **[Section Title]**. What would you like to change about the existing data shape or sample data?"
+
+Wait for the user's response. Once they describe the changes, update `data.json` and `types.ts` accordingly.
+
+After updating, inform the user and ask if they'd like further adjustments.
+
+Stop here — the remaining steps below are for generating new data from scratch.
+
+**If no sample data exists:** Continue to Step 3.
+
+## Step 3: Check for Global Data Shape
+
+Check if `product/data-shape/data-shape.md` exists.
+
+**If it exists:**
+- Read the file to understand the global entity definitions
+- Entity names in your sample data should match the global data shape
+- Use the descriptions and relationships as a guide
+
+**If it doesn't exist:**
+Show a warning but continue:
+
+"Note: A global data shape hasn't been defined yet. I'll create entity structures based on the section spec, but for consistency across sections, consider using the `@03-data-shape` agent first."
+
+## Step 4: Ask Clarifying Questions
+
+Read and analyze `product/sections/[section-id]/spec.md` to understand:
+
+- What data entities are implied by the user flows?
+- What fields/properties would each entity need?
+- What sample values would be realistic and helpful for design?
+- What actions can be taken on each entity? (These become callback props)
+
+**Load personas and user flows.** Follow the `designos-context` skill (`.claude/skills/designos-context/SKILL.md`): run `npm run -s context -- [section-id]` and apply its rules. Tell the user in two or three lines which personas and flows belong to this section, and show any conflicts before going on. Then use the report:
+
+- **Flow steps in this section**: the data must let every step be shown. A step that reviews a submitted value needs a record that has one.
+- **Edge cases** (`E1…`): include at least one record or value that produces each edge case that returns to a step in this section (a rejected value, an expired item, an empty list, a blocked account). Name the edge case in `_meta` so the screen design can find it.
+- **Rules** (`R1…`): the sample values must respect them, apart from the records that exist to show a rule being broken.
+- **Personas**: let their context decide what realistic means: wording, language, volumes, the kind of names and amounts they would see.
+- **The spec is binding**: flows and personas shape the sample values. They do not add entities or fields the spec does not call for. If a flow needs data the spec does not cover, tell the user and point to the `@06-shape-section` agent.
+
+If the section has no flow and no persona, continue as before.
+
+**If a global data shape exists:** Cross-reference the spec with the data shape. Use the same entity names and ensure consistency.
+
+**Do NOT generate the files yet.** First, ask the user clarifying questions about the data shape for this section. Example questions:
+- "Based on the spec, I see these entities: [Entity1], [Entity2]. Does that match your expectations, or are there others?"
+- "What statuses should [Entity] have? (e.g., draft, active, archived)"
+- "Should [Entity] include [field]? Or is that out of scope?"
+- "How many sample records would be useful for the design? (5-10 is typical)"
+
+Ask questions using the `ask_questions` tool. Have a back-and-forth until you clearly understand the data structure the user wants.
+
+## Step 5: Generate the Files
+
+Once the user has confirmed the data structure, generate both files:
+
+### Generate `product/sections/[section-id]/data.json`
+
+Create the data file with:
+
+- **A `_meta` section** - Human-readable descriptions of each entity and how they relate in the UI (displayed in the Design OS interface)
+- **Realistic sample data** - Use believable names, dates, descriptions, etc.
+- **Varied content** - Mix short and long text, different statuses, etc.
+- **Edge cases** - Include at least one empty array, one long description, etc.
+- **TypeScript-friendly structure** - Use consistent field names and types
+
+#### Required `_meta` Structure
+
+Every data.json MUST include a `_meta` object at the top level with:
+
+1. **`models`** - An object where each key is an entity name and value is a plain-language description of what it represents in the UI
+2. **`relationships`** - An array of strings describing how entities relate from the user's perspective
+
+Example structure:
+
+```json
+{
+  "_meta": {
+    "models": {
+      "invoices": "Each invoice represents a bill you send to a client for work completed.",
+      "lineItems": "Line items are the individual services or products listed on each invoice."
+    },
+    "relationships": [
+      "Each Invoice contains one or more Line Items (the breakdown of charges)",
+      "Invoices track which Client they belong to via the clientName field"
+    ]
+  },
+  "invoices": [
+    {
+      "id": "inv-001",
+      "invoiceNumber": "INV-2024-001",
+      "clientName": "Acme Corp",
+      "clientEmail": "billing@acme.com",
+      "total": 1500.00,
+      "status": "sent",
+      "dueDate": "2024-02-15",
+      "lineItems": [
+        { "description": "Web Design", "quantity": 1, "rate": 1500.00 }
+      ]
+    }
+  ]
+}
+```
+
+The `_meta` descriptions should:
+- Use plain, non-technical language
+- Explain what each entity represents from the user's perspective
+- Describe relationships in terms of "contains", "belongs to", "links to"
+- **Match the global data shape entity names if one exists**
+
+### Generate `product/sections/[section-id]/types.ts`
+
+Generate TypeScript types based on the data structure.
+
+#### Type Generation Rules
+
+1. **Infer types from the sample data values:**
+   - Strings → `string`
+   - Numbers → `number`
+   - Booleans → `boolean`
+   - Arrays → `TypeName[]`
+   - Objects → Create a named interface
+
+2. **Use union types for status/enum fields:**
+   - If a field like `status` has known values, use a union: `'draft' | 'sent' | 'paid' | 'overdue'`
+   - Base this on the spec and the variety in sample data
+
+3. **Create a Props interface for the main component:**
+   - Include the data as a prop (e.g., `invoices: Invoice[]`)
+   - Include optional callback props for each action (e.g., `onDelete?: (id: string) => void`)
+
+4. **Use consistent entity names:**
+   - If a global data shape exists, use the same entity names
+
+5. **Plain TypeScript only (tech stack):**
+   - Interfaces and union types, no schema library and no imports from packages
+   - If `validation` is decided in the stack, add a short JSDoc note on the fields that would be validated (e.g. `/** validated: required, email */`); do not import the library
+
+Example types.ts:
+
+```typescript
+// =============================================================================
+// UI Data Shapes — These define the data the components expect to receive
+// =============================================================================
+
+export interface LineItem {
+  description: string
+  quantity: number
+  rate: number
+}
+
+export interface Invoice {
+  id: string
+  invoiceNumber: string
+  clientName: string
+  clientEmail: string
+  total: number
+  status: 'draft' | 'sent' | 'paid' | 'overdue'
+  dueDate: string
+  lineItems: LineItem[]
+}
+
+// =============================================================================
+// Component Props
+// =============================================================================
+
+export interface InvoiceListProps {
+  /** The list of invoices to display */
+  invoices: Invoice[]
+  /** Called when user wants to view an invoice's details */
+  onView?: (id: string) => void
+  /** Called when user wants to edit an invoice */
+  onEdit?: (id: string) => void
+  /** Called when user wants to delete an invoice */
+  onDelete?: (id: string) => void
+  /** Called when user wants to create a new invoice */
+  onCreate?: () => void
+}
+```
+
+#### Naming Conventions
+
+- Use PascalCase for interface names: `Invoice`, `LineItem`, `InvoiceListProps`
+- Use camelCase for property names: `clientName`, `dueDate`, `lineItems`
+- Props interface should be named `[SectionName]Props` (e.g., `InvoiceListProps`)
+- Add JSDoc comments for callback props to explain when they're called
+- **Match entity names from the global data shape if one exists**
+
+## Step 6: Inform and Next Steps
+
+After creating both files, let the user know:
+
+"I've created two files for **[Section Title]**:
+
+1. `product/sections/[section-id]/data.json` - Sample data with [X] records
+2. `product/sections/[section-id]/types.ts` - TypeScript interfaces for type safety
+
+The types include:
+- `[Entity]` - The main data type
+- `[SectionName]Props` - Props interface for the component (includes callbacks for [list actions])
+
+Review the files and let me know if you'd like any adjustments. When you're ready, use the `@08-design-screen` agent to create the screen design for this section."
+
+## Important Notes
+
+- **Always ask clarifying questions before generating** — never auto-generate from the spec alone
+- Generate realistic, believable sample data - not "Lorem ipsum" or "Test 123"
+- Include 5-10 sample records for main entities (enough to show a realistic list)
+- Include edge cases: empty arrays, long text, different statuses
+- Keep field names clear and TypeScript-friendly (camelCase)
+- The data structure should directly map to the spec's user flows
+- When flows are linked, every edge case that returns to a step in this section has sample data that produces it
+- Never edit a flow, persona or spec file from this command
+- Always generate types.ts alongside data.json
+- types.ts stays plain TypeScript: no validation or data-fetching library is imported (tech stack)
+- Callback props should cover all actions mentioned in the spec
+- **Use entity names from the global data shape for consistency across sections**
+- If the user requests changes after reviewing, update the files immediately

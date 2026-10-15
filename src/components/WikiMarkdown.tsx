@@ -1,12 +1,13 @@
 import { useMemo, type MouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { MermaidDiagram } from '@/components/MermaidDiagram'
-import { resolveWikiLink } from '@/lib/wiki-loader'
+import { createSlugger, createWikiMarked, transformInline } from '@/lib/wiki-markdown'
 
 interface WikiMarkdownProps {
   markdown: string
+  /** Give headings anchor ids so a table of contents can link to them. Use once per page. */
+  anchors?: boolean
 }
 
 type Block = { type: 'markdown'; content: string } | { type: 'mermaid'; content: string }
@@ -18,9 +19,6 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     node.setAttribute('rel', 'noopener noreferrer')
   }
 })
-
-const escapeHtml = (text: string) =>
-  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 /** Split markdown into Mermaid diagrams and everything else */
 function splitBlocks(markdown: string): Block[] {
@@ -35,40 +33,22 @@ function splitBlocks(markdown: string): Block[] {
   return blocks
 }
 
-/** Replace [[wikilinks]] and ^[provenance] markers, leaving code untouched */
-function transformInline(text: string): string {
-  return text
-    .split(/(```[\s\S]*?```|`[^`\n]*`)/g)
-    .map((part, index) => {
-      if (index % 2 === 1) return part
-      return part
-        .replace(/\[\[([^\]|\\]+?)(?:\\?\|([^\]]+))?\]\]/g, (_, target: string, alias?: string) => {
-          const label = escapeHtml((alias || target.split('/').pop() || target).trim())
-          const resolved = resolveWikiLink(target)
-          return resolved
-            ? `<a href="/wiki/${resolved}" data-wiki="${resolved}" class="wiki-link">${label}</a>`
-            : `<span class="wiki-link-broken" title="No wiki page for ${escapeHtml(target)}">${label}</span>`
-        })
-        .replace(/\^\[(inferred|ambiguous)\]/g, '<span class="wiki-provenance">$1</span>')
-    })
-    .join('')
-}
-
-function renderMarkdown(markdown: string): string {
-  const html = marked.parse(transformInline(markdown), { gfm: true, async: false }) as string
+function renderMarkdown(markdown: string, marked: ReturnType<typeof createWikiMarked>): string {
+  const html = marked.parse(transformInline(markdown), { async: false })
   return DOMPurify.sanitize(html)
     .replace(/<table>/g, '<div class="wiki-table"><table>')
     .replace(/<\/table>/g, '</table></div>')
 }
 
 const proseClasses = [
-  'text-[15px] leading-relaxed text-stone-700 dark:text-stone-300',
+  'text-[15px] leading-relaxed text-stone-700 dark:text-rwe-neutral-300',
   '[&>*+*]:mt-4',
+  '[&_h1]:scroll-mt-20 [&_h2]:scroll-mt-20 [&_h3]:scroll-mt-20 [&_h4]:scroll-mt-20',
   '[&_h1]:text-xl [&_h1]:font-semibold [&_h1]:text-stone-900 dark:[&_h1]:text-stone-100',
   '[&_h2]:mt-10 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-stone-900 dark:[&_h2]:text-stone-100',
   '[&_h3]:mt-6 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-stone-900 dark:[&_h3]:text-stone-100',
   '[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li+li]:mt-1',
-  '[&_li:has(>input)]:list-none [&_li>input]:mr-2 [&_li>input]:accent-lime-600',
+  '[&_li:has(>input)]:list-none [&_li>input]:mr-2 [&_li>input]:accent-brand-blue-600',
   '[&_strong]:font-semibold [&_strong]:text-stone-900 dark:[&_strong]:text-stone-100',
   '[&_code]:font-mono [&_code]:text-[13px] [&_code]:bg-stone-100 dark:[&_code]:bg-stone-800 [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5',
   '[&_pre]:bg-stone-100 dark:[&_pre]:bg-stone-900 [&_pre]:rounded-md [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre_code]:bg-transparent [&_pre_code]:p-0',
@@ -79,21 +59,21 @@ const proseClasses = [
   '[&_th]:text-left [&_th]:font-medium [&_th]:text-stone-500 dark:[&_th]:text-stone-400 [&_th]:bg-stone-50 dark:[&_th]:bg-stone-900 [&_th]:px-3 [&_th]:py-2 [&_th]:whitespace-nowrap',
   '[&_td]:px-3 [&_td]:py-2 [&_td]:align-top [&_td]:border-t [&_td]:border-stone-200 dark:[&_td]:border-stone-800',
   '[&_a]:text-stone-900 dark:[&_a]:text-stone-100 [&_a]:underline [&_a]:decoration-stone-300 dark:[&_a]:decoration-stone-600 [&_a]:underline-offset-2 hover:[&_a]:decoration-stone-500',
-  '[&_.wiki-link]:decoration-lime-500 [&_.wiki-link]:decoration-2 hover:[&_.wiki-link]:decoration-lime-600',
+  '[&_.wiki-link]:decoration-brand-blue-500 [&_.wiki-link]:decoration-2 hover:[&_.wiki-link]:decoration-brand-blue-600',
   '[&_.wiki-link-broken]:text-red-600 dark:[&_.wiki-link-broken]:text-red-400 [&_.wiki-link-broken]:underline [&_.wiki-link-broken]:decoration-dashed [&_.wiki-link-broken]:underline-offset-2 [&_.wiki-link-broken]:cursor-help',
   '[&_.wiki-provenance]:ml-1 [&_.wiki-provenance]:rounded [&_.wiki-provenance]:px-1.5 [&_.wiki-provenance]:py-px [&_.wiki-provenance]:text-[11px] [&_.wiki-provenance]:font-medium [&_.wiki-provenance]:bg-amber-100 [&_.wiki-provenance]:text-amber-800 dark:[&_.wiki-provenance]:bg-amber-900/40 dark:[&_.wiki-provenance]:text-amber-300',
 ].join(' ')
 
 /** Renders a wiki page body: markdown, [[wikilinks]] and Mermaid diagrams */
-export function WikiMarkdown({ markdown }: WikiMarkdownProps) {
+export function WikiMarkdown({ markdown, anchors = false }: WikiMarkdownProps) {
   const navigate = useNavigate()
-  const blocks = useMemo(
-    () =>
-      splitBlocks(markdown).map((block) =>
-        block.type === 'markdown' ? { ...block, html: renderMarkdown(block.content) } : { ...block, html: '' }
-      ),
-    [markdown]
-  )
+  const blocks = useMemo(() => {
+    // One marked instance for all blocks keeps heading ids unique over the whole page
+    const marked = createWikiMarked(anchors ? createSlugger() : undefined)
+    return splitBlocks(markdown).map((block) =>
+      block.type === 'markdown' ? { ...block, html: renderMarkdown(block.content, marked) } : { ...block, html: '' }
+    )
+  }, [markdown, anchors])
 
   function handleClick(event: MouseEvent<HTMLDivElement>) {
     const link = (event.target as HTMLElement).closest('a[data-wiki]')
@@ -106,7 +86,7 @@ export function WikiMarkdown({ markdown }: WikiMarkdownProps) {
     <div className={proseClasses} onClick={handleClick}>
       {blocks.map((block, index) =>
         block.type === 'mermaid' ? (
-          <div key={index} className="rounded-md border border-stone-200 dark:border-stone-800 p-4">
+          <div key={index} className="rounded-md border border-stone-200 dark:border-rwe-neutral-800 p-4">
             <MermaidDiagram chart={block.content} />
           </div>
         ) : (

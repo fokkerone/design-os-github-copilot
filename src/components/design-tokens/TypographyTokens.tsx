@@ -18,13 +18,13 @@ export function FontFamilies({ typography }: { typography: Typography }) {
       count={typography.fontFamilies.length}
       hint="Previews use the token stack; if a family is not installed locally, the browser falls back to the next entry."
     >
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 @2xl:grid-cols-3 gap-4">
         {typography.fontFamilies.map((f) => (
-          <div key={f.name} className="rounded-md border border-stone-200 dark:border-stone-700 p-4 space-y-2 min-w-0">
-            <p className="text-4xl text-stone-900 dark:text-stone-100 leading-none" style={{ fontFamily: f.stack }}>
+          <div key={f.name} className="rounded-md border border-stone-200 dark:border-rwe-neutral-700 p-4 space-y-2 min-w-0">
+            <p className="text-4xl text-stone-900 dark:text-rwe-neutral-100 leading-none" style={{ fontFamily: f.stack }}>
               Aa
             </p>
-            <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{f.family}</p>
+            <p className="text-sm font-medium text-stone-900 dark:text-rwe-neutral-100 truncate">{f.family}</p>
             <div className="flex flex-wrap items-center gap-1.5">
               <CodePill>font-{f.name}</CodePill>
             </div>
@@ -41,17 +41,17 @@ export function TypeScale({ typography }: { typography: Typography }) {
   const stack = bodyStack(typography)
   return (
     <TokenGroup title="Type scale" count={typography.fontSizes.length} hint="Rendered at true size; line height shown where the token defines one.">
-      <div className="divide-y divide-stone-100 dark:divide-stone-800 overflow-hidden">
+      <div className="divide-y divide-stone-100 dark:divide-rwe-neutral-800 overflow-hidden">
         {typography.fontSizes.map((f) => (
           <div key={f.name} className="grid grid-cols-[6.5rem_1fr] items-baseline gap-4 py-3">
             <div className="space-y-0.5">
               <CodePill>text-{f.name}</CodePill>
-              <p className="font-mono text-[11px] text-stone-400 dark:text-stone-500">
+              <p className="font-mono text-[11px] text-stone-400 dark:text-rwe-neutral-500">
                 {f.px}px{f.lineHeight ? ` / ${f.lineHeight.px}px` : ''}
               </p>
             </div>
             <p
-              className="truncate text-stone-900 dark:text-stone-100"
+              className="truncate text-stone-900 dark:text-rwe-neutral-100"
               style={{
                 fontFamily: stack,
                 fontSize: `${f.px}px`,
@@ -73,14 +73,14 @@ export function FontWeights({ typography }: { typography: Typography }) {
   const stack = bodyStack(typography)
   return (
     <TokenGroup title="Font weights" count={typography.fontWeights.length}>
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 @2xl:grid-cols-5 gap-3">
         {typography.fontWeights.map((w) => (
-          <div key={w.name} className="rounded-md bg-stone-50 dark:bg-stone-800/50 px-3 py-2.5 space-y-1">
-            <p className="text-2xl text-stone-900 dark:text-stone-100" style={{ fontFamily: stack, fontWeight: w.value }}>
+          <div key={w.name} className="rounded-md bg-stone-50 dark:bg-rwe-neutral-800/50 px-3 py-2.5 space-y-1">
+            <p className="text-2xl text-stone-900 dark:text-rwe-neutral-100" style={{ fontFamily: stack, fontWeight: w.value }}>
               Ag
             </p>
             <CodePill>font-{w.name}</CodePill>
-            <p className="font-mono text-[11px] text-stone-400 dark:text-stone-500">{w.value}</p>
+            <p className="font-mono text-[11px] text-stone-400 dark:text-rwe-neutral-500">{w.value}</p>
           </div>
         ))}
       </div>
@@ -96,19 +96,19 @@ export function TextStyles({ typography }: { typography: Typography }) {
       count={typography.textStyles.length}
       hint="Figma text styles from DESIGN.md, mapped to the token utilities that reproduce them."
     >
-      <div className="overflow-x-auto rounded-md border border-stone-200 dark:border-stone-700">
+      <div className="overflow-x-auto rounded-md border border-stone-200 dark:border-rwe-neutral-700">
         <table className="w-full text-[13px]">
-          <thead className="bg-stone-50 dark:bg-stone-900 text-left text-[11px] uppercase tracking-wide text-stone-500 dark:text-stone-400">
+          <thead className="bg-stone-50 dark:bg-rwe-neutral-900 text-left text-[11px] uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400">
             <tr>
               <th className="px-3 py-2 font-medium">Style</th>
               <th className="px-3 py-2 font-medium">Size / LH</th>
               <th className="px-3 py-2 font-medium">Utilities</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
+          <tbody className="divide-y divide-stone-100 dark:divide-rwe-neutral-800">
             {typography.textStyles.map((t) => (
               <tr key={t.label}>
-                <td className="px-3 py-1.5 text-stone-800 dark:text-stone-200 whitespace-nowrap">
+                <td className="px-3 py-1.5 text-stone-800 dark:text-rwe-neutral-200 whitespace-nowrap">
                   {t.label}
                 </td>
                 <td className="px-3 py-1.5 font-mono text-[11px] text-stone-500 whitespace-nowrap">

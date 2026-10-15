@@ -1,9 +1,12 @@
 import { useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AppLayout } from '@/components/AppLayout'
+import { StepName } from '@/components/AgentPrompt'
 import { EmptyState } from '@/components/EmptyState'
 import { StepIndicator, type StepStatus } from '@/components/StepIndicator'
 import { NextPhaseButton } from '@/components/NextPhaseButton'
+import { PageTabs } from '@/components/PageTabs'
+import { roadmapTabs } from '@/components/tabs'
 import { loadProductData } from '@/lib/product-loader'
 
 export function DataShapePage() {
@@ -15,13 +18,14 @@ export function DataShapePage() {
 
   return (
     <AppLayout>
+      <PageTabs label="Roadmap views" tabs={roadmapTabs} />
       <div className="space-y-6">
         {/* Page intro */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 mb-2">
+          <h1 className="text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-2">
             Data Shape
           </h1>
-          <p className="text-stone-600 dark:text-stone-400">
+          <p className="text-stone-600 dark:text-rwe-neutral-400">
             Sketch out the general shape of your product's data — the core entities and how they relate.
           </p>
         </div>
@@ -33,29 +37,29 @@ export function DataShapePage() {
           ) : (
             <div className="space-y-6">
               {/* Entities */}
-              <Card className="border-stone-200 dark:border-stone-700 shadow-sm">
+              <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-stone-900 dark:text-stone-100">
+                  <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">
                     Entities
-                    <span className="ml-2 text-sm font-normal text-stone-500 dark:text-stone-400">
+                    <span className="ml-2 text-sm font-normal text-stone-500 dark:text-rwe-neutral-400">
                       ({dataShape.entities.length})
                     </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {dataShape.entities.length === 0 ? (
-                    <p className="text-stone-500 dark:text-stone-400">No entities defined.</p>
+                    <p className="text-stone-500 dark:text-rwe-neutral-400">No entities defined.</p>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 @2xl:grid-cols-2 gap-4">
                       {dataShape.entities.map((entity, index) => (
                         <div
                           key={index}
-                          className="bg-stone-50 dark:bg-stone-800/50 rounded-lg p-4"
+                          className="bg-stone-50 dark:bg-rwe-neutral-800/50 rounded-lg p-4"
                         >
-                          <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-1">
+                          <h3 className="font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-1">
                             {entity.name}
                           </h3>
-                          <p className="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                          <p className="text-stone-600 dark:text-rwe-neutral-400 text-sm leading-relaxed">
                             {entity.description}
                           </p>
                         </div>
@@ -66,24 +70,24 @@ export function DataShapePage() {
               </Card>
 
               {/* Relationships */}
-              <Card className="border-stone-200 dark:border-stone-700 shadow-sm">
+              <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-stone-900 dark:text-stone-100">
+                  <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">
                     Relationships
-                    <span className="ml-2 text-sm font-normal text-stone-500 dark:text-stone-400">
+                    <span className="ml-2 text-sm font-normal text-stone-500 dark:text-rwe-neutral-400">
                       ({dataShape.relationships.length})
                     </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {dataShape.relationships.length === 0 ? (
-                    <p className="text-stone-500 dark:text-stone-400">No relationships defined.</p>
+                    <p className="text-stone-500 dark:text-rwe-neutral-400">No relationships defined.</p>
                   ) : (
                     <ul className="space-y-2">
                       {dataShape.relationships.map((relationship, index) => (
                         <li key={index} className="flex items-start gap-3">
-                          <span className="w-1.5 h-1.5 rounded-full bg-stone-400 dark:bg-stone-500 mt-2 shrink-0" />
-                          <span className="text-stone-700 dark:text-stone-300">
+                          <span className="w-1.5 h-1.5 rounded-full bg-stone-400 dark:bg-rwe-neutral-500 mt-2 shrink-0" />
+                          <span className="text-stone-700 dark:text-rwe-neutral-300">
                             {relationship}
                           </span>
                         </li>
@@ -94,12 +98,12 @@ export function DataShapePage() {
               </Card>
 
               {/* Edit hint */}
-              <div className="bg-stone-100 dark:bg-stone-800 rounded-md px-4 py-3">
-                <p className="text-sm text-stone-600 dark:text-stone-400">
-                  To update the data shape, use the{' '}
-                  <code className="font-mono text-stone-800 dark:text-stone-200">@data-shape</code>{' '}
-                  agent or edit the file directly at{' '}
-                  <code className="font-mono text-stone-800 dark:text-stone-200">
+              <div className="bg-stone-100 dark:bg-rwe-neutral-800 rounded-md px-4 py-3">
+                <p className="text-sm text-stone-600 dark:text-rwe-neutral-400">
+                  To update the data shape, use{' '}
+                  <StepName step="data-shape" />{' '}
+                  or edit the file directly at{' '}
+                  <code className="font-mono text-stone-800 dark:text-rwe-neutral-200">
                     product/data-shape/data-shape.md
                   </code>
                 </p>
@@ -111,7 +115,7 @@ export function DataShapePage() {
         {/* Next Phase Button - shown when all steps complete */}
         {hasDataShape && (
           <StepIndicator step={2} status="current" isLast>
-            <NextPhaseButton nextPhase="design" />
+            <NextPhaseButton nextPhase="design-system" />
           </StepIndicator>
         )}
       </div>

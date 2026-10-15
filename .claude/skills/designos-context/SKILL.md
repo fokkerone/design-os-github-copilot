@@ -1,6 +1,6 @@
 ---
 name: designos-context
-description: Load the personas and user flows that belong to a DesignOS section, screen design or flow, together with the section spec, existing screen designs, flow coverage and conflicts between the planning files. Shared context step for /sample-data, /design-screen, /shape-section, /screenshot-design, /clickdummy and /export-product. Read-only. Triggers on "load the persona and flow context", "which flows use this screen", "flow coverage", "which steps have no screen".
+description: Load the personas and user flows that belong to a DesignOS section, screen design or flow, together with the section spec, existing screen designs, flow coverage and conflicts between the planning files. Shared context step for /design-os:sample-data, /design-os:design-screen, /design-os:shape-section, /design-os:screenshot-design, /design-os:clickdummy and /design-os:export-product. Read-only. Triggers on "load the persona and flow context", "which flows use this screen", "flow coverage", "which steps have no screen".
 phase: "Planning › Shared context"
 ---
 
@@ -55,7 +55,7 @@ If a section has no persona and no flow, say so in one line and continue. Person
 
 1. **The section spec is binding.** `product/sections/<section-id>/spec.md` is the plan for the section. Do not add screens, steps, features or dependencies that contradict it. If a flow asks for something the spec does not cover, that is a conflict (rule 3), not a licence to extend the scope.
 2. **Never invent a relation.** A screen belongs to a flow step only when the step names it in its `Section / Screen` column. A persona belongs to a section only when the spec or the persona file says so. If a relation is missing, report it as missing.
-3. **Show conflicts, do not resolve them.** List every entry under **Conflicts** to the user with the two files that disagree, and ask how to proceed. Never pick a side silently, and never edit a flow, persona or spec to make a conflict disappear. Point to the command that owns the file: `/design-os:userflow update <flow-id>`, `/design-os:persona update <persona-id>`, `/shape-section`.
+3. **Show conflicts, do not resolve them.** List every entry under **Conflicts** to the user with the two files that disagree, and ask how to proceed. Never pick a side silently, and never edit a flow, persona or spec to make a conflict disappear. Point to the command that owns the file: `/design-os:userflow update <flow-id>`, `/design-os:persona update <persona-id>`, `/design-os:shape-section`.
 4. **Gaps are information.** A step without a screen design is work that is still open, not an error. Name the gaps; do not treat a missing screen as if it existed.
 5. **Stay in scope.** Load the context for the section, screen or flow you are working on. Do not pull every persona and flow into a task that concerns one screen.
 6. **Coverage is computed, never written.** It follows from the flow's step table and the files in `src/sections/`. Do not write coverage numbers into a flow, spec or wiki page.

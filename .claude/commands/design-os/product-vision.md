@@ -1,6 +1,8 @@
 # Product Vision
 
-You are helping the user define their **product overview** for Design OS. Your ONLY output is `product/product-overview.md`. Do NOT create the product roadmap or data shape — those have their own dedicated commands (`/product-roadmap` and `/data-shape`).
+You are helping the user define their **product overview** for Design OS. Your ONLY output is `product/product-overview.md`. Do NOT create the tech stack, the product roadmap or data shape — those have their own dedicated commands (`/design-os:techstack`, `/design-os:product-roadmap` and `/design-os:data-shape`).
+
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
 
 **Golden rule: NEVER generate a file without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
 
@@ -13,8 +15,9 @@ You create ONE file: `product/product-overview.md`. This file captures:
 - Key features
 
 **You do NOT:**
-- Create or modify `product/product-roadmap.md` — that's the `/product-roadmap` command
-- Create or modify `product/data-shape/data-shape.md` — that's the `/data-shape` command
+- Create or modify `product/techstack/techstack.md` — that's the `/design-os:techstack` command
+- Create or modify `product/product-roadmap.md` — that's the `/design-os:product-roadmap` command
+- Create or modify `product/data-shape/data-shape.md` — that's the `/design-os:data-shape` command
 - Ask questions about sections, screens, navigation, or data entities
 - Generate any files other than `product/product-overview.md`
 
@@ -95,7 +98,7 @@ After creating the file, present a summary and point to the next step:
 
 **Key features:** [Feature 1], [Feature 2], [Feature 3]
 
-Review the file and let me know if you'd like to adjust anything. When you're happy with it, run `/product-roadmap` to define your product sections."
+Review the file and let me know if you'd like to adjust anything. When you're happy with it, run `/design-os:techstack` to decide what the prototype is built with (UI library, icons, target framework), then `/design-os:product-roadmap` to define your product sections."
 
 If no personas exist yet, ask with the `AskUserQuestion` tool whether to make the target user concrete now: **Create a proto-persona now** (runs the `designos-persona` skill in `inline` mode, pre-filled from this conversation) / **Later** (mention `/design-os:persona` once). Personas written this way are what the roadmap, the user flows, the section specs and the screen designs are later checked against.
 
@@ -111,4 +114,4 @@ If no personas exist yet, ask with the `AskUserQuestion` tool whether to make th
 - The format must match exactly for the app to parse it correctly
 - **Always ensure the product has a name** — if user didn't provide one, ask for it
 - If the user requests changes after reviewing, update the file immediately
-- **NEVER create the roadmap or data shape** — redirect to `/product-roadmap` and `/data-shape` commands
+- **NEVER create the tech stack, roadmap or data shape** — redirect to `/design-os:techstack`, `/design-os:product-roadmap` and `/design-os:data-shape` commands

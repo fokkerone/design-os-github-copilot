@@ -16,6 +16,7 @@ When you export your designs, you get production-ready React components. Your ta
 
 - **React** (v18 or higher)
 - **Tailwind CSS** (v4) — Components use Tailwind utility classes for styling
+- **The packages in `product-plan/techstack.md`** — With the default stack that is shadcn/ui's dependencies (e.g., Radix UI, `class-variance-authority`, `clsx`, `tailwind-merge`) and `lucide-react`; the UI primitives themselves ship in `product-plan/ui/`
 
 ### Backend
 

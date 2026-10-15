@@ -11,7 +11,7 @@
  *   node scripts/wiki.mjs pending
  *       Lists sources that need an ingest: product/ artifacts that are new or
  *       whose content hash changed, and wiki/raw/ files without a manifest entry.
- *       Also lists flows and personas whose metadata differs from their wiki page
+ *       Also lists flows, personas and the tech stack whose metadata differs from their wiki page
  *       (run sync-meta).
  *
  *   node scripts/wiki.mjs record <path> --type <product|raw|capture>
@@ -19,10 +19,11 @@
  *       [--created a,b] [--updated c,d] [--note "<text>"]
  *       Appends the manifest entry (content hash, timestamp) and the log entry.
  *
- *   node scripts/wiki.mjs sync-meta <product/flows/<id>.md | product/personas/<id>.md>
+ *   node scripts/wiki.mjs sync-meta <product/flows/<id>.md | product/personas/<id>.md | product/techstack/techstack.md>
  *       Copies flow metadata (status, artifacts, personas) into wiki/flows/<id>.md,
- *       or persona metadata (status, confidence, flows, sections, artifacts) into
- *       wiki/personas/<id>.md, updates the matching columns of the domain Home.md,
+ *       persona metadata (status, confidence, flows, sections, artifacts) into
+ *       wiki/personas/<id>.md, or the tech stack status into wiki/techstack/techstack.md,
+ *       updates the matching columns of the domain Home.md,
  *       and logs one "meta" line. No ingest.
  */
 
@@ -121,11 +122,12 @@ const META = {
     ['sections', 'sections', '[]'],
     ['artifacts', 'artifacts', '[]'],
   ],
+  techstack: [['status', 'techstack_status', null]],
 }
 
 function metaDomain(sourcePath) {
-  const match = rel(sourcePath).match(/^product\/(flows|personas)\/[^/]+\.md$/)
-  return match ? match[1] : null
+  const match = rel(sourcePath).match(/^product\/(flows|personas)\/[^/]+\.md$|^product\/(techstack)\/techstack\.md$/)
+  return match ? match[1] ?? match[2] : null
 }
 
 function metaDiff(sourcePath) {
@@ -230,7 +232,7 @@ function cmdRecord(path, flags) {
 }
 
 function cmdSyncMeta(sourcePath) {
-  if (!sourcePath || !metaDomain(sourcePath)) fail('usage: sync-meta product/flows/<flow-id>.md | product/personas/<persona-id>.md')
+  if (!sourcePath || !metaDomain(sourcePath)) fail('usage: sync-meta product/flows/<flow-id>.md | product/personas/<persona-id>.md | product/techstack/techstack.md')
   if (!existsSync(sourcePath)) fail(`file not found: ${sourcePath}`)
   const diff = metaDiff(sourcePath)
   if (!diff) fail(`no wiki page for this ${metaDomain(sourcePath).slice(0, -1)} yet — ingest it first`)

@@ -2,6 +2,8 @@
 
 You are helping the user export their complete product design as a handoff package for implementation. This generates all files needed to integrate the UI designs into a real codebase.
 
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
+
 ## Step 1: Check Prerequisites
 
 Verify the minimum requirements exist:
@@ -15,12 +17,13 @@ Verify the minimum requirements exist:
 - `product/data-shape/data-shape.md` — Product entities
 - `product/design-system/design-system.json` — Design system
 - `src/shell/components/AppShell.tsx` — Application shell
+- `product/techstack/techstack.md` — Tech stack (without it the defaults apply: shadcn/ui, lucide-react)
 
 If required files are missing:
 
 "To export your product, you need at minimum:
-- A product overview (`/product-vision`)
-- A roadmap with sections (`/product-roadmap`)
+- A product overview (`/design-os:product-vision`)
+- A roadmap with sections (`/design-os:product-roadmap`)
 - At least one section with screen designs
 
 Please complete these first."
@@ -28,6 +31,14 @@ Please complete these first."
 Stop here if required files are missing.
 
 If recommended files are missing, show warnings but continue.
+
+## Step 1b: Load the Tech Stack
+
+Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`). Tell the user in one line which stack applies: the file `product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react".
+
+- The decisions are binding. An undecided area means no new dependency, and the export lists it as undecided instead of choosing.
+- A request the stack cannot serve is a conflict. Show it to the user, name the area, and offer `/design-os:techstack update`. Never pick a side silently.
+- Never edit `product/techstack/techstack.md` from this step. The export copies it unchanged.
 
 ## Step 2: Gather Export Information
 
@@ -40,6 +51,8 @@ Read all relevant files:
 6. `product/shell/spec.md` (if exists)
 7. For each section: `spec.md`, `data.json`, `types.ts`
 8. List screen design components in `src/sections/` and `src/shell/`
+9. `product/techstack/techstack.md` (if exists) — UI library, base, style, icons, registries, packages, target framework, undecided areas. Otherwise use the output of `npm run -s techstack` (the defaults)
+10. The primitives in `src/ui/` (if exists) — the product UI layer that shell and screens import
 
 ## Step 3: Create Export Directory Structure
 
@@ -49,6 +62,7 @@ Create the `product-plan/` directory with this structure:
 product-plan/
 ├── README.md
 ├── product-overview.md
+├── techstack.md (if product/techstack/techstack.md exists)
 ├── design-system.md (if exists)
 ├── prompts/
 │   ├── one-shot-prompt.md
@@ -65,6 +79,9 @@ product-plan/
 ├── data-shapes/
 │   ├── README.md
 │   └── overview.ts
+├── ui/ (copy of src/ui/, if exists)
+│   ├── utils.ts
+│   └── [primitive].tsx
 ├── flows/ (if product/flows/ exists)
 │   ├── README.md
 │   └── [flow-id].md
@@ -109,6 +126,12 @@ The design system documentation provides implementers with:
 
 This helps maintain design consistency during implementation.
 
+## Step 4c: Copy the Tech Stack
+
+If `product/techstack/techstack.md` exists, copy it unchanged to `product-plan/techstack.md`. If it does not exist, create `product-plan/techstack.md` from the defaults printed by `npm run -s techstack` and mark every row as `default`, so the prompts can be pre-filled either way.
+
+From this file the README, the milestone instructions and the prompts take: the UI library, base and style, the icon set, the registries and reference repositories, the packages (with purpose and area), the constraints and open questions, the `target-framework` and `routing` decisions, and the list of undecided areas.
+
 ## Step 5: Generate Milestone Instructions
 
 Each milestone instruction file should begin with this preamble:
@@ -122,6 +145,7 @@ Each milestone instruction file should begin with this preamble:
 - Finished UI designs (React components with full styling)
 - Product requirements and user flow specifications
 - Design system tokens (colors, typography)
+- The product UI primitives the components are built from (`ui/`) and the tech stack decisions (`techstack.md`)
 - Sample data showing the shape of data components expect
 - Test specs focused on user-facing behavior
 
@@ -133,12 +157,17 @@ Each milestone instruction file should begin with this preamble:
 
 The components are props-based — they accept data and fire callbacks. How you architect the backend, data layer, and business logic is up to you.
 
+**Tech stack:** The components are built with [UI library] ([base], style [style]) and [icon set], and target [target framework, or "a target framework that is not decided yet"]. See `techstack.md` for the full decisions, registries and packages. If your codebase already has its own components (buttons, dialogs, inputs, ...), use those and treat `ui/` as a reference for how the designs use them; otherwise copy `ui/` into your project.
+
 ---
 ```
+
+Fill the bracketed values from `product-plan/techstack.md` when you write the preamble.
 
 ### 01-shell.md
 
 Place in `product-plan/instructions/incremental/01-shell.md`. Cover:
+- Setting up the tech stack: install the packages listed in `techstack.md`, add the registries, copy `ui/` (or map it to the target codebase's own components)
 - Setting up design tokens (CSS custom properties, Tailwind colors, Google Fonts)
 - Implementing the application shell (copy components, wire up navigation, user menu)
 - Responsive behavior
@@ -151,6 +180,7 @@ Place in `product-plan/instructions/incremental/[NN]-[section-id].md`. Each shou
 - Key functionality bullet points (3-6 capabilities)
 - Components provided (list with descriptions)
 - Props reference (data props and callback props table)
+- UI primitives and packages the section needs (from `ui/` and `techstack.md`), and the routing decision for its navigation callbacks
 - Expected user flows (2-4 flows with numbered steps and expected outcomes)
 - Empty state handling
 - Testing reference to `tests.md`
@@ -170,6 +200,16 @@ Copy from `src/shell/components/` to `product-plan/shell/components/`:
 - Remove any Design OS-specific imports
 - Ensure components are self-contained
 
+### UI Primitives
+
+If `src/ui/` exists, copy it to `product-plan/ui/` (`utils.ts` and every primitive):
+- Keep the relative imports: `../../ui/...` from shell components and `../../../ui/...` from section components resolve the same way in `product-plan/`
+- Map palette steps back to semantic utilities using `tokens.css` and the `// token: role` comments (`bg-teal-600` with `// token: primary` → `bg-primary`, `text-zinc-500` with `// token: muted-foreground` → `text-muted-foreground`, and so on), as for the shell and section components. Run `npm run tokens:check` first, as in Step 4b. Without `tokens.css`, keep the palette steps
+- Remove Design OS-specific imports. Nothing may import `@/components/*`
+- Do not copy `src/components/ui/`: that is Design OS UI, not the product's
+
+Mention in `product-plan/README.md` that `ui/` is the product UI layer and a reference when the target codebase has its own components.
+
 ### Section Components
 
 For each section, copy from `src/sections/[section-id]/components/` to `product-plan/sections/[section-id]/components/`:
@@ -183,7 +223,7 @@ Copy `product/sections/[section-id]/types.ts` to `product-plan/sections/[section
 
 ### Sample Data
 
-Copy `product/sections/[section-id]/data.json` to `product-plan/sections/[section-id]/sample-data.json`
+Copy `product/sections/[section-id]/data.json` to `product-plan/sections/[section-id]/design-os:sample-data.json`
 
 ## Step 8: Generate Section READMEs
 
@@ -243,7 +283,9 @@ Please carefully read and analyze the following files:
 2. **@product-plan/instructions/one-shot-instructions.md** — Complete implementation instructions for all milestones
 
 After reading these, also review:
+- **@product-plan/techstack.md** — Tech stack decisions (UI library, icons, registries, packages, target framework)
 - **@product-plan/design-system/** — Color and typography tokens
+- **@product-plan/ui/** — Product UI primitives the components are built from
 - **@product-plan/data-shapes/** — UI data contracts
 - **@product-plan/shell/** — Application shell components
 - **@product-plan/sections/** — All section components, types, sample data, and test specs
@@ -252,7 +294,7 @@ After reading these, also review:
 
 Review all the provided files, then ask me clarifying questions about:
 
-1. **My tech stack** — What framework, language, and tools I'm using
+1. **My tech stack** — [PRE-FILLED from product-plan/techstack.md: "The designs are built with <UI library> (<base>, style <style>) and <icon set>. Registries: <...>. Packages: <...>. Target framework: <...>. I have already decided these." Then ask only about what is undecided or open: <list the undecided areas, for example target framework, package manager, state, data fetching>. If my codebase already has its own components, use those and treat `ui/` as a reference.]
 2. **Authentication & users** — How users should sign up, log in, and what permissions exist
 3. **Product requirements** — Anything in the specs or user flows that needs clarification
 4. **Anything else** — Whatever you need to know before implementing
@@ -262,14 +304,17 @@ Lastly, ask me if I have any additional notes for this implementation.
 Once I answer your questions, create a comprehensive implementation plan before coding.
 ```
 
+Write item 1 of "Before You Begin" with the real values from `product-plan/techstack.md`, not the bracketed placeholder: state what is decided, and ask only about areas that are undecided (for example `target-framework`, `package-manager`, `state`, `data-fetching`) or listed under Open Questions. If nothing is undecided, say so and ask only for corrections.
+
 ### prompts/section-prompt.md
 
-Template prompt with `SECTION_NAME`, `SECTION_ID`, and `NN` variables for incremental section-by-section implementation.
+Template prompt with `SECTION_NAME`, `SECTION_ID`, and `NN` variables for incremental section-by-section implementation. Its "Before You Begin" item "1. **My tech stack**" is pre-filled from `product-plan/techstack.md` in the same way as in the one-shot prompt (decided areas stated, only undecided areas asked), and the prompt lists `@product-plan/techstack.md` and `@product-plan/ui/` among the files to read.
 
 ## Step 13: Generate README.md
 
 Create `product-plan/README.md` with:
-- What's included (prompts, instructions, design assets)
+- What's included (prompts, instructions, design assets, `techstack.md`, `ui/`)
+- Tech stack: UI library, base, style and icon set, the registries and reference repositories, the packages to install (name, purpose), the target framework, and the areas that are still undecided. State that `ui/` is the product UI layer and that an existing codebase's own components take precedence, with `ui/` as reference
 - Option A: Incremental (recommended) — step-by-step guide
 - Option B: One-shot — single session guide
 - Testing guidance
@@ -308,7 +353,7 @@ cd . && zip -r product-plan.zip product-plan/
 
 ## Step 16: Confirm Completion
 
-Let the user know what was generated, listing all prompt files, instruction files, design assets, and section packages. Mention restarting the dev server to access the Export page for downloading `product-plan.zip`.
+Let the user know what was generated, listing all prompt files, instruction files, design assets, `techstack.md`, `ui/` (number of primitives), and section packages. Include one line with the stack that was exported ([stack line from Step 1b]), the packages and registries it lists, the `routing` decision and the areas that stay undecided (the prompts ask about those). Mention restarting the dev server to access the Export page for downloading `product-plan.zip`.
 
 Explain how to use it:
 1. Copy `product-plan/` to their implementation codebase
@@ -326,4 +371,6 @@ Explain how to use it:
 - Screenshots provide visual reference for fidelity checking
 - Sample data files are for testing before real APIs are built
 - The export is self-contained — no dependencies on Design OS
-- Components are portable — they work with any React setup
+- Components are portable — they work with any React setup that provides the packages listed in `techstack.md`; they import their primitives from `ui/`
+- Pre-fill "My tech stack" in the prompts from `techstack.md`; ask only about undecided areas
+- Never edit `product/techstack/techstack.md` from this command

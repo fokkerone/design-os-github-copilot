@@ -2,6 +2,8 @@
 
 You are helping the user create or update their product roadmap for Design OS.
 
+**Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
+
 **Golden rule: NEVER generate a file without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
 
 ## Step 1: Check Current State
@@ -38,7 +40,7 @@ After updating, inform the user and ask if they'd like further adjustments.
 
 Read `product/product-overview.md`. If it doesn't exist:
 
-"Before creating a product roadmap, you'll need to define your product vision. Please run `/product-vision` first."
+"Before creating a product roadmap, you'll need to define your product vision. Please run `/design-os:product-vision` first."
 
 Stop here if the product overview is missing.
 
@@ -81,11 +83,13 @@ Once the user has confirmed the sections they want, create `product/product-road
 2. **[Section 2]** — [Description]
 3. **[Section 3]** — [Description]
 
-Review the sections and let me know if you'd like to adjust anything. When you're ready, run `/data-shape` to sketch out the general shape of your product's data."
+Review the sections and let me know if you'd like to adjust anything. When you're ready, run `/design-os:data-shape` to sketch out the general shape of your product's data."
 
 ---
 
 ## Personas and User Flows
+
+Run `npm run -s techstack` (see the `designos-techstack` skill, `.claude/skills/designos-techstack/SKILL.md`). Tell the user in one line which stack applies (`product/techstack/techstack.md`, or "defaults: shadcn/ui, lucide-react"). The roadmap itself stays technology-neutral: do not ask about libraries and do not write them into it. Only when a proposed section clearly needs something the stack leaves undecided (a data table, charts, maps, a rich text editor), name the gap in one line and offer `/design-os:techstack update`. Do not decide it here and never edit `product/techstack/techstack.md`.
 
 Before proposing sections, run `npm run -s context` (see the `designos-context` skill, `.claude/skills/designos-context/SKILL.md`). Skip this part if there are no personas and no flows.
 
