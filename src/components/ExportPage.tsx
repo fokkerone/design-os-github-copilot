@@ -62,7 +62,7 @@ export function ExportPage() {
       <div className='space-y-6'>
         {/* Page intro */}
         <div className='mb-8'>
-          YoBro
+          YoBros
           <h1 className='text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-2'>
             {exportZipAvailable ? "Ready for implementation!" : "Export"}
           </h1>
