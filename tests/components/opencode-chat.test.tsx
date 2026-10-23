@@ -26,7 +26,7 @@ describe('ChatDock with an OpenCode server', () => {
     expect(screen.getByText('ping')).toBeInTheDocument()
     expect(fake.prompts).toHaveLength(1)
     expect(fake.prompts[0].text).toBe('ping')
-    expect(fake.requests).toContain('POST /session')
+    expect(fake.requests).toContain('POST /api/session')
     expect(fake.unhandled).toEqual([])
   }, 15000)
 
@@ -42,14 +42,14 @@ describe('ChatDock with an OpenCode server', () => {
     const url = fake.url
     await fake.stop()
     render(<ChatDock baseUrl={url} />)
-    expect(await screen.findByRole('status', {}, { timeout: 5000 })).toHaveTextContent('opencode serve --port 4096')
+    expect(await screen.findByRole('status', {}, { timeout: 5000 })).toHaveTextContent('npm run dev')
     // restart so afterEach can stop cleanly
     fake = await new FakeOpenCode().start()
   }, 15000)
 
   it('shows no banner while the server is up', async () => {
     render(<ChatDock baseUrl={fake.url} />)
-    await waitFor(() => expect(fake.requests).toContain('GET /global/health'))
+    await waitFor(() => expect(fake.requests).toContain('GET /api/info'))
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 })
@@ -74,7 +74,7 @@ describe('model choice', () => {
     expect(fake.prompts[0].model).toBeUndefined()
   }, 15000)
 
-  it('sends the chosen model with the next prompt and remembers it', async () => {
+  it('starts the session with the chosen model and remembers it', async () => {
     const { unmount } = render(<ChatDock baseUrl={fake.url} />)
     await waitFor(() => expect(within(picker()).getAllByRole('option').length).toBe(4))
     await userEvent.selectOptions(picker(), 'rwe-factory-gpt/gpt-6-sol-factory')
@@ -108,13 +108,13 @@ describe('reload', () => {
     render(<ChatDock baseUrl={fake.url} />)
     expect(await screen.findByText('first answer', {}, { timeout: 5000 })).toBeInTheDocument()
     expect(screen.getByText('remember me')).toBeInTheDocument()
-    expect(fake.requests.filter((r) => r === 'POST /session')).toHaveLength(1)
+    expect(fake.requests.filter((r) => r === 'POST /api/session')).toHaveLength(1)
   }, 20000)
 
   it('starts fresh when the remembered session is gone from the server', async () => {
     localStorage.setItem('designos:session', 'ses_gone')
     render(<ChatDock baseUrl={fake.url} />)
-    await waitFor(() => expect(fake.requests).toContain('GET /session/ses_gone'), { timeout: 5000 })
+    await waitFor(() => expect(fake.requests).toContain('GET /api/session/ses_gone/message'), { timeout: 5000 })
     expect(input()).toBeInTheDocument()
     expect(screen.queryByText(/ask the agent/i)).toBeInTheDocument()
   }, 15000)
@@ -136,4 +136,35 @@ describe('new chat', () => {
     expect(await screen.findByText('new answer', {}, { timeout: 5000 })).toBeInTheDocument()
     expect(fake.prompts.map((p) => p.sessionID)[0]).not.toBe(fake.prompts[1].sessionID)
   }, 25000)
+})
+
+describe('questions', () => {
+  it('shows the question of the agent, sends the answer as a form reply and continues', async () => {
+    fake.reply({ question: [{ question: 'Which scope?', header: 'Scope', options: [{ label: 'Only this element' }, { label: 'All screens' }] }], chunks: ['Changing only this element'], formDelayMs: 300 })
+    render(<ChatDock baseUrl={fake.url} />)
+    await userEvent.type(input(), 'make it bigger{Enter}')
+    // The form comes after the tool call (as with the real server): the card turns into the questions
+    await userEvent.click(await screen.findByRole('radio', { name: 'Only this element' }, { timeout: 5000 }))
+    expect(screen.getByText('Which scope?')).toBeInTheDocument()
+    expect(screen.getByRole('status', { name: /waiting for your answer/i })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Send answer' }))
+    expect(await screen.findByText('Changing only this element', {}, { timeout: 5000 })).toBeInTheDocument()
+    expect(fake.answers).toEqual([{ q0: 'Only this element' }])
+    expect(fake.unhandled).toEqual([])
+  }, 15000)
+
+  it('catches up on a question whose event it missed while the stream was down', async () => {
+    fake.reply({ question: [{ question: 'Which scope?', options: [{ label: 'Only this element' }] }], chunks: ['done'], formDelayMs: 100, dropStreamBeforeForm: true })
+    render(<ChatDock baseUrl={fake.url} />)
+    await userEvent.type(input(), 'make it bigger{Enter}')
+    expect(await screen.findByRole('radio', { name: 'Only this element' }, { timeout: 5000 })).toBeInTheDocument()
+  }, 15000)
+
+  it('skips a question by cancelling the form', async () => {
+    fake.reply({ question: [{ question: 'Which scope?', options: [{ label: 'A' }] }], chunks: ['unused'] })
+    render(<ChatDock baseUrl={fake.url} />)
+    await userEvent.type(input(), 'go{Enter}')
+    await userEvent.click(await screen.findByRole('button', { name: 'Skip' }, { timeout: 5000 }))
+    await waitFor(() => expect(fake.answers).toEqual([null]))
+  }, 15000)
 })

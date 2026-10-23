@@ -119,7 +119,7 @@ function Questions({ approval, onRespond }: { approval: Approval; onRespond: (r:
 
   return (
     <form
-      className="my-2 space-y-4 rounded-md border border-brand-blue-200 bg-rwe-sand-25 p-3 dark:border-energy-green-700/50 dark:bg-rwe-neutral-950/60"
+      className="my-2 min-w-0 space-y-4 rounded-md border border-brand-blue-200 bg-rwe-sand-25 p-3 dark:border-energy-green-700/50 dark:bg-rwe-neutral-950/60"
       onSubmit={(e) => {
         e.preventDefault()
         if (complete) submit()
@@ -129,7 +129,7 @@ function Questions({ approval, onRespond }: { approval: Approval; onRespond: (r:
         const a = get(q.id)
         const multiple = !!q.multiple
         return (
-          <fieldset key={q.id} className="space-y-1.5">
+          <fieldset key={q.id} className="min-w-0 space-y-1.5 wrap-anywhere">
             {q.header && <p className={`text-[12px] ${muted}`}>{q.header}</p>}
             <legend className="text-[14px] font-medium leading-snug">{q.prompt}</legend>
             {q.options?.map((o) => {

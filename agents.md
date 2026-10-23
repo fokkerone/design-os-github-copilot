@@ -144,6 +144,11 @@ Design concrete user flows with the REFINE and CARE frameworks, chain-of-thought
 - **Design Screen** — Create screen designs (applies design system voice and UI style, composes them from `src/ui/` and the tech stack)
 - **Screenshot** — Capture screenshots
 
+### Live Edit (any time after a screen design or the shell exists)
+
+Change a screen design or the shell from the preview, like v0: **Select element** (`V`) in the preview toolbar, click an element, optionally tweak it in the inspector (design tokens only, preview without writing), then either send the tweaks with **Apply with agent** or describe the change in the chat. The message carries the element's source location (`data-dos-src`, added in dev by `scripts/babel-source-attr.mjs` to `src/sections`, `src/shell`, `src/ui`), component path, classes and HTML in a fenced `live-edit` block. The agent follows `.claude/commands/design-os/live-edit.md`: asks 1–3 questions (scope, tokens, conflicts), edits the source (HMR updates the preview), then captures the change and ingests it into `wiki/design-changes/<section-id>.md`.
+**Output:** edited source in `src/sections/` or `src/shell/`, `wiki/design-changes/`
+
 ### 8. Clickdummy
 
 Assemble a fully navigable clickdummy from all designed sections. Wraps screen designs in the application shell with working inter-section navigation at `/clickdummy/preview`. Use this to demo to stakeholders and gather feedback before exporting.
@@ -160,15 +165,16 @@ Generate the complete export package with all components, types, and handoff doc
 
 The app has a left main navigation (Prototype with Vision, Roadmap, Sections, Prototype and Export; Personas; User Flows; Design System; Tech Stack; Wiki). Right of it the content splits: the agent chat on the left, the page of the current step on the right (resizable by dragging the handle, sizes remembered in localStorage under `react-resizable-panels:designos:split…`; collapsible and expandable in the header). Data Shape is a tab of Roadmap, the Shell a tab of Design System. Old routes (`/sections`, `/design`, `/clickdummy`, ...) redirect (`src/lib/navigation.ts`); all routes live in `src/lib/paths.ts` and `src/lib/routes.tsx`.
 
-The chat is [assistant-ui](https://www.assistant-ui.com/) with the OpenCode runtime (`@assistant-ui/react-opencode`):
+The chat is [assistant-ui](https://www.assistant-ui.com/) on its external store runtime, with its own client for the OpenCode **2.x** HTTP API (`src/lib/chat/v2/`: `api.ts` client, `thread.ts` event reducer, `convert.ts` to assistant-ui messages, `use-session.ts`). The npm SDK (`@opencode-ai/sdk`) and `@assistant-ui/react-opencode` speak the 1.x API, which a 2.x server answers with its web UI, so they are not used.
 
-- `npm run dev` starts `opencode serve --port 4096` (Vite plugin, `scripts/opencode-dev.mjs`; set `DESIGNOS_NO_OPENCODE=1` to skip) and proxies `/opencode` to it, so the browser needs no CORS and never sees API keys.
-- Models come from the user's `~/.config/opencode/opencode.json` (e.g. the Azure `rwe-factory-*` providers). The chat lists them via `/config/providers`; "Default" uses the server default.
+- `npm run dev` starts its own `opencode serve` in the project folder on a free port with a random password (`OPENCODE_SERVER_PASSWORD`), via the Vite plugin in `scripts/opencode-dev.mjs`. The dev server proxies `/opencode` to it and adds the password, so the browser needs no CORS and never sees the password or API keys. Every checkout gets its own server, so worktrees never share one.
+- `DESIGNOS_OPENCODE_URL` (plus `DESIGNOS_OPENCODE_PASSWORD`) connects to a running server instead. `DESIGNOS_NO_OPENCODE=1` skips the autostart and proxies to `127.0.0.1:${DESIGNOS_OPENCODE_PORT:-4096}`. `DESIGNOS_OPENCODE_PORT` alone fixes the port of the autostarted server.
+- Models come from the user's `~/.config/opencode/opencode.json` (e.g. the Azure `rwe-factory-*` providers). The chat lists them via `/api/model`; "Default" uses the server default.
+- The chat follows `GET /api/event` and reloads the session on every (re)connect, so events missed while the stream was down (a question, a permission) still show. The health check (`/api/info`) only counts the server as offline after two missed checks in a row.
 - "Start with agent" on a page sends `Follow the instructions in .claude/commands/design-os/<step>.md.` plus the prompt into the chat (`buildStepMessage` in `src/lib/harness.ts`). The agent writes files in `product/`; the loaders pick them up through HMR.
 - The chat remembers its OpenCode session (`designos:session` in localStorage), so a page reload (e.g. when the agent writes files and Vite reloads) reopens the conversation. "New chat" starts a fresh session. Agent questions and permissions are answered in the chat (`src/components/chat/ToolCall.tsx`); typed `/design-os:<step>` commands are expanded to the instruction to read the command file (`expandSlashCommand`).
-- The chat remembers its OpenCode session (`designos:session` in localStorage), so a page reload (e.g. when the agent writes files and Vite reloads) reopens the conversation. "New chat" starts a fresh session. Agent questions and permissions are answered in the chat (`src/components/chat/ToolCall.tsx`); typed `/design-os:<step>` commands are expanded to the instruction to read the command file (`expandSlashCommand`).
-- Without OpenCode the chat shows the command to start it. Pages outside a chat fall back to copy-and-paste commands.
-- Chat tests run against a fake OpenCode server (`tests/helpers/fake-opencode.ts`). Component tests use jsdom (`// @vitest-environment jsdom`), model tests run in node. Smoke tests: `npm run test:e2e` (Playwright in the installed Chrome, `e2e/`) start the app on port 3100 with a fake OpenCode on 4196, so no agent or API key is needed and `product/` stays untouched. `DESIGNOS_OPENCODE_PORT` moves the proxy and the autostart to another port. Smoke tests: `npm run test:e2e` (Playwright in the installed Chrome, `e2e/`) start the app on port 3100 with a fake OpenCode on 4196, so no agent or API key is needed and `product/` stays untouched. `DESIGNOS_OPENCODE_PORT` moves the proxy and the autostart to another port.
+- Without OpenCode (not installed, or not 2.x) the chat shows `npm run dev` as the way to start it. Pages outside a chat fall back to copy-and-paste commands.
+- Chat tests run against a fake OpenCode server (`tests/helpers/fake-opencode.ts`). Component tests use jsdom (`// @vitest-environment jsdom`), model tests run in node. Smoke tests: `npm run test:e2e` (Playwright in the installed Chrome, `e2e/`) start the app on port 3100 with `DESIGNOS_NO_OPENCODE=1` and a fake OpenCode 2.x on 4196, so no agent or API key is needed and `product/` stays untouched.
 
 ---
 
@@ -192,6 +198,7 @@ The chat is [assistant-ui](https://www.assistant-ui.com/) with the OpenCode runt
 | `/design-os:wiki-taxonomy` | Audit tags and domains |
 | `/design-os:wiki-rebuild` | Archive, rebuild, restore |
 | `/design-os:userflow` | Design a user flow, then ingest it into `wiki/flows/` |
+| `/design-os:live-edit` | Apply a change to a picked element, then record it in `wiki/design-changes/` |
 | `/design-os:persona` | Create or validate a persona, then ingest it into `wiki/personas/` |
 
 ### Personas and user flows as shared context

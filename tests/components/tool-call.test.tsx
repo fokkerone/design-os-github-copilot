@@ -171,7 +171,7 @@ describe('questions in the chat (OpenCode)', () => {
     expect(await screen.findByText('Which start?', {}, { timeout: 5000 })).toBeInTheDocument()
     await userEvent.click(screen.getByRole('radio', { name: 'A' }))
     await userEvent.click(screen.getByRole('button', { name: 'Send answer' }))
-    await waitFor(() => expect(fake.answers).toEqual([[['A']]]), { timeout: 5000 })
+    await waitFor(() => expect(fake.answers).toEqual([{ q0: 'A' }]), { timeout: 5000 })
     expect(await screen.findByText('Great, A it is', {}, { timeout: 5000 })).toBeInTheDocument()
     expect(fake.unhandled).toEqual([])
   }, 20000)

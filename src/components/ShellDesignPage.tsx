@@ -5,15 +5,23 @@ import { loadShellPreview } from '@/lib/shell-loader'
 import { PageTabs } from '@/components/PageTabs'
 import { designSystemTabs } from '@/components/tabs'
 import { paths } from '@/lib/paths'
+import { Inspector, PickButton } from '@/components/live-edit/Inspector'
+import { useLivePicker } from '@/components/live-edit/useLivePicker'
+import { useLivePreview } from '@/components/live-edit/useLivePreview'
+import type { LiveTarget } from '@/lib/live-edit/selection'
 import React from 'react'
 
 const MIN_WIDTH = 320
 const DEFAULT_WIDTH_PERCENT = 100
+const SHELL_TARGET: LiveTarget = { kind: 'shell' }
 
 export function ShellDesignPage() {
   const [widthPercent, setWidthPercent] = useState(DEFAULT_WIDTH_PERCENT)
   const containerRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const target = SHELL_TARGET
+  const live = useLivePreview(iframeRef, target)
 
   // Handle resize drag
   const handleMouseDown = useCallback(() => {
@@ -107,6 +115,7 @@ export function ShellDesignPage() {
                 <Monitor className="w-4 h-4" strokeWidth={1.5} />
               </button>
             </div>
+            {live && <PickButton active={live.picking} onToggle={() => live.setPicking(!live.picking)} />}
             <span className="text-xs text-stone-500 dark:text-rwe-neutral-400 font-mono w-10 text-right">
               {Math.round(widthPercent)}%
             </span>
@@ -126,7 +135,7 @@ export function ShellDesignPage() {
       {/* Preview area with resizable container */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-hidden flex items-stretch justify-center p-6"
+        className="relative flex-1 overflow-hidden flex items-stretch justify-center p-6"
       >
         {/* Left resize handle */}
         <div
@@ -144,6 +153,7 @@ export function ShellDesignPage() {
           style={{ width: previewWidth, minWidth: MIN_WIDTH, maxWidth: '100%' }}
         >
           <iframe
+            ref={iframeRef}
             src={paths.shellFullscreen}
             className="w-full h-full border-0"
             title="Shell Preview"
@@ -159,6 +169,22 @@ export function ShellDesignPage() {
             <GripVertical className="w-3 h-3 text-stone-500 dark:text-rwe-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
           </div>
         </div>
+
+        {/* Live Edit: the inspector floats over the preview, like the element it edits */}
+        {live?.selection && (
+          <div className="absolute inset-y-6 right-6 z-10">
+            <Inspector
+              key={live.selection.element.src}
+              selection={live.selection}
+              onChange={live.setEdits}
+              onClose={live.dismiss}
+              onAddToChat={live.focusComposer}
+              onApply={live.apply}
+              guides={live.guides}
+              onGuidesChange={live.setGuides}
+            />
+          </div>
+        )}
       </div>
     </div>
   )
@@ -181,6 +207,9 @@ function getLazyShellPreview() {
  */
 export function ShellDesignFullscreen() {
   const ShellPreviewComponent = getLazyShellPreview()
+
+  // Live Edit: the picker, when the preview is embedded in a step page
+  useLivePicker()
 
   // Sync theme with parent window
   useEffect(() => {

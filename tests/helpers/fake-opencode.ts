@@ -1,6 +1,6 @@
 /**
- * A small fake of `opencode serve` for tests: the routes and event shapes the assistant-ui
- * OpenCode adapter uses, recorded from a real server (v1.18.35). Replies are scripted per prompt.
+ * A small fake of `opencode serve` 2.x for tests: the /api routes and event shapes the chat uses,
+ * recorded from a real server (v2.1.2). Replies are scripted per prompt.
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http'
 import type { AddressInfo } from 'node:net'
@@ -12,37 +12,51 @@ export interface ScriptedReply {
   delayMs?: number
   /** The agent asks the user first (the `question` tool) and streams its chunks after the answer */
   question?: { question: string; header?: string; options?: { label: string; description?: string }[] }[]
+  /** Wait between the tool call and its form (ms), as the real server does: the chat shows the call first */
+  formDelayMs?: number
+  /** The event stream drops right before the form, so the chat misses `form.created` and has to catch up */
+  dropStreamBeforeForm?: boolean
 }
 
-interface Msg {
-  info: Record<string, unknown>
-  parts: Record<string, unknown>[]
-}
+type ModelRef = { id: string; providerID: string }
+type History = Record<string, unknown> & { id: string; type: string }
 
 let counter = 0
 const id = (prefix: string) => `${prefix}_${(++counter).toString().padStart(6, '0')}`
+
+export const FAKE_MODELS = [
+  { id: 'claude-opus-5-5-factory', providerID: 'rwe-factory-claude', name: 'claude-opus-5-5-factory' },
+  { id: 'claude-sonnet-5-5-factory', providerID: 'rwe-factory-claude', name: 'claude-sonnet-5-5-factory' },
+  { id: 'gpt-6-sol-factory', providerID: 'rwe-factory-gpt', name: 'gpt-6-sol-factory' },
+]
 
 export class FakeOpenCode {
   server: Server
   url = ''
   /** Every request received, "METHOD /path" */
   requests: string[] = []
-  /** Bodies of prompt requests */
-  prompts: { sessionID: string; text: string; model?: { providerID: string; modelID: string }; agent?: string }[] = []
+  /** Authorization headers received */
+  auth: (string | undefined)[] = []
+  /** Prompts, with the model of their session at that time (undefined: server default) */
+  prompts: { sessionID: string; text: string; model?: { providerID: string; modelID: string } }[] = []
   aborts: string[] = []
-  /** Routes the fake does not implement, the adapter asked for them */
+  /** Routes the fake does not implement, the client asked for them */
   unhandled: string[] = []
-  /** Answers received for questions, one entry per reply (rejected: null) */
-  answers: (string[][] | null)[] = []
-  private pending = new Map<string, { sessionID: string; resume: () => void; reject: () => void; info: Record<string, unknown>; part: Record<string, unknown>; input: unknown }>()
-  sessions = new Map<string, Record<string, unknown>>()
-  messages = new Map<string, Msg[]>()
+  /** Answers to forms, one entry per reply (cancelled: null) */
+  answers: (Record<string, unknown> | null)[] = []
+  sessions = new Map<string, { id: string; model?: ModelRef; time: { created: number; updated: number } }>()
+  history = new Map<string, History[]>()
+  private forms = new Map<string, { form: Record<string, unknown>; resume: () => void; cancel: () => void }>()
   private clients = new Set<ServerResponse>()
   private replies: ScriptedReply[] = []
   private timers = new Set<NodeJS.Timeout>()
 
-  constructor() {
-    this.server = createServer((req, res) => this.handle(req, res))
+  private readonly password: string | undefined
+
+  /** With a password, every /api request needs Basic auth as opencode 2.x does */
+  constructor(password?: string) {
+    this.password = password
+    this.server = createServer((req, res) => void this.handle(req, res))
   }
 
   async start(port = 0): Promise<this> {
@@ -52,7 +66,7 @@ export class FakeOpenCode {
   }
 
   async stop() {
-    for (const t of this.timers) clearTimeout(t)
+    this.stopTimers()
     for (const c of this.clients) c.end()
     this.server.closeAllConnections()
     await new Promise<void>((resolve) => this.server.close(() => resolve()))
@@ -63,25 +77,15 @@ export class FakeOpenCode {
     this.replies.push(script)
   }
 
-  emit(type: string, properties: Record<string, unknown>) {
-    const data = JSON.stringify({ id: id('evt'), type, properties })
-    for (const c of this.clients) c.write(`data: ${data}\n\n`)
+  /** Ends every open event stream, as a dropped connection does */
+  dropStreams() {
+    for (const c of this.clients) c.end()
+    this.clients.clear()
   }
 
-  private session(sessionID: string) {
-    return this.sessions.get(sessionID)
-  }
-
-  private newSession() {
-    const now = Date.now()
-    const sessionID = id('ses')
-    const info = {
-      id: sessionID, slug: 'fake-session', projectID: 'p', directory: '/fake', path: '', title: 'New session',
-      version: '1.18.35', time: { created: now, updated: now }, summary: { additions: 0, deletions: 0, files: 0 },
-    }
-    this.sessions.set(sessionID, info)
-    this.messages.set(sessionID, [])
-    return info
+  emit(type: string, data: Record<string, unknown>) {
+    const event = JSON.stringify({ id: id('evt'), created: Date.now(), type, data })
+    for (const c of this.clients) c.write(`data: ${event}\n\n`)
   }
 
   private async body(req: IncomingMessage): Promise<Record<string, unknown>> {
@@ -100,93 +104,91 @@ export class FakeOpenCode {
     const url = new URL(req.url ?? '/', this.url)
     const path = url.pathname
     this.requests.push(`${req.method} ${path}`)
+    this.auth.push(req.headers.authorization)
 
-    if (path === '/global/health') return this.json(res, { healthy: true, version: '1.18.35' })
+    // Like the real server: everything outside /api is the web UI
+    if (!path.startsWith('/api/')) {
+      res.writeHead(200, { 'content-type': 'text/html' })
+      return res.end('<!doctype html><html></html>')
+    }
+    const expected = this.password && `Basic ${Buffer.from(`opencode:${this.password}`).toString('base64')}`
+    if (expected && req.headers.authorization !== expected) return this.json(res, { _tag: 'UnauthorizedError', message: 'Authentication required' }, 401)
 
-    if (path === '/event' || path === '/global/event') {
+    if (path === '/api/info') return this.json(res, { version: '2.1.2', pid: process.pid, urls: [this.url] })
+    if (path === '/api/model') return this.json(res, { data: FAKE_MODELS })
+
+    if (path === '/api/event') {
       res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache', connection: 'keep-alive' })
       this.clients.add(res)
       res.on('close', () => this.clients.delete(res))
-      res.write(`data: ${JSON.stringify({ id: id('evt'), type: 'server.connected', properties: {} })}\n\n`)
+      res.write(`data: ${JSON.stringify({ id: id('evt'), type: 'server.connected', data: {} })}\n\n`)
       return
     }
 
-    if (path === '/session' && req.method === 'POST') {
-      await this.body(req)
-      return this.json(res, this.newSession())
-    }
-    if (path === '/session' || path === '/experimental/session') {
-      return this.json(res, [...this.sessions.values()])
-    }
-    if (path === '/session/status') return this.json(res, {})
-    if (path === '/permission') return this.json(res, [])
-    if (path === '/question') {
-      return this.json(res, [...this.pending].map(([qid, p]) => ({ id: qid, ...p.info, sessionID: p.sessionID })))
-    }
-    const qm = path.match(/^\/question\/([^/]+)\/(reply|reject)$/)
-    if (qm && req.method === 'POST') {
-      const entry = this.pending.get(qm[1])
-      if (!entry) return this.json(res, { name: 'NotFoundError' }, 404)
+    if (path === '/api/session' && req.method === 'POST') {
       const body = await this.body(req)
-      this.pending.delete(qm[1])
-      if (qm[2] === 'reply') {
-        const answers = body.answers as string[][]
-        this.answers.push(answers)
-        this.emit('question.replied', { sessionID: entry.sessionID, requestID: qm[1], answers })
-        Object.assign(entry.part, { state: { status: 'completed', input: entry.input, output: 'User has answered your questions', metadata: { answers }, title: 'Asked 1 question', time: { start: Date.now(), end: Date.now() } } })
-        this.emit('message.part.updated', { sessionID: entry.sessionID, part: { ...entry.part }, time: Date.now() })
-        entry.resume()
-      } else {
-        this.answers.push(null)
-        this.emit('question.rejected', { sessionID: entry.sessionID, requestID: qm[1] })
-        entry.reject()
-      }
-      return this.json(res, true)
-    }
-    if (path === '/config/providers') {
-      const model = (id: string) => [id, { id, name: id }] as const
-      return this.json(res, {
-        providers: [
-          { id: 'rwe-factory-claude', name: 'RWE FACTORY CLAUDE', models: Object.fromEntries([model('claude-opus-5-5-factory'), model('claude-sonnet-5-5-factory')]) },
-          { id: 'rwe-factory-gpt', name: 'RWE FACTORY GPT', models: Object.fromEntries([model('gpt-6-sol-factory')]) },
-        ],
-        default: { 'rwe-factory-claude': 'claude-sonnet-5-5-factory' },
-      })
+      const now = Date.now()
+      const session = { id: id('ses'), model: (body.model as ModelRef | undefined) ?? undefined, time: { created: now, updated: now } }
+      this.sessions.set(session.id, session)
+      this.history.set(session.id, [])
+      this.emit('session.created', { sessionID: session.id })
+      return this.json(res, { data: session })
     }
 
-    const m = path.match(/^\/session\/([^/]+)(?:\/(\w+))?$/)
+    const m = path.match(/^\/api\/session\/([^/]+)(?:\/(\w+))?(?:\/([^/]+))?(?:\/(reply))?$/)
     if (m) {
-      const [, sessionID, action] = m
-      const info = this.session(sessionID)
-      if (!info) return this.json(res, { name: 'NotFoundError' }, 404)
-      if (!action && req.method === 'GET') return this.json(res, info)
-      if (!action && req.method === 'PATCH') {
-        Object.assign(info, await this.body(req))
-        return this.json(res, info)
+      const [, sessionID, action, sub, reply] = m
+      const session = this.sessions.get(sessionID)
+      if (!session) return this.json(res, { _tag: 'SessionNotFoundError', message: `Session not found: ${sessionID}` }, 404)
+      if (!action && req.method === 'GET') return this.json(res, { data: session })
+      if (action === 'message' && req.method === 'GET') return this.json(res, { data: this.history.get(sessionID), cursor: {} })
+      if (action === 'model' && req.method === 'POST') {
+        session.model = (await this.body(req)).model as ModelRef
+        return this.json(res, { data: session })
       }
-      if (!action && req.method === 'DELETE') {
-        this.sessions.delete(sessionID)
-        return this.json(res, true)
-      }
-      if (action === 'message' && req.method === 'GET') return this.json(res, this.messages.get(sessionID) ?? [])
-      if (action === 'prompt_async' && req.method === 'POST') {
+      if (action === 'prompt' && req.method === 'POST') {
         const body = await this.body(req)
-        const text = ((body.parts as { text?: string }[]) ?? []).map((p) => p.text ?? '').join('')
-        this.prompts.push({ sessionID, text, model: body.model as never, agent: body.agent as string | undefined })
-        res.writeHead(204).end()
-        void this.whenListening().then(() => this.answer(sessionID, text))
+        const messageID = (body.id as string) ?? id('msg')
+        const text = body.text as string
+        this.prompts.push({ sessionID, text, model: session.model && { providerID: session.model.providerID, modelID: session.model.id } })
+        this.json(res, { data: { id: messageID, sessionID, type: 'user', payload: { text }, delivery: 'steer', time: { created: Date.now() } } })
+        void this.whenListening().then(() => this.answer(sessionID, messageID, text))
         return
       }
-      if (action === 'abort' && req.method === 'POST') {
+      if (action === 'interrupt' && req.method === 'POST') {
         this.aborts.push(sessionID)
         this.stopTimers()
-        this.emit('session.idle', { sessionID })
-        return this.json(res, true)
+        this.emit('session.execution.interrupted', { sessionID })
+        return this.json(res, { interrupted: true })
+      }
+      if (action === 'permission' && !sub && req.method === 'GET') return this.json(res, { data: [] })
+      if (action === 'form' && !sub && req.method === 'GET') {
+        return this.json(res, { data: [...this.forms.values()].map((f) => f.form).filter((f) => f.sessionID === sessionID) })
+      }
+      if (action === 'form' && sub) {
+        const entry = this.forms.get(sub)
+        if (!entry) return this.json(res, { _tag: 'FormNotFoundError', message: 'Form not found' }, 404)
+        this.forms.delete(sub)
+        if (reply && req.method === 'POST') {
+          const { answer } = await this.body(req)
+          this.answers.push(answer as Record<string, unknown>)
+          this.emit('form.replied', { id: sub, sessionID, answer })
+          entry.resume()
+          res.writeHead(204).end()
+          return
+        }
+        if (!reply && req.method === 'DELETE') {
+          this.answers.push(null)
+          this.emit('form.cancelled', { id: sub, sessionID })
+          entry.cancel()
+          res.writeHead(204).end()
+          return
+        }
       }
     }
 
     this.unhandled.push(`${req.method} ${path}`)
-    this.json(res, { name: 'NotFoundError', message: `fake: ${req.method} ${path}` }, 404)
+    this.json(res, { _tag: 'NotFoundError', message: `fake: ${req.method} ${path}` }, 404)
   }
 
   /** The real server has its event stream open long before a prompt; wait for the client to subscribe */
@@ -200,75 +202,95 @@ export class FakeOpenCode {
     this.timers.clear()
   }
 
-  private answer(sessionID: string, text: string) {
+  private later(fn: () => void, ms = 0) {
+    const t = setTimeout(() => {
+      this.timers.delete(t)
+      fn()
+    }, ms)
+    this.timers.add(t)
+  }
+
+  private answer(sessionID: string, userID: string, text: string) {
+    const history = this.history.get(sessionID)!
     const now = Date.now()
-    const userID = id('msg')
-    const user: Msg = {
-      info: { id: userID, sessionID, role: 'user', time: { created: now }, agent: 'build', model: { providerID: 'p', modelID: 'm' } },
-      parts: [{ id: id('prt'), sessionID, messageID: userID, type: 'text', text }],
-    }
-    this.messages.get(sessionID)!.push(user)
-    this.emit('message.updated', { sessionID, info: user.info })
-    this.emit('message.part.updated', { sessionID, part: user.parts[0], time: now })
-    this.emit('session.status', { sessionID, status: { type: 'busy' } })
+    history.push({ id: userID, type: 'user', text, time: { created: now } })
+    this.emit('session.inbox.enqueued', { sessionID, inboxID: userID, item: { type: 'user', payload: { text }, delivery: 'steer' } })
+    this.emit('session.execution.started', { sessionID })
 
     const script = this.replies.shift() ?? { chunks: ['ok'] }
-    const asstID = id('msg')
-    const partID = id('prt')
-    const asst: Msg = {
-      info: {
-        id: asstID, sessionID, role: 'assistant', parentID: userID, modelID: 'm', providerID: 'p', mode: 'build', agent: 'build',
-        path: { cwd: '/fake', root: '/fake' }, cost: 0, tokens: { total: 0, input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
-        time: { created: now + 1 },
-      },
-      parts: [],
+    const finish = () => {
+      this.emit('session.execution.succeeded', { sessionID })
+      history.push({ id: id('msg'), type: 'idle', outcome: 'succeeded' })
     }
-    this.messages.get(sessionID)!.push(asst)
-    this.emit('message.updated', { sessionID, info: asst.info })
-    const textPart = { id: partID, sessionID, messageID: asstID, type: 'text', text: '', time: { start: now + 2 } }
-    asst.parts.push(textPart)
-    this.emit('message.part.updated', { sessionID, part: { ...textPart }, time: now + 2 })
-
     const stream = () => {
-    let i = 0
-    const step = () => {
-      if (i < script.chunks.length) {
-        const delta = script.chunks[i++]
-        textPart.text += delta
-        this.emit('message.part.delta', { sessionID, messageID: asstID, partID, field: 'text', delta })
-        this.timers.add(setTimeout(step, script.delayMs ?? 0))
-        return
+      const messageID = id('msg')
+      const message: History = { id: messageID, type: 'assistant', content: [{ type: 'text', text: '' }], time: { created: Date.now() } }
+      history.push(message)
+      const part = (message.content as { text: string }[])[0]
+      this.emit('session.step.started', { sessionID, assistantMessageID: messageID, agent: 'build' })
+      this.emit('session.text.started', { sessionID, assistantMessageID: messageID, ordinal: 0 })
+      let i = 0
+      const step = () => {
+        if (i < script.chunks.length) {
+          const delta = script.chunks[i++]
+          part.text += delta
+          this.emit('session.text.delta', { sessionID, assistantMessageID: messageID, ordinal: 0, delta })
+          this.later(step, script.delayMs ?? 0)
+          return
+        }
+        this.emit('session.text.ended', { sessionID, assistantMessageID: messageID, ordinal: 0, text: part.text })
+        this.emit('session.step.ended', { sessionID, assistantMessageID: messageID, finish: 'stop' })
+        message.finish = 'stop'
+        finish()
       }
-      const done = Date.now()
-      Object.assign(asst.info, { time: { created: now + 1, completed: done }, finish: 'stop' })
-      Object.assign(textPart, { time: { start: now + 2, end: done } })
-      this.emit('message.part.updated', { sessionID, part: { ...textPart }, time: done })
-      this.emit('message.updated', { sessionID, info: asst.info })
-      this.emit('session.idle', { sessionID })
-    }
-    this.timers.add(setTimeout(step, 0))
+      this.later(step)
     }
 
     if (!script.question) return stream()
 
-    const callID = id('call')
-    const toolPart: Record<string, unknown> = { id: id('prt'), sessionID, messageID: asstID, type: 'tool', tool: 'question', callID, state: { status: 'pending', input: {}, raw: '' } }
-    asst.parts.unshift(toolPart)
-    this.emit('message.part.updated', { sessionID, part: { ...toolPart }, time: now + 2 })
+    // The question tool: a tool call plus a form, the answer resumes the run
+    const messageID = id('msg')
+    const toolID = id('toolu')
     const input = { questions: script.question }
-    const qid = id('que')
-    const info = { questions: script.question, tool: { messageID: asstID, callID } }
-    this.pending.set(qid, {
-      sessionID, info, part: toolPart, input,
-      resume: stream,
-      reject: () => {
-        Object.assign(toolPart, { state: { status: 'error', input, error: 'The user dismissed this question', time: { start: now, end: Date.now() } } })
-        this.emit('message.part.updated', { sessionID, part: { ...toolPart }, time: Date.now() })
-        this.emit('session.idle', { sessionID })
+    const tool: Record<string, unknown> = { type: 'tool', id: toolID, name: 'question', state: { status: 'running', input } }
+    history.push({ id: messageID, type: 'assistant', content: [tool], time: { created: Date.now() } })
+    this.emit('session.step.started', { sessionID, assistantMessageID: messageID, agent: 'build' })
+    this.emit('session.tool.input.started', { sessionID, assistantMessageID: messageID, id: toolID, name: 'question' })
+    this.emit('session.tool.called', { sessionID, assistantMessageID: messageID, id: toolID, input })
+    const formID = id('frm')
+    const form = {
+      id: formID,
+      sessionID,
+      title: 'Questions',
+      metadata: { kind: 'question', tool: { messageID, id: toolID } },
+      fields: script.question.map((q, i) => ({
+        key: `q${i}`,
+        title: q.header,
+        description: q.question,
+        type: 'string',
+        options: q.options?.map((o) => ({ value: o.label, label: o.label, description: o.description })),
+        custom: true,
+      })),
+    }
+    this.forms.set(formID, {
+      form,
+      resume: () => {
+        const answers = [[String(Object.values(this.answers.at(-1) ?? {})[0] ?? '')]]
+        tool.state = { status: 'completed', input, content: [{ type: 'text', text: 'User has answered your questions' }], metadata: { answers } }
+        this.emit('session.tool.success', { sessionID, assistantMessageID: messageID, id: toolID, content: [{ type: 'text', text: 'User has answered your questions' }], metadata: { answers } })
+        this.emit('session.step.ended', { sessionID, assistantMessageID: messageID, finish: 'tool-calls' })
+        stream()
+      },
+      cancel: () => {
+        tool.state = { status: 'error', input, error: { type: 'dismissed', message: 'The user dismissed this question' } }
+        this.emit('session.tool.error', { sessionID, assistantMessageID: messageID, id: toolID, error: { type: 'dismissed', message: 'The user dismissed this question' } })
+        this.emit('session.step.ended', { sessionID, assistantMessageID: messageID, finish: 'tool-calls' })
+        finish()
       },
     })
-    this.emit('question.asked', { id: qid, sessionID, ...info })
-    Object.assign(toolPart, { state: { status: 'running', input, time: { start: now + 3 } } })
-    this.emit('message.part.updated', { sessionID, part: { ...toolPart }, time: now + 3 })
+    this.later(() => {
+      if (script.dropStreamBeforeForm) this.dropStreams()
+      this.emit('form.created', { form })
+    }, script.formDelayMs ?? 0)
   }
 }

@@ -12,23 +12,15 @@ export interface ModelOption extends ModelRef {
 
 export const MODEL_STORAGE_KEY = 'designos:model'
 
-interface ProvidersResponse {
-  providers?: { id?: string; name?: string; models?: Record<string, { id?: string; name?: string }> }[]
-}
-
-/** The answer of `GET /config/providers`, flattened and sorted by provider and label */
-export function parseProviders(data: unknown): ModelOption[] {
-  const providers = (data as ProvidersResponse | undefined)?.providers
-  if (!Array.isArray(providers)) return []
+/** The answer of `GET /api/model` (OpenCode 2.x), sorted by provider and label */
+export function parseModels(data: unknown): ModelOption[] {
+  if (!Array.isArray(data)) return []
   const options: ModelOption[] = []
-  for (const p of providers) {
-    if (!p?.id || !p.models) continue
-    for (const [key, m] of Object.entries(p.models)) {
-      const modelID = m?.id ?? key
-      options.push({ providerID: p.id, modelID, label: m?.name || modelID, provider: p.name || p.id })
-    }
+  for (const m of data as { id?: unknown; providerID?: unknown; name?: unknown }[]) {
+    if (typeof m?.id !== 'string' || typeof m.providerID !== 'string') continue
+    options.push({ providerID: m.providerID, modelID: m.id, label: typeof m.name === 'string' && m.name ? m.name : m.id, provider: m.providerID })
   }
-  return options.sort((a, b) => a.provider.localeCompare(b.provider) || a.modelID.localeCompare(b.modelID))
+  return options.sort((a, b) => a.provider.localeCompare(b.provider) || a.label.localeCompare(b.label))
 }
 
 export const modelKey = (m: ModelRef) => `${m.providerID}/${m.modelID}`

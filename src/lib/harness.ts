@@ -67,7 +67,7 @@ export function buildStepMessage(step: StepId, prompt?: string): string {
   return prompt ? `${head}\n\n${prompt}` : head
 }
 
-const EXTRA_COMMANDS = ['wiki-ingest', 'wiki-capture', 'wiki-query', 'wiki-status', 'wiki-lint', 'wiki-rebuild', 'wiki-cross-link', 'wiki-taxonomy']
+const EXTRA_COMMANDS = ['live-edit', 'wiki-ingest', 'wiki-capture', 'wiki-query', 'wiki-status', 'wiki-lint', 'wiki-rebuild', 'wiki-cross-link', 'wiki-taxonomy']
 
 /**
  * OpenCode does not parse slash commands out of a prompt, the agent would only guess.

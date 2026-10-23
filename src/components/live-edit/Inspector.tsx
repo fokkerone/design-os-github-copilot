@@ -1,0 +1,564 @@
+import { useMemo, useRef, useState } from 'react'
+import {
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
+  ChevronDown,
+  Italic,
+  MessageSquarePlus,
+  Minus,
+  MousePointerClick,
+  Redo2,
+  RotateCcw,
+  Scan,
+  Sparkles,
+  Strikethrough,
+  Type,
+  Underline,
+  Undo2,
+  X,
+} from 'lucide-react'
+import { loadDesignTokens } from '@/lib/design-tokens-loader'
+import {
+  currentClass,
+  inspectorGroups,
+  isArbitrary,
+  optionFromInput,
+  type InspectorGroup,
+  type InspectorOption,
+  type InspectorProperty,
+} from '@/lib/live-edit/inspector-options'
+import { shortSource, type LiveEdit, type LiveSelection } from '@/lib/live-edit/selection'
+
+const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
+const muted = 'text-stone-500 dark:text-rwe-neutral-400'
+const surface = 'bg-rwe-sand-100 dark:bg-rwe-neutral-900'
+const field = `w-full rounded-md ${surface} px-2.5 py-1.5 text-[13px] text-rwe-neutral-900 dark:text-rwe-neutral-100 ${focusRing}`
+const iconButton = `flex size-7 items-center justify-center rounded-md ${muted} hover:bg-stone-100 hover:text-rwe-neutral-900 disabled:opacity-40 disabled:hover:bg-transparent dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-100 ${focusRing}`
+const primaryButton = `flex items-center gap-1.5 rounded-md bg-brand-blue-500 px-2.5 py-1.5 text-[12px] font-medium text-white hover:bg-brand-blue-600 dark:bg-energy-green-500 dark:text-brand-blue-900 dark:hover:bg-energy-green-400 ${focusRing}`
+// Transparent colors show a checkerboard behind the swatch
+const checker = 'repeating-conic-gradient(#d6d3d1 0% 25%, #ffffff 0% 50%) 50% / 8px 8px'
+
+/** What a property shows: the class that sets it (edited or in the source) and the computed value */
+interface PropertyState {
+  property: InspectorProperty
+  /** The class in the source, null when none sets it */
+  from: string | null
+  /** The class now: the edit, else the source class */
+  current: string | null
+  option: InspectorOption | undefined
+  computed: string
+  edited: boolean
+}
+
+const round = (value: string) => value.replace(/(\d+\.\d{2})\d+/g, '$1')
+
+/**
+ * The Live Edit inspector, next to the preview: edits the picked element with design tokens.
+ * Edits are a preview until "Apply with agent" sends them; the agent writes them to the source.
+ */
+export function Inspector({
+  selection,
+  onChange,
+  onClose,
+  onAddToChat,
+  onApply,
+  guides = false,
+  onGuidesChange,
+}: {
+  selection: LiveSelection
+  onChange: (edits: LiveEdit[]) => void
+  onClose: () => void
+  onAddToChat: () => void
+  onApply: () => void
+  /** "Show paddings and margins" in the preview */
+  guides?: boolean
+  onGuidesChange?: (on: boolean) => void
+}) {
+  const groups = useMemo(() => inspectorGroups(loadDesignTokens()), [])
+  // Undo and redo walk through the edit lists of this element
+  const [history, setHistory] = useState<LiveEdit[][]>([selection.edits])
+  const [index, setIndex] = useState(0)
+  const { element, edits } = selection
+
+  const commit = (next: LiveEdit[]) => {
+    setHistory([...history.slice(0, index + 1), next])
+    setIndex(index + 1)
+    onChange(next)
+  }
+  const step = (to: number) => {
+    setIndex(to)
+    onChange(history[to])
+  }
+  const setEdit = (property: string, edit: LiveEdit | null) => {
+    const rest = edits.filter((e) => e.property !== property)
+    commit(edit ? [...rest, edit] : rest)
+  }
+
+  const stateOf = (property: InspectorProperty): PropertyState => {
+    const from = currentClass(property, element.classes)
+    const edit = edits.find((e) => e.property === property.property)
+    const current = edit?.to ?? from
+    return {
+      property,
+      from,
+      current,
+      option: property.options.find((o) => o.className === current),
+      computed: round(element.styles[property.property] ?? ''),
+      edited: !!edit,
+    }
+  }
+  const choose = (state: PropertyState, option: InspectorOption | null) =>
+    setEdit(
+      state.property.property,
+      !option || option.className === state.from
+        ? null
+        : { property: state.property.property, from: state.from, to: option.className, css: option.css, ...(option.role && { role: option.role }) },
+    )
+
+  const contentEdit = edits.find((e) => e.property === 'content')
+  const controls = { stateOf, choose }
+
+  return (
+    <aside
+      aria-label="Inspector"
+      className="flex h-full w-[296px] shrink-0 flex-col overflow-hidden rounded-lg border border-stone-200 bg-rwe-sand-25 shadow-xl dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950"
+    >
+      <header className="flex items-center gap-2 border-b border-stone-200 px-3 py-2 dark:border-rwe-neutral-800">
+        <MousePointerClick className="size-4 shrink-0 text-brand-blue-500 dark:text-energy-green-500" strokeWidth={1.5} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13px] font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">
+            {element.componentPath.join(' › ') || 'Element'} <span className={muted}>· {element.tag}</span>
+          </p>
+          <p className={`truncate font-mono text-[11px] ${muted}`} title={element.src}>
+            {shortSource(element.src)}
+          </p>
+        </div>
+        <button type="button" aria-label="Close inspector" onClick={onClose} className={iconButton}>
+          <X className="size-4" strokeWidth={1.5} />
+        </button>
+      </header>
+
+      <div className="flex-1 divide-y divide-stone-200 overflow-y-auto dark:divide-rwe-neutral-800">
+        {element.textOnly && (
+          <Section title="Content">
+            <textarea
+              aria-label="Content"
+              rows={2}
+              value={contentEdit?.to ?? element.text}
+              onChange={(e) =>
+                setEdit('content', e.target.value === element.text ? null : { property: 'content', from: element.text, to: e.target.value, css: {} })
+              }
+              className={`${field} resize-y`}
+            />
+          </Section>
+        )}
+        {groups.map((group) => (
+          <GroupSection key={group.id} group={group} {...controls} guides={guides} onGuidesChange={onGuidesChange} classes={element.classes} />
+        ))}
+        <Section title="Classes">
+          <p className={`break-words font-mono text-[11px] ${muted}`}>{element.classes.join(' ') || '—'}</p>
+        </Section>
+      </div>
+
+      <footer className="flex items-center gap-1 border-t border-stone-200 px-3 py-2 dark:border-rwe-neutral-800">
+        <button type="button" aria-label="Undo" disabled={index === 0} onClick={() => step(index - 1)} className={iconButton}>
+          <Undo2 className="size-4" strokeWidth={1.5} />
+        </button>
+        <button type="button" aria-label="Redo" disabled={index >= history.length - 1} onClick={() => step(index + 1)} className={iconButton}>
+          <Redo2 className="size-4" strokeWidth={1.5} />
+        </button>
+        <button type="button" aria-label="Reset edits" disabled={edits.length === 0} onClick={() => commit([])} className={iconButton}>
+          <RotateCcw className="size-4" strokeWidth={1.5} />
+        </button>
+        {edits.length > 0 ? (
+          <>
+            <button type="button" aria-label="Describe in chat" title="Describe in chat" onClick={onAddToChat} className={`ml-auto ${iconButton}`}>
+              <MessageSquarePlus className="size-4" strokeWidth={1.5} />
+            </button>
+            <button type="button" onClick={onApply} className={primaryButton}>
+              <Sparkles className="size-3.5" strokeWidth={1.75} />
+              Apply with agent
+            </button>
+          </>
+        ) : (
+          <button type="button" onClick={onAddToChat} className={`ml-auto ${primaryButton}`}>
+            <MessageSquarePlus className="size-3.5" strokeWidth={1.75} />
+            Describe in chat
+          </button>
+        )}
+      </footer>
+    </aside>
+  )
+}
+
+interface Controls {
+  stateOf: (property: InspectorProperty) => PropertyState
+  choose: (state: PropertyState, option: InspectorOption | null) => void
+}
+
+const byProperty = (group: InspectorGroup, prefix: string) => group.properties.filter((p) => p.property.startsWith(prefix))
+
+/** One inspector section; Layout and Appearance lay their side and corner fields out in pairs */
+function GroupSection({
+  group,
+  stateOf,
+  choose,
+  guides,
+  onGuidesChange,
+  classes,
+}: Controls & { group: InspectorGroup; guides: boolean; onGuidesChange?: (on: boolean) => void; classes: string[] }) {
+  const corners = byProperty(group, 'border-').filter((p) => p.property !== 'border-radius')
+  // Single corners open by themselves when the element already rounds them one by one
+  const [splitCorners, setSplitCorners] = useState(() => corners.some((p) => currentClass(p, classes)))
+  const render = (property: InspectorProperty) => <Field key={property.property} state={stateOf(property)} choose={choose} />
+
+  if (group.id === 'layout') {
+    const single = group.properties.filter((p) => !/^(margin|padding)-/.test(p.property))
+    return (
+      <Section
+        title={group.title}
+        action={
+          onGuidesChange && (
+            <label className={`flex items-center gap-1.5 text-[12px] ${muted}`}>
+              <input
+                type="checkbox"
+                checked={guides}
+                onChange={(e) => onGuidesChange(e.target.checked)}
+                className="size-3.5 accent-brand-blue-500 dark:accent-energy-green-500"
+              />
+              Show paddings and margins
+            </label>
+          )
+        }
+      >
+        {single.map(render)}
+        <Pairs title="Margin">{byProperty(group, 'margin-').map(render)}</Pairs>
+        <Pairs title="Padding">{byProperty(group, 'padding-').map(render)}</Pairs>
+      </Section>
+    )
+  }
+
+  if (group.id === 'appearance') {
+    const all = group.properties.find((p) => p.property === 'border-radius')!
+    const opacity = group.properties.find((p) => p.property === 'opacity')!
+    return (
+      <Section title={group.title}>
+        {render(opacity)}
+        <Field
+          state={stateOf(all)}
+          choose={choose}
+          aside={
+            <button
+              type="button"
+              aria-label="Individual corners"
+              aria-pressed={splitCorners}
+              title="Individual corners"
+              onClick={() => setSplitCorners(!splitCorners)}
+              className={`flex size-[34px] shrink-0 items-center justify-center rounded-md border border-stone-200 dark:border-rwe-neutral-800 ${
+                splitCorners ? 'bg-stone-100 text-rwe-neutral-900 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-100' : muted
+              } ${focusRing}`}
+            >
+              <Scan className="size-4" strokeWidth={1.5} />
+            </button>
+          }
+        />
+        {splitCorners && <Pairs>{corners.map(render)}</Pairs>}
+      </Section>
+    )
+  }
+
+  return <Section title={group.title}>{group.properties.map(render)}</Section>
+}
+
+function Field({ state, choose, aside }: { state: PropertyState; choose: Controls['choose']; aside?: React.ReactNode }) {
+  const { property, edited } = state
+  const control =
+    property.kind === 'scale' ? (
+      <ScrubField state={state} choose={choose} />
+    ) : property.kind === 'segmented' ? (
+      <Segmented state={state} choose={choose} />
+    ) : property.kind === 'color' ? (
+      <ColorField state={state} choose={choose} />
+    ) : (
+      <SelectField state={state} choose={choose} />
+    )
+  return (
+    <div className="min-w-0">
+      <span className={`mb-1.5 flex items-center justify-between text-[12px] ${muted}`}>
+        {property.label}
+        {edited && <span className="font-mono text-[11px] text-brand-blue-500 dark:text-energy-green-500">edited</span>}
+      </span>
+      <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1">{control}</div>
+        {aside}
+      </div>
+    </div>
+  )
+}
+
+/** A number field over a token scale: drag the grip or use the arrow keys to step, or type a value */
+function ScrubField({ state, choose }: { state: PropertyState; choose: Controls['choose'] }) {
+  const { property, option, current, computed } = state
+  const options = property.options
+  const [draft, setDraft] = useState<string | null>(null)
+  const drag = useRef<{ x: number; start: number } | null>(null)
+  const display = option ? option.label : current && isArbitrary(current) ? current.slice(current.indexOf('[') + 1, -1) : computed || '—'
+  const hint = option?.value && option.value !== option.label ? option.value : current && isArbitrary(current) ? 'not a token' : option ? '' : 'computed'
+
+  // Where on the scale the value sits: its token, else the token closest to the computed value
+  const position = () => {
+    const at = options.findIndex((o) => o.className === current)
+    if (at >= 0) return at
+    const target = parseFloat(computed)
+    let best = 0
+    let distance = Infinity
+    options.forEach((o, i) => {
+      const d = Math.abs(parseFloat(o.value ?? '') - target)
+      if (d < distance) [best, distance] = [i, d]
+    })
+    return best
+  }
+  const stepTo = (i: number) => choose(state, options[Math.max(0, Math.min(options.length - 1, i))])
+  const commitDraft = () => {
+    if (draft === null) return
+    const next = optionFromInput(property, draft)
+    if (next) choose(state, next)
+    setDraft(null)
+  }
+
+  return (
+    <div className={`flex items-center gap-2 rounded-md ${surface} py-1 pl-1 pr-2.5`}>
+      <span
+        role="slider"
+        tabIndex={-1}
+        aria-label={`Drag to change ${property.name ?? property.label}`}
+        aria-valuemin={0}
+        aria-valuemax={options.length - 1}
+        aria-valuenow={position()}
+        onPointerDown={(e) => {
+          e.currentTarget.setPointerCapture(e.pointerId)
+          drag.current = { x: e.clientX, start: position() }
+        }}
+        onPointerMove={(e) => {
+          if (!drag.current) return
+          const steps = Math.round((e.clientX - drag.current.x) / 8)
+          const next = Math.max(0, Math.min(options.length - 1, drag.current.start + steps))
+          if (options[next].className !== current) stepTo(next)
+        }}
+        onPointerUp={() => (drag.current = null)}
+        className="flex h-6 w-4 shrink-0 cursor-ew-resize items-center justify-center rounded bg-stone-300/70 dark:bg-rwe-neutral-700"
+      >
+        <span className="h-3 w-px bg-stone-500 dark:bg-rwe-neutral-400" />
+        <span className="ml-0.5 h-3 w-px bg-stone-500 dark:bg-rwe-neutral-400" />
+      </span>
+      <input
+        aria-label={property.name ?? property.label}
+        value={draft ?? display}
+        onChange={(e) => setDraft(e.target.value)}
+        onFocus={(e) => e.target.select()}
+        onBlur={commitDraft}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') commitDraft()
+          else if (e.key === 'Escape') setDraft(null)
+          else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.preventDefault()
+            setDraft(null)
+            stepTo(position() + (e.key === 'ArrowUp' ? 1 : -1))
+          }
+        }}
+        className="min-w-0 flex-1 bg-transparent font-mono text-[13px] text-rwe-neutral-900 focus:outline-none dark:text-rwe-neutral-100"
+      />
+      {hint && <span className={`shrink-0 font-mono text-[11px] ${hint === 'not a token' ? 'text-amber-600 dark:text-amber-400' : muted}`}>{hint}</span>}
+    </div>
+  )
+}
+
+function SelectField({ state, choose }: { state: PropertyState; choose: Controls['choose'] }) {
+  const { property, current, from, computed } = state
+  return (
+    <div className="relative">
+      <select
+        aria-label={property.name ?? property.label}
+        value={current ?? ''}
+        onChange={(e) => choose(state, property.options.find((o) => o.className === e.target.value) ?? null)}
+        className={`${field} appearance-none pr-8`}
+      >
+        {!from && <option value="">{`— ${computed || 'not set'}`}</option>}
+        {property.options.map((o) => (
+          <option key={o.className} value={o.className}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className={`pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 ${muted}`} strokeWidth={1.5} />
+    </div>
+  )
+}
+
+const SEGMENT_ICONS: Record<string, React.ReactNode> = {
+  'not-italic': <Type className="size-4" strokeWidth={1.5} />,
+  italic: <Italic className="size-4" strokeWidth={1.5} />,
+  'text-left': <AlignLeft className="size-4" strokeWidth={1.5} />,
+  'text-center': <AlignCenter className="size-4" strokeWidth={1.5} />,
+  'text-right': <AlignRight className="size-4" strokeWidth={1.5} />,
+  'text-justify': <AlignJustify className="size-4" strokeWidth={1.5} />,
+  'normal-case': <Minus className="size-4" strokeWidth={1.5} />,
+  capitalize: <span className="text-[12px]">Aa</span>,
+  uppercase: <span className="text-[12px] font-semibold">AA</span>,
+  lowercase: <span className="text-[12px]">aa</span>,
+  'no-underline': <Minus className="size-4" strokeWidth={1.5} />,
+  underline: <Underline className="size-4" strokeWidth={1.5} />,
+  'line-through': <Strikethrough className="size-4" strokeWidth={1.5} />,
+  overline: <span className="text-[13px] overline">a</span>,
+}
+
+/** Icon buttons for a handful of values; without a class the computed value is the active one */
+function Segmented({ state, choose }: { state: PropertyState; choose: Controls['choose'] }) {
+  const { property, current, computed } = state
+  const active = (o: InspectorOption) => (current ? o.className === current : Object.values(o.css)[0] === computed || (computed === 'start' && o.className === 'text-left'))
+  return (
+    <div role="group" aria-label={property.name ?? property.label} className={`flex gap-0.5 rounded-md ${surface} p-0.5`}>
+      {property.options.map((o) => (
+        <button
+          key={o.className}
+          type="button"
+          aria-label={o.label}
+          aria-pressed={active(o)}
+          title={`${o.label} (${o.className})`}
+          onClick={() => choose(state, o)}
+          className={`flex h-7 flex-1 items-center justify-center rounded ${focusRing} ${
+            active(o)
+              ? 'bg-rwe-sand-25 text-rwe-neutral-900 shadow-sm dark:bg-rwe-neutral-950 dark:text-rwe-neutral-50'
+              : `${muted} hover:text-rwe-neutral-900 dark:hover:text-rwe-neutral-100`
+          }`}
+        >
+          {SEGMENT_ICONS[o.className] ?? o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function Swatch({ color, size = 'size-7' }: { color: string; size?: string }) {
+  return (
+    <span aria-hidden className={`${size} inline-block shrink-0 overflow-hidden rounded-full border border-stone-300 dark:border-rwe-neutral-700`} style={{ background: checker }}>
+      <span className="block size-full" style={{ background: color }} />
+    </span>
+  )
+}
+
+/** Swatch and value; opens the palette of the design system (roles first, then every palette step) */
+function ColorField({ state, choose }: { state: PropertyState; choose: Controls['choose'] }) {
+  const { property, option, current, computed } = state
+  const [open, setOpen] = useState(false)
+  const groups = useMemo(() => {
+    const map = new Map<string, InspectorOption[]>()
+    for (const o of property.options) map.set(o.group ?? '', [...(map.get(o.group ?? '') ?? []), o])
+    return [...map]
+  }, [property.options])
+  const label = option?.label ?? (current && isArbitrary(current) ? current : computed || 'not set')
+
+  return (
+    <div>
+      <button
+        type="button"
+        aria-label={`${property.name ?? property.label}: ${label}`}
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+        className={`flex w-full items-center gap-2 rounded-md text-left ${focusRing}`}
+      >
+        <Swatch color={option?.swatch ?? computed} />
+        <span className={`${field} truncate font-mono`}>{label}</span>
+      </button>
+      {open && (
+        <div className={`mt-2 max-h-80 space-y-2 overflow-y-auto rounded-md ${surface} p-2`}>
+          {groups.map(([name, options]) => (
+            <div key={name}>
+              <p className={`mb-1 text-[11px] ${muted}`}>{name}</p>
+              {name === 'Roles' ? (
+                <div className="space-y-0.5">
+                  {options.map((o) => (
+                    <ColorOption key={o.label} option={o} selected={o.className === current} onPick={() => choose(state, o)} wide />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-11 gap-1">
+                  {options.map((o) => (
+                    <ColorOption key={o.className} option={o} selected={o.className === current} onPick={() => choose(state, o)} />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ColorOption({ option, selected, onPick, wide }: { option: InspectorOption; selected: boolean; onPick: () => void; wide?: boolean }) {
+  const ring = selected ? 'ring-2 ring-brand-blue-500 dark:ring-energy-green-500' : ''
+  if (wide) {
+    return (
+      <button
+        type="button"
+        aria-label={option.label}
+        aria-pressed={selected}
+        onClick={onPick}
+        className={`flex w-full items-center gap-2 rounded px-1 py-0.5 text-left text-[12px] text-rwe-neutral-900 hover:bg-stone-100 dark:text-rwe-neutral-100 dark:hover:bg-rwe-neutral-800 ${ring} ${focusRing}`}
+      >
+        <Swatch color={option.swatch ?? ''} size="size-4" />
+        <span className="truncate">{option.label}</span>
+      </button>
+    )
+  }
+  return (
+    <button type="button" aria-label={option.label} aria-pressed={selected} title={option.label} onClick={onPick} className={`flex aspect-square rounded-full ${ring} ${focusRing}`}>
+      <Swatch color={option.swatch ?? ''} size="size-full" />
+    </button>
+  )
+}
+
+function Section({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="space-y-3 px-3 py-3.5">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{title}</h3>
+        {action}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+/** Side or corner fields two by two, under an optional label */
+function Pairs({ title, children }: { title?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      {title && <p className="mb-1.5 text-[12px] text-rwe-neutral-900 dark:text-rwe-neutral-100">{title}</p>}
+      <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">{children}</div>
+    </div>
+  )
+}
+
+/** Toolbar toggle for the picker */
+export function PickButton({ active, onToggle }: { active: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onToggle}
+      title="Select an element (V)"
+      className={`flex items-center gap-1.5 rounded px-2 py-1 text-xs transition-colors ${focusRing} ${
+        active
+          ? 'bg-brand-blue-500 text-white dark:bg-energy-green-500 dark:text-brand-blue-900'
+          : `${muted} hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-200`
+      }`}
+    >
+      <MousePointerClick className="size-3.5" strokeWidth={1.5} />
+      Select element
+    </button>
+  )
+}

@@ -1,4 +1,4 @@
-import { ArrowUp, Bot, Square } from 'lucide-react'
+import { ArrowUp, Bot, MousePointerClick, Square, X } from 'lucide-react'
 import {
   AuiIf,
   ComposerPrimitive,
@@ -10,6 +10,8 @@ import {
   useAuiState,
 } from '@assistant-ui/react'
 import { expandSlashCommand } from '@/lib/harness'
+import { useLiveEdit } from '@/lib/live-edit/live-edit-context'
+import { buildLiveEditMessage, parseLiveEditMessage, selectionLabel, shortSource } from '@/lib/live-edit/selection'
 import { ACTIVITY_LABEL, useAgentActivity } from '@/lib/chat/activity'
 import { ChatMarkdown } from './ChatMarkdown'
 import { ToolCall } from './ToolCall'
@@ -56,10 +58,31 @@ function UserMessage() {
     <MessagePrimitive.Root className="flex justify-end">
       <div className="max-w-[85%] whitespace-pre-wrap rounded-lg bg-rwe-sand-500 px-3.5 py-2 text-[14px] leading-relaxed dark:bg-rwe-neutral-800">
         <MessagePrimitive.Parts>
-          {({ part }) => (part.type === 'text' ? <MessagePartPrimitive.Text /> : null)}
+          {({ part }) => (part.type === 'text' ? <UserText /> : null)}
         </MessagePrimitive.Parts>
       </div>
     </MessagePrimitive.Root>
+  )
+}
+
+/** A Live Edit request shows as a chip plus the request, the context block stays folded */
+function UserText() {
+  const text = useAuiState((s) => ('text' in s.part ? (s.part.text as string) : ''))
+  const live = parseLiveEditMessage(text)
+  if (!live) return <MessagePartPrimitive.Text />
+  return (
+    <>
+      <details className="mb-1.5 text-[12px]">
+        <summary className={`flex cursor-pointer list-none items-center gap-1.5 ${muted}`}>
+          <MousePointerClick className="size-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+          <span className="font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">{live.label}</span>
+          <span className="truncate font-mono">{live.source}</span>
+          {live.edits > 0 && <span>· {live.edits} edit{live.edits === 1 ? '' : 's'}</span>}
+        </summary>
+        <pre className="mt-1.5 max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-rwe-sand-25 p-2 font-mono text-[11px] dark:bg-rwe-neutral-950/60">{live.context}</pre>
+      </details>
+      {live.request}
+    </>
   )
 }
 
@@ -114,18 +137,44 @@ function AssistantText() {
 
 function Composer({ extras }: { extras?: React.ReactNode }) {
   const aui = useAui()
+  const live = useLiveEdit()
+  const picked = live?.selection && !live.sent ? live.selection : null
   return (
     <ComposerPrimitive.Root
       // OpenCode does not parse slash commands from a prompt: expand them into the step instruction first
       onSubmit={() => {
         const text = aui.composer().getState().text
         const expanded = expandSlashCommand(text)
-        if (expanded !== text) aui.composer().setText(expanded)
+        // A picked element turns the message into a Live Edit request with the element as context
+        if (picked && expanded === text) {
+          aui.composer().setText(buildLiveEditMessage(picked, text))
+          live?.markSent()
+        } else if (expanded !== text) aui.composer().setText(expanded)
       }}
       className="rounded-lg border border-stone-200 bg-rwe-sand-25 px-3.5 pb-2.5 pt-3 transition-colors focus-within:border-stone-300 dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950/60 dark:focus-within:border-rwe-neutral-700">
+      {picked && (
+        <div className="mb-2 flex items-center gap-1.5">
+          <span className="inline-flex min-w-0 items-center gap-1.5 rounded-full bg-brand-blue-500 py-0.5 pl-2 pr-1 text-[12px] text-white dark:bg-energy-green-500 dark:text-brand-blue-900">
+            <MousePointerClick className="size-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+            <span className="font-medium">{selectionLabel(picked)}</span>
+            {picked.edits.length > 0 && <span className="opacity-80">· {picked.edits.length}</span>}
+            <button
+              type="button"
+              aria-label="Remove selected element"
+              onClick={() => live?.select(null)}
+              className={`flex size-4 items-center justify-center rounded-full hover:bg-black/15 ${focusRing}`}
+            >
+              <X className="size-3" strokeWidth={2} />
+            </button>
+          </span>
+          <span className={`truncate font-mono text-[11px] ${muted}`} title={picked.element.src}>
+            {shortSource(picked.element.src)}
+          </span>
+        </div>
+      )}
       <ComposerPrimitive.Input
         aria-label="Message the agent"
-        placeholder="Reply to the agent…"
+        placeholder={picked ? 'Describe the change…' : 'Reply to the agent…'}
         rows={1}
         className="block max-h-40 min-h-6 w-full resize-none bg-transparent text-[14px] text-rwe-neutral-900 placeholder:text-stone-500 focus:outline-none dark:text-rwe-neutral-50 dark:placeholder:text-rwe-neutral-500"
       />

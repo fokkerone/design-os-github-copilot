@@ -1,39 +1,60 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { AssistantRuntimeProvider, useAui } from '@assistant-ui/react'
-import { createOpencodeClient, useOpenCodeRuntime } from '@assistant-ui/react-opencode'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { AssistantRuntimeProvider, useAui, useExternalStoreRuntime, type AppendMessage } from '@assistant-ui/react'
 import { OPENCODE_PROXY_PATH, resolveBaseUrl, useOpenCodeStatus } from '@/lib/chat/opencode'
-import { loadModelChoice, modelKey, parseProviders, saveModelChoice, type ModelOption, type ModelRef } from '@/lib/chat/models'
+import { loadModelChoice, modelKey, parseModels, saveModelChoice, type ModelOption, type ModelRef } from '@/lib/chat/models'
 import { loadSessionId, saveSessionId } from '@/lib/chat/session'
 import { useAgentActivity } from '@/lib/chat/activity'
-import { ChatContext, type ChatContextValue } from '@/lib/chat/chat-context'
+import { ChatContext, SHOW_CHAT_EVENT, type ChatContextValue } from '@/lib/chat/chat-context'
+import { OpenCodeClient } from '@/lib/chat/v2/api'
+import { toThreadMessages } from '@/lib/chat/v2/convert'
+import { useOpenCodeSession } from '@/lib/chat/v2/use-session'
+import { LiveEditContext } from '@/lib/live-edit/live-edit-context'
+import { APPLY_EDITS_REQUEST, buildLiveEditMessage, type LiveEdit, type LiveSelection } from '@/lib/live-edit/selection'
+
+const textOf = (message: AppendMessage) =>
+  message.content.map((part) => (part.type === 'text' ? part.text : '')).join('')
 
 /**
- * One OpenCode runtime for the whole app: the chat and the step pages share it,
- * so a page can start a step in the conversation next to it.
+ * One OpenCode chat for the whole app: the chat and the step pages share it, so a page can start
+ * a step in the conversation next to it. Talks to OpenCode 2.x through the dev server's proxy.
  */
 export function ChatProvider({ baseUrl = OPENCODE_PROXY_PATH, children }: { baseUrl?: string; children: ReactNode }) {
   const url = resolveBaseUrl(baseUrl)
-  // The runtime keeps its connection per client, so the client is created once per URL
-  const [client] = useState(() => createOpencodeClient({ baseUrl: url }))
+  const client = useMemo(() => new OpenCodeClient({ baseUrl: url }), [url])
   const status = useOpenCodeStatus(url)
   const [options, setOptions] = useState<ModelOption[]>([])
   const [choice, setChoice] = useState<ModelRef | undefined>(loadModelChoice)
   // A remembered model the server no longer offers is ignored (until the list is loaded we trust it)
   const model =
     options.length === 0 || (choice && options.some((o) => modelKey(o) === modelKey(choice))) ? choice : undefined
-  // Sent with every prompt; undefined lets OpenCode use the model from opencode.json
   // Read once: the session to reopen after a reload
   const [initialSessionId] = useState(loadSessionId)
-  const runtime = useOpenCodeRuntime({ client, defaultModel: model, initialSessionId, onThreadIdChange: saveSessionId })
+  const session = useOpenCodeSession(client, {
+    model: model ? { id: model.modelID, providerID: model.providerID } : undefined,
+    initialSessionId,
+    onSessionChange: saveSessionId,
+    online: status === 'online',
+  })
+  const { state, send: sendText, cancel, respond, newChat } = session
 
-  // The models come from the server, so the list always matches opencode.json
+  const messages = useMemo(() => toThreadMessages(state), [state])
+  const runtime = useExternalStoreRuntime({
+    messages,
+    convertMessage: (m) => m,
+    isRunning: state.running,
+    onNew: async (message) => sendText(textOf(message)),
+    onCancel: cancel,
+    onRespondToToolApproval: respond,
+  })
+
+  // The models come from the server, so the list always matches the OpenCode config
   useEffect(() => {
     if (status !== 'online') return
     let cancelled = false
-    client.config
-      .providers()
-      .then((res) => {
-        if (!cancelled) setOptions(parseProviders(res.data))
+    client
+      .models()
+      .then((list) => {
+        if (!cancelled) setOptions(parseModels(list))
       })
       .catch(() => {})
     return () => {
@@ -48,7 +69,7 @@ export function ChatProvider({ baseUrl = OPENCODE_PROXY_PATH, children }: { base
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Bridge state={{ status, options, model, setModel }}>{children}</Bridge>
+      <Bridge state={{ status, options, model, setModel, newChat }}>{children}</Bridge>
     </AssistantRuntimeProvider>
   )
 }
@@ -58,5 +79,40 @@ function Bridge({ state, children }: { state: Omit<ChatContextValue, 'send' | 'a
   const activity = useAgentActivity()
   const send = useCallback((text: string) => aui.thread().append(text), [aui])
   const value = { ...state, activity, send }
-  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
+  return (
+    <ChatContext.Provider value={value}>
+      <LiveEditProvider>{children}</LiveEditProvider>
+    </ChatContext.Provider>
+  )
+}
+
+/** The element picked in a preview, between the page that picked it and the composer that sends it */
+export function LiveEditProvider({ children }: { children: ReactNode }) {
+  const [selection, setSelection] = useState<LiveSelection | null>(null)
+  const [sent, setSent] = useState(false)
+  const select = useCallback((next: LiveSelection | null) => {
+    setSelection(next)
+    setSent(false)
+  }, [])
+  const setEdits = useCallback((edits: LiveEdit[]) => setSelection((s) => (s ? { ...s, edits } : s)), [])
+  const markSent = useCallback(() => setSent(true), [])
+  const focusComposer = useCallback(() => {
+    // The chat may be collapsed behind the expanded step panel: show it, then focus once it is visible
+    window.dispatchEvent(new Event(SHOW_CHAT_EVENT))
+    const focus = () => document.querySelector<HTMLTextAreaElement>('textarea[aria-label="Message the agent"]')?.focus()
+    focus()
+    requestAnimationFrame(() => requestAnimationFrame(focus))
+  }, [])
+  const aui = useAui()
+  const apply = useCallback(() => {
+    if (!selection || sent) return
+    window.dispatchEvent(new Event(SHOW_CHAT_EVENT))
+    aui.thread().append(buildLiveEditMessage(selection, APPLY_EDITS_REQUEST))
+    setSent(true)
+  }, [aui, selection, sent])
+  const value = useMemo(
+    () => ({ selection, sent, select, setEdits, markSent, focusComposer, apply }),
+    [selection, sent, select, setEdits, markSent, focusComposer, apply],
+  )
+  return <LiveEditContext.Provider value={value}>{children}</LiveEditContext.Provider>
 }

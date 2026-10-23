@@ -1,6 +1,6 @@
 ---
 title: Wiki Taxonomy
-updated: 2026-10-14
+updated: 2026-10-23
 ---
 
 # Wiki Taxonomy
@@ -31,6 +31,7 @@ Domains are concern-centric, not source-centric. A page's domain describes *what
 | `decisions` | `decisions/` | Decision records: why X was chosen over Y | captures, any |
 | `research` | `research/` | User research findings, competitors, market, external articles (personas themselves go to `personas/`) | `wiki/raw/` |
 | `feedback` | `feedback/` | Stakeholder and user feedback on screens and the clickdummy | captures |
+| `design-changes` | `design-changes/` | Changelog of Live Edit changes to screen designs and the shell: one page per section (`<section-id>.md`, `shell.md`), newest first, with request, class swap and reason | `live-edit` captures |
 | `handoff` | `handoff/` | Export & implementation notes for the target codebase | `product-plan/`, captures |
 
 ### System Domains
@@ -55,8 +56,9 @@ Assign each knowledge unit to a domain with this decision tree:
 10. **Reusable screen/interaction pattern or component convention**? → `ui/`
 11. **User research findings, competitors, market, external knowledge**? → `research/`
 12. **Feedback from stakeholders or users**? → `feedback/`
-13. **Export, handoff, implementation notes**? → `handoff/`
-14. **Section-specific knowledge that fits none of the above**?
+13. **A change made with Live Edit** (`designos_step: live-edit:...`)? → `design-changes/` (one page per section, template `_templates/design-change.md`); a decision behind it also goes to `decisions/`
+14. **Export, handoff, implementation notes**? → `handoff/`
+15. **Section-specific knowledge that fits none of the above**?
     → Create a domain named after the section id (e.g. `invoices/`)
     → Add it under "Project Domains" below before creating the folder
 
@@ -88,6 +90,7 @@ Tags mirror domain names. Every content page gets the tag of its domain.
 - `decisions` — decision records
 - `research` — external and user research
 - `feedback` — stakeholder and user feedback
+- `design-changes` — Live Edit changes to screens and the shell
 - `handoff` — export and implementation notes
 - `how-to` — Design OS guides (system domain)
 

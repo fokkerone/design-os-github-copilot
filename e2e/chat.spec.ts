@@ -45,7 +45,7 @@ test.describe('chat', () => {
     await page.getByRole('radio', { name: 'Use a file' }).check()
     await page.getByRole('button', { name: 'Send answer' }).click()
     await expect(page.getByText('Great, continuing')).toBeVisible()
-    expect(opencode.answers).toEqual([[['Use a file']]])
+    expect(opencode.answers).toEqual([{ q0: 'Use a file' }])
   })
 
   test('Stop aborts a running answer', async ({ page, opencode }) => {
@@ -92,7 +92,7 @@ test.describe('chat', () => {
 
   test('shows how to start OpenCode when it is not running', async ({ page }) => {
     await page.goto('/prototype/vision')
-    await expect(page.getByRole('status').filter({ hasText: 'opencode serve --port 4096' })).toBeVisible()
+    await expect(page.getByRole('status').filter({ hasText: 'npm run dev' })).toBeVisible()
     if (!hasSampleProject) await expect(page.getByRole('button', { name: 'Start with agent' })).toBeDisabled()
   })
 })

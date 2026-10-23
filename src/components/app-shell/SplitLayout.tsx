@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { useDefaultLayout, usePanelRef } from 'react-resizable-panels'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Maximize2, MessageSquare, Minimize2, PanelRight } from 'lucide-react'
 import type { AgentActivity } from '@/lib/chat/activity'
+import { SHOW_CHAT_EVENT } from '@/lib/chat/chat-context'
 
 /** open: chat and step side by side, expanded: step fills the area, hidden: chat only */
 export type PanelMode = 'open' | 'expanded' | 'hidden'
@@ -62,6 +63,16 @@ export function SplitLayout({ title, chat, children, panelMode, onPanelModeChang
     setInternal(next)
     onPanelModeChange?.(next)
   }
+
+  // A page asks for the chat (Live Edit "Describe in chat"): uncover it
+  const covered = hasChat && (wide ? mode === 'expanded' : mode !== 'hidden')
+  const showChat = useEffectEvent(() => setMode(wide ? 'open' : 'hidden'))
+  useEffect(() => {
+    if (!covered) return
+    const onShow = () => showChat()
+    window.addEventListener(SHOW_CHAT_EVENT, onShow)
+    return () => window.removeEventListener(SHOW_CHAT_EVENT, onShow)
+  }, [covered])
 
   return (
     <div className="flex h-full min-h-[560px] flex-col text-rwe-neutral-900 dark:text-rwe-neutral-100">

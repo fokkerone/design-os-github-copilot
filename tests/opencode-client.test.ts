@@ -34,10 +34,13 @@ describe('checkOpenCodeHealth', () => {
     expect(await checkOpenCodeHealth(url)).toBe(false)
   })
 
-  it('is false when the server answers but is not healthy', async () => {
-    const res = (status: number, body: unknown) => async () => new Response(JSON.stringify(body), { status })
-    expect(await checkOpenCodeHealth('http://x', res(200, { healthy: false }))).toBe(false)
-    expect(await checkOpenCodeHealth('http://x', res(502, {}))).toBe(false)
+  it('is false when the server answers but is not OpenCode 2.x', async () => {
+    const res = (status: number, body: string, type = 'application/json') => async () => new Response(body, { status, headers: { 'content-type': type } })
+    // A 1.x server (or any web page) answers /api/info with HTML
+    expect(await checkOpenCodeHealth('http://x', res(200, '<!doctype html>', 'text/html'))).toBe(false)
+    expect(await checkOpenCodeHealth('http://x', res(200, '{}'))).toBe(false)
+    expect(await checkOpenCodeHealth('http://x', res(401, '{"message":"Authentication required"}'))).toBe(false)
+    expect(await checkOpenCodeHealth('http://x', res(502, '{}'))).toBe(false)
   })
 
   it('gives up after the timeout instead of hanging', async () => {
@@ -46,7 +49,7 @@ describe('checkOpenCodeHealth', () => {
     expect(await checkOpenCodeHealth('http://x', hang as typeof fetch, 30)).toBe(false)
   })
 
-  it('names the command that starts the server', () => {
-    expect(OPENCODE_START_COMMAND).toBe('opencode serve --port 4096')
+  it('names the command that starts the server (the dev server starts OpenCode)', () => {
+    expect(OPENCODE_START_COMMAND).toBe('npm run dev')
   })
 })

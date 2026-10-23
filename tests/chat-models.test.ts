@@ -1,26 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { loadModelChoice, modelKey, parseModelKey, parseProviders, saveModelChoice } from '@/lib/chat/models'
+import { loadModelChoice, modelKey, parseModelKey, parseModels, saveModelChoice } from '@/lib/chat/models'
 
-const response = {
-  providers: [
-    { id: 'rwe-factory-claude', name: 'RWE FACTORY CLAUDE', models: { 'claude-sonnet-5-5-factory': { id: 'claude-sonnet-5-5-factory', name: 'Sonnet 5.5' }, 'claude-opus-5-5-factory': { id: 'claude-opus-5-5-factory', name: 'claude-opus-5-5-factory' } } },
-    { id: 'rwe-factory-gpt', name: 'RWE FACTORY GPT', models: { 'gpt-6-sol-factory': { id: 'gpt-6-sol-factory', name: 'gpt-6-sol-factory' } } },
-  ],
-}
+// GET /api/model of OpenCode 2.x (shortened)
+const response = [
+  { id: 'claude-sonnet-5-5-factory', providerID: 'rwe-factory-claude', name: 'Sonnet 5.5', family: 'claude' },
+  { id: 'claude-opus-5-5-factory', providerID: 'rwe-factory-claude' },
+  { id: 'gpt-6-sol-factory', providerID: 'rwe-factory-gpt', name: 'gpt-6-sol-factory' },
+]
 
-describe('parseProviders', () => {
-  it('flattens providers into selectable models with a provider group', () => {
-    const options = parseProviders(response)
+describe('parseModels', () => {
+  it('turns the models of the server into selectable options grouped by provider', () => {
+    const options = parseModels(response)
     expect(options).toHaveLength(3)
-    expect(options[0]).toEqual({ providerID: 'rwe-factory-claude', modelID: 'claude-opus-5-5-factory', label: 'claude-opus-5-5-factory', provider: 'RWE FACTORY CLAUDE' })
+    expect(options[0]).toEqual({ providerID: 'rwe-factory-claude', modelID: 'claude-opus-5-5-factory', label: 'claude-opus-5-5-factory', provider: 'rwe-factory-claude' })
   })
-  it('sorts by provider, then model, and uses the model name as label', () => {
-    const labels = parseProviders(response).map((o) => o.label)
-    expect(labels).toEqual(['claude-opus-5-5-factory', 'Sonnet 5.5', 'gpt-6-sol-factory'])
+  it('sorts by provider, then label, and uses the model name as label', () => {
+    expect(parseModels(response).map((o) => o.label)).toEqual(['claude-opus-5-5-factory', 'Sonnet 5.5', 'gpt-6-sol-factory'])
   })
   it('survives a malformed answer', () => {
-    expect(parseProviders(undefined)).toEqual([])
-    expect(parseProviders({ providers: [{ id: 'x' }] })).toEqual([])
+    expect(parseModels(undefined)).toEqual([])
+    expect(parseModels([{ id: 'x' }, null])).toEqual([])
   })
 })
 

@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { afterEach } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { SplitLayout } from '@/components/app-shell/SplitLayout'
+import { SHOW_CHAT_EVENT } from '@/lib/chat/chat-context'
 
 function setup(props: Partial<React.ComponentProps<typeof SplitLayout>> = {}) {
   return render(
@@ -95,6 +96,16 @@ describe('SplitLayout', () => {
     expect(chatArea()).toHaveAttribute('data-collapsed', 'true')
     await userEvent.click(screen.getByRole('button', { name: 'Chat' }))
     expect(chatArea()).toHaveAttribute('data-collapsed', 'false')
+  })
+
+  it('shows the chat when a page asks for it (Live Edit "Describe in chat")', async () => {
+    setup()
+    await userEvent.click(screen.getByRole('button', { name: /expand step/i }))
+    act(() => {
+      window.dispatchEvent(new Event(SHOW_CHAT_EVENT))
+    })
+    expect(chatArea()).toHaveAttribute('data-collapsed', 'false')
+    expect(screen.getByText('step content')).toBeInTheDocument()
   })
 
   it('is a no-chat layout when no chat is given', () => {
