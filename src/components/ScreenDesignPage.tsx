@@ -14,8 +14,12 @@ import { LiveEditPanel } from '@/components/live-edit/LiveEditPanel'
 import { useLivePicker } from '@/components/live-edit/useLivePicker'
 import { useProductFonts } from '@/lib/product-fonts'
 import { useLivePreview } from '@/components/live-edit/useLivePreview'
+import { useLiveComments, useOneMode } from '@/components/live-edit/useLiveComments'
+import { CommentButton } from '@/components/live-edit/CommentButton'
 import type { LiveTarget } from '@/lib/live-edit/selection'
 
+/** For useOneMode outside a chat, where neither mode exists */
+const noMode = () => {}
 const MIN_WIDTH = 320
 const DEFAULT_WIDTH_PERCENT = 100
 
@@ -31,6 +35,8 @@ export function ScreenDesignPage() {
     [sectionId, screenDesignName],
   )
   const live = useLivePreview(iframeRef, target)
+  const comments = useLiveComments(iframeRef, target)
+  useOneMode(live?.picking ?? false, live?.setPicking ?? noMode, comments?.commenting ?? false, comments?.setCommenting ?? noMode)
 
   // Load product data to get section title
   const productData = useMemo(() => loadProductData(), [])
@@ -141,6 +147,15 @@ export function ScreenDesignPage() {
               </button>
             </div>
             {live && <PickButton active={live.picking} onToggle={() => live.setPicking(!live.picking)} />}
+            {comments && (
+              <CommentButton
+                active={comments.commenting}
+                onToggle={() => comments.setCommenting(!comments.commenting)}
+                open={comments.open}
+                showResolved={comments.showResolved}
+                onShowResolved={comments.setShowResolved}
+              />
+            )}
             <span className="text-xs text-stone-500 dark:text-rwe-neutral-400 font-mono w-10 text-right">
               {Math.round(widthPercent)}%
             </span>

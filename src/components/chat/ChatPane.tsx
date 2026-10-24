@@ -12,6 +12,7 @@ import {
 import { expandSlashCommand } from '@/lib/harness'
 import { useLiveEdit } from '@/lib/live-edit/live-edit-context'
 import { buildLiveEditMessage, parseLiveEditMessage, selectionLabel, shortSource } from '@/lib/live-edit/selection'
+import { parseCommentMessage } from '@/lib/comments/message'
 import { ACTIVITY_LABEL, useAgentActivity } from '@/lib/chat/activity'
 import { ChatMarkdown } from './ChatMarkdown'
 import { ToolCall } from './ToolCall'
@@ -69,6 +70,24 @@ function UserMessage() {
 function UserText() {
   const text = useAuiState((s) => ('text' in s.part ? (s.part.text as string) : ''))
   const live = parseLiveEditMessage(text)
+  const comment = live ? null : parseCommentMessage(text)
+  if (comment) {
+    return (
+      <>
+        <details className="mb-1.5 text-[12px]">
+          <summary className={`flex cursor-pointer list-none items-center gap-1.5 ${muted}`}>
+            <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-brand-blue-500 text-[10px] font-semibold text-white" aria-hidden>
+              {comment.number}
+            </span>
+            <span className="font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">{comment.element}</span>
+            {comment.command && <span className="font-mono">/impeccable {comment.command}</span>}
+          </summary>
+          <pre className="mt-1.5 max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-rwe-sand-25 p-2 font-mono text-[11px] dark:bg-rwe-neutral-950/60">{comment.context}</pre>
+        </details>
+        {comment.text}
+      </>
+    )
+  }
   if (!live) return <MessagePartPrimitive.Text />
   return (
     <>

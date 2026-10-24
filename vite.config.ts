@@ -14,6 +14,10 @@ import reactDevtoolsHook from './scripts/react-devtools-hook.mjs'
 import componentProps from './scripts/component-props.mjs'
 // @ts-expect-error plain ESM script, tested in tests/live-edit-writer.test.ts
 import liveEditWriter from './scripts/live-edit-writer.mjs'
+// @ts-expect-error plain ESM script, tested in tests/comments-store.test.ts
+import commentsStore from './scripts/comments-store.mjs'
+// @ts-expect-error plain ESM script, tested in tests/impeccable-context.test.ts
+import { impeccableContext } from './scripts/impeccable-context.mjs'
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
@@ -29,6 +33,10 @@ export default defineConfig(({ command }) => ({
     componentProps(),
     // Live Edit: writes prop edits from the inspector into the JSX at the call site
     liveEditWriter(),
+    // Comments: numbered comments on the preview, stored in wiki/comments/
+    commentsStore(),
+    // impeccable reads PRODUCT.md and DESIGN.md through .agents/context/ (npm run impeccable:context)
+    impeccableContext(),
     // Starts OpenCode for this checkout and proxies /opencode to it (env switches: see the script)
     opencodeServePlugin(),
   ],

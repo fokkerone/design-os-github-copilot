@@ -8,7 +8,7 @@ import type { FromPreview, PickedElement, TreeNode } from './protocol'
 
 const SOURCE_ATTR = 'data-dos-src'
 const COMPONENT_ATTR = 'data-dos-comp'
-const OVERLAY_ATTR = 'data-dos-overlay'
+export const OVERLAY_ATTR = 'data-dos-overlay'
 const MAX_HTML = 1500
 const MAX_TEXT = 200
 const ACCENT = '#2563eb'
@@ -63,7 +63,7 @@ export function pickable(target: EventTarget | null): HTMLElement | null {
 }
 
 /** The elements rendered from one source location, in document order */
-function withSource(doc: Document, src: string): HTMLElement[] {
+export function withSource(doc: Document, src: string): HTMLElement[] {
   return [...doc.querySelectorAll<HTMLElement>(`[${SOURCE_ATTR}]`)].filter((el) => el.getAttribute(SOURCE_ATTR) === src)
 }
 

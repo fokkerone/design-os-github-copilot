@@ -33,3 +33,11 @@ agents/**/dist/
 # Playwright
 test-results/
 playwright-report/
+
+# impeccable: engine binaries are downloaded by the launcher; the context links and the config are
+# written by npm run impeccable:context (also on npm run dev); runs are local
+.claude/skills/impeccable/scripts/bin/
+.github/skills/impeccable/scripts/bin/
+.opencode/skills/impeccable/scripts/bin/
+.agents/context/
+.impeccable/

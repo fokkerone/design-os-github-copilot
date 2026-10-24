@@ -30,7 +30,7 @@ No mode given → ask which one.
 
 ## Safety Rules
 
-- **Never delete** `wiki/raw/`, `wiki/.obsidian/`, `wiki/_archives/`, `wiki/_templates/`, `wiki/how-to/` (system domain, shipped with the repo), or `wiki/log.md` (append-only).
+- **Never delete** `wiki/raw/`, `wiki/.obsidian/`, `wiki/_archives/`, `wiki/_templates/`, `wiki/how-to/` (system domain, shipped with the repo), `wiki/comments/` (system domain, the user's comments), or `wiki/log.md` (append-only).
 - **Always archive** before rebuild or restore.
 - **Always confirm** destructive steps: print exactly what will be deleted/overwritten and wait for an explicit yes.
 
@@ -56,7 +56,7 @@ No mode given → ask which one.
 
 After archiving and confirmation:
 
-1. **Clear** compiled content: all domain folders and `.md` files in `wiki/` except `log.md`, plus `_manifest.json`, `_lint-report.md`, `_insights.md`. Keep `_meta/taxonomy.md` (vocabulary is still valid), `_templates/`, `how-to/`, `raw/`, `.obsidian/`, `_archives/`.
+1. **Clear** compiled content: all domain folders and `.md` files in `wiki/` except `log.md`, plus `_manifest.json`, `_lint-report.md`, `_insights.md`. Keep `_meta/taxonomy.md` (vocabulary is still valid), `_templates/`, `how-to/`, `comments/`, `raw/`, `.obsidian/`, `_archives/`.
 2. **Re-initialize:** fresh `wiki/Home.md` (same template as the initial vault, including the How To section), `_manifest.json` → `{"sources": []}`.
 3. **Recompile, one source at a time,** with the `designos-wiki-ingest` process, in planning-flow order so later artifacts build on earlier ones:
    1. `product/product-overview.md`

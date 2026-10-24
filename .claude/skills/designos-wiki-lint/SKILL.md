@@ -28,7 +28,7 @@ Also read `wiki/_manifest.json`, `wiki/_meta/taxonomy.md`, `wiki/log.md`.
 
 | # | Check | Severity | Detection |
 |---|-------|----------|-----------|
-| a | **Orphaned pages** | warning | No inbound `[[wikilink]]`. `Home.md` files, `log.md`, `_lint-report.md`, `_insights.md` and `how-to/` pages are exempt. |
+| a | **Orphaned pages** | warning | No inbound `[[wikilink]]`. `Home.md` files, `log.md`, `_lint-report.md`, `_insights.md`, `how-to/` and `comments/` pages are exempt. |
 | b | **Broken wikilinks** | critical | `[[target]]` resolves to no `.md` in the vault (match by path or by file name, as Obsidian does). |
 | c | **Missing cross-links** | warning | Prose mentions another page's title/alias without linking it. |
 | d | **Contradictions** | critical | Pages with overlapping tags/domains asserting opposite things about the same decision, entity, token, or flow, without a `Status: Disputed` block. Flag for human review; never auto-resolve. |

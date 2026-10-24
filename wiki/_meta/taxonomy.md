@@ -19,7 +19,7 @@ Domains are concern-centric, not source-centric. A page's domain describes *what
 
 | Domain | Folder | What goes here | Typical source |
 |--------|--------|----------------|----------------|
-| `product` | `product/` | Vision, target users, problems & solutions, value proposition, key features | `product/product-overview.md` |
+| `product` | `product/` | Vision, target users, problems & solutions, value proposition, key features; `PRODUCT.md`, the product truth for impeccable (template `_templates/impeccable-product.md`) | `product/product-overview.md`, personas, tech stack, flows |
 | `roadmap` | `roadmap/` | Sections, scope, sequencing, in/out decisions | `product/product-roadmap.md` |
 | `data` | `data/` | Entities, relationships, shared vocabulary | `product/data-shape/data-shape.md` |
 | `techstack` | `techstack/` | Tech stack of the prototype and the export: UI library, icons, registries and reference repos, packages, app patterns, tooling, target framework | `product/techstack/techstack.md` |
@@ -39,6 +39,7 @@ Domains are concern-centric, not source-centric. A page's domain describes *what
 | Domain | Folder | What goes here | Maintained by |
 |--------|--------|----------------|---------------|
 | `how-to` | `how-to/` | Step-by-step guides for Design OS, the wiki, user flows and personas. Shipped with the repository. | Maintainers only. Never routed to by ingest or capture, never cleared by rebuild, exempt from orphan, source and pending checks. |
+| `comments` | `comments/` | Numbered comments on screen designs and the shell (Comment mode): one page per section, each comment with element anchor, impeccable command and status | Design OS (`scripts/comments-store.mjs`) and `/design-os:comment`. Never routed to by ingest or capture, never cleared by rebuild, exempt from orphan, source and pending checks. |
 
 ### Routing Rules
 

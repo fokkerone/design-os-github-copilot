@@ -12,6 +12,8 @@ updated: 2026-10-23
 ## Summary
 Live Edit changes a screen design or the shell from the preview, the way v0 does: point at an element, say what should change, and the agent edits the source next to the chat. The preview updates through HMR as soon as the file is saved.
 
+For feedback that should wait or follow an impeccable command (polish, audit, harden ...), leave a numbered **Comment** instead: [[how-to/comments]].
+
 ## How to use it
 
 1. Open a screen design (Prototype › Sections › a screen) or the shell (Prototype › Shell).

@@ -19,6 +19,8 @@ export interface LiveEditContextValue {
   apply: () => void
   /** Sends edits the inspector already wrote to the source, for the agent to record in the wiki */
   record: (edits: LiveEdit[]) => void
+  /** Sends a ready message (a comment) to the agent as it is */
+  sendMessage: (text: string) => void
 }
 
 /** null outside a ChatProvider: the previews then offer no picker */

@@ -147,6 +147,12 @@ Design concrete user flows with the REFINE and CARE frameworks, chain-of-thought
 ### Live Edit (any time after a screen design or the shell exists)
 
 Change a screen design or the shell from the preview, like v0: **Select element** (`V`) in the preview toolbar, click an element (or pick an exact React component in the **Layers** tab, a component tree like the React DevTools; components carry their call site as `data-dos-call`, and their props and `cva()` variants can be changed live), optionally tweak it in the inspector (design tokens only, preview without writing), then either send the tweaks with **Apply with agent** or describe the change in the chat. The message carries the element's source location (`data-dos-src`, added in dev by `scripts/babel-source-attr.mjs` to `src/sections`, `src/shell`, `src/ui`), component path, classes and HTML in a fenced `live-edit` block. The agent follows `.claude/commands/design-os/live-edit.md`: asks 1–3 questions (scope, tokens, conflicts), edits the source (HMR updates the preview), then captures the change and ingests it into `wiki/design-changes/<section-id>.md`.
+
+### Comments and impeccable (any time after a screen design or the shell exists)
+
+**Comment** (`C`) in the preview toolbar works like v0's annotations: a click drops a numbered pin on the element, the user writes the comment and picks an [impeccable](https://impeccable.style) command (**Improve**: polish, layout, typeset, colorize, bolder, quieter, distill, clarify, adapt, animate, delight, onboard · **Check**: critique, audit · **Maintain**: harden, optimize, extract; `src/lib/comments/commands.ts`). Comments are stored in the wiki, one page per section (`wiki/comments/<section-id>.md`, `shell.md`; format `src/lib/comments/format.ts`, written by the dev endpoint `scripts/comments-store.mjs`), status `open` → `sent` → `resolved`; a number is never reused. A pin opens its comment (edit, **Send to chat**, delete); one comment goes to the chat per message, as a fenced `design-comment` block. The agent follows `.claude/commands/design-os/comment.md`: runs the impeccable command on the element under the Design OS rules (tokens, `src/ui/`, `ui:check`; Check commands change no file), then marks the comment resolved and records the change in `wiki/design-changes/`.
+
+impeccable is installed per project for Claude Code, Copilot and OpenCode (`.claude/skills/impeccable`, `.github/skills/impeccable`, `.opencode/skills/impeccable`; engine binaries are downloaded on first use and not committed). It reads the Design OS context through `.agents/context/`: `npm run impeccable:context` (also run by `npm run dev`) links `DESIGN.md` to `product/design-system/DESIGN.md` and `PRODUCT.md` to `wiki/product/PRODUCT.md`, the product truth compiled by `/design-os:wiki-ingest --product`. Never run `/impeccable init`, `document`, `shape`, `craft`, `live`, `generate` or `hooks` in Design OS: the planning steps own those files.
 **Output:** edited source in `src/sections/` or `src/shell/`, `wiki/design-changes/`
 
 ### 8. Clickdummy
@@ -199,6 +205,7 @@ The chat is [assistant-ui](https://www.assistant-ui.com/) on its external store 
 | `/design-os:wiki-rebuild` | Archive, rebuild, restore |
 | `/design-os:userflow` | Design a user flow, then ingest it into `wiki/flows/` |
 | `/design-os:live-edit` | Apply a change to a picked element, then record it in `wiki/design-changes/` |
+| `/design-os:comment` | Work on one numbered comment with its impeccable command, then resolve it in `wiki/comments/` |
 | `/design-os:persona` | Create or validate a persona, then ingest it into `wiki/personas/` |
 
 ### Personas and user flows as shared context

@@ -119,9 +119,16 @@ export function LiveEditProvider({ children }: { children: ReactNode }) {
     },
     [aui, selection],
   )
+  const sendMessage = useCallback(
+    (text: string) => {
+      window.dispatchEvent(new Event(SHOW_CHAT_EVENT))
+      aui.thread().append(text)
+    },
+    [aui],
+  )
   const value = useMemo(
-    () => ({ selection, sent, select, setEdits, markSent, focusComposer, apply, record }),
-    [selection, sent, select, setEdits, markSent, focusComposer, apply, record],
+    () => ({ selection, sent, select, setEdits, markSent, focusComposer, apply, record, sendMessage }),
+    [selection, sent, select, setEdits, markSent, focusComposer, apply, record, sendMessage],
   )
   return <LiveEditContext.Provider value={value}>{children}</LiveEditContext.Provider>
 }
