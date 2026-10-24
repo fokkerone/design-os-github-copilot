@@ -7,6 +7,7 @@ import { designSystemTabs } from '@/components/tabs'
 import { paths } from '@/lib/paths'
 import { Inspector, PickButton } from '@/components/live-edit/Inspector'
 import { useLivePicker } from '@/components/live-edit/useLivePicker'
+import { useProductFonts } from '@/lib/product-fonts'
 import { useLivePreview } from '@/components/live-edit/useLivePreview'
 import type { LiveTarget } from '@/lib/live-edit/selection'
 import React from 'react'
@@ -132,47 +133,50 @@ export function ShellDesignPage() {
         </div>
       </header>
 
-      {/* Preview area with resizable container */}
-      <div
-        ref={containerRef}
-        className="relative flex-1 overflow-hidden flex items-stretch justify-center p-6"
-      >
-        {/* Left resize handle */}
+      {/* Preview and, while an element is picked, the Live Edit inspector */}
+      <div className="flex min-h-0 flex-1">
+        {/* Preview area with resizable container */}
         <div
-          className="w-4 flex items-center justify-center cursor-ew-resize group shrink-0"
-          onMouseDown={handleMouseDown}
+          ref={containerRef}
+          className="relative flex min-w-0 flex-1 items-stretch justify-center overflow-hidden p-6"
         >
-          <div className="w-1 h-16 rounded-full bg-stone-300 dark:bg-rwe-neutral-600 group-hover:bg-stone-400 dark:group-hover:bg-rwe-neutral-500 transition-colors flex items-center justify-center">
-            <GripVertical className="w-3 h-3 text-stone-500 dark:text-rwe-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
+          {/* Left resize handle */}
+          <div
+            className="w-4 flex items-center justify-center cursor-ew-resize group shrink-0"
+            onMouseDown={handleMouseDown}
+          >
+            <div className="w-1 h-16 rounded-full bg-stone-300 dark:bg-rwe-neutral-600 group-hover:bg-stone-400 dark:group-hover:bg-rwe-neutral-500 transition-colors flex items-center justify-center">
+              <GripVertical className="w-3 h-3 text-stone-500 dark:text-rwe-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
+            </div>
+          </div>
+
+          {/* Preview container using iframe for true isolation */}
+          <div
+            className="bg-rwe-sand-25 dark:bg-rwe-neutral-950 rounded-lg shadow-xl border border-stone-200 dark:border-rwe-neutral-700 overflow-hidden"
+            style={{ width: previewWidth, minWidth: MIN_WIDTH, maxWidth: '100%' }}
+          >
+            <iframe
+              ref={iframeRef}
+              src={paths.shellFullscreen}
+              className="w-full h-full border-0"
+              title="Shell Preview"
+            />
+          </div>
+
+          {/* Right resize handle */}
+          <div
+            className="w-4 flex items-center justify-center cursor-ew-resize group shrink-0"
+            onMouseDown={handleMouseDown}
+          >
+            <div className="w-1 h-16 rounded-full bg-stone-300 dark:bg-rwe-neutral-600 group-hover:bg-stone-400 dark:group-hover:bg-rwe-neutral-500 transition-colors flex items-center justify-center">
+              <GripVertical className="w-3 h-3 text-stone-500 dark:text-rwe-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
+            </div>
           </div>
         </div>
 
-        {/* Preview container using iframe for true isolation */}
-        <div
-          className="bg-rwe-sand-25 dark:bg-rwe-neutral-950 rounded-lg shadow-xl border border-stone-200 dark:border-rwe-neutral-700 overflow-hidden"
-          style={{ width: previewWidth, minWidth: MIN_WIDTH, maxWidth: '100%' }}
-        >
-          <iframe
-            ref={iframeRef}
-            src={paths.shellFullscreen}
-            className="w-full h-full border-0"
-            title="Shell Preview"
-          />
-        </div>
-
-        {/* Right resize handle */}
-        <div
-          className="w-4 flex items-center justify-center cursor-ew-resize group shrink-0"
-          onMouseDown={handleMouseDown}
-        >
-          <div className="w-1 h-16 rounded-full bg-stone-300 dark:bg-rwe-neutral-600 group-hover:bg-stone-400 dark:group-hover:bg-rwe-neutral-500 transition-colors flex items-center justify-center">
-            <GripVertical className="w-3 h-3 text-stone-500 dark:text-rwe-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
-          </div>
-        </div>
-
-        {/* Live Edit: the inspector floats over the preview, like the element it edits */}
+        {/* Live Edit: the inspector sits next to the preview, so the resize handles stay free */}
         {live?.selection && (
-          <div className="absolute inset-y-6 right-6 z-10">
+          <div className="flex shrink-0 py-6 pr-4">
             <Inspector
               key={live.selection.element.src}
               selection={live.selection}
@@ -210,6 +214,8 @@ export function ShellDesignFullscreen() {
 
   // Live Edit: the picker, when the preview is embedded in a step page
   useLivePicker()
+  // The product's fonts, which the prototype does not load otherwise
+  useProductFonts()
 
   // Sync theme with parent window
   useEffect(() => {

@@ -95,6 +95,7 @@ export function describe(el: HTMLElement): PickedElement {
     classes: [...el.classList],
     text: shorten((el.textContent ?? '').replace(/\s+/g, ' ').trim(), MAX_TEXT),
     textOnly: el.children.length === 0 && (el.textContent ?? '').trim().length > 0,
+    dark: el.ownerDocument.documentElement.classList.contains('dark'),
     html: shorten(clone.outerHTML, MAX_HTML),
     styles,
   }

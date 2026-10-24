@@ -1,7 +1,10 @@
 import { defineConfig } from 'vitest/config'
 import path from 'path'
+// @ts-expect-error plain ESM script
+import tailwindTheme from './scripts/tailwind-theme.mjs'
 
 export default defineConfig({
+  plugins: [tailwindTheme()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

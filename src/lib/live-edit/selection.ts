@@ -18,8 +18,10 @@ export interface LiveEdit {
   to: string
   /** The CSS the preview shows meanwhile, e.g. { "font-size": "3.75rem" } */
   css: Record<string, string>
-  /** Semantic role of a color, e.g. "primary": the agent marks it with a token comment */
-  role?: string
+  /** Token the class stands for, e.g. "primary" or "radius-md": the agent names it in a `token:` comment */
+  token?: string
+  /** The `dark:` class swap that goes with it (semantic colors, shadows) */
+  dark?: { from: string | null; to: string }
 }
 
 export interface LiveSelection {
@@ -62,12 +64,15 @@ export function serializeSelection(selection: LiveSelection): string {
     lines.push('edits:')
     for (const edit of edits) {
       const css = Object.entries(edit.css).map(([k, v]) => `${k}: ${v}`).join('; ')
+      const raw = /\[.+\]/.test(edit.to)
       const notes = [
-        edit.role && `token: ${edit.role}`,
-        /\[.+\]$/.test(edit.to) && 'not a token',
+        edit.token && `token: ${edit.token}`,
+        edit.token && raw && 'exact value',
+        !edit.token && raw && 'not a token',
         css && `preview ${css}`,
       ].filter(Boolean)
-      lines.push(`  - ${edit.property}: ${q(edit.from ?? '(none)')} -> ${q(edit.to)}${notes.length ? `  # ${notes.join('; ')}` : ''}`)
+      const dark = edit.dark ? `; dark ${q(edit.dark.from ?? '(none)')} -> ${q(edit.dark.to)}` : ''
+      lines.push(`  - ${edit.property}: ${q(edit.from ?? '(none)')} -> ${q(edit.to)}${dark}${notes.length ? `  # ${notes.join('; ')}` : ''}`)
     }
   }
   lines.push('html: |', ...unfence(element.html).split('\n').map((l) => `  ${l}`))

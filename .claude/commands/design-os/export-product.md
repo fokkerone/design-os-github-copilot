@@ -204,7 +204,7 @@ Copy from `src/shell/components/` to `product-plan/shell/components/`:
 
 If `src/ui/` exists, copy it to `product-plan/ui/` (`utils.ts` and every primitive):
 - Keep the relative imports: `../../ui/...` from shell components and `../../../ui/...` from section components resolve the same way in `product-plan/`
-- Map palette steps back to semantic utilities using `tokens.css` and the `// token: role` comments (`bg-teal-600` with `// token: primary` → `bg-primary`, `text-zinc-500` with `// token: muted-foreground` → `text-muted-foreground`, and so on), as for the shell and section components. Run `npm run tokens:check` first, as in Step 4b. Without `tokens.css`, keep the palette steps
+- Map token classes back to semantic utilities using `tokens.css` and the `// token: <name>` comments: palette steps (`bg-teal-600` with `// token: primary` → `bg-primary`, `text-zinc-500` with `// token: muted-foreground` → `text-muted-foreground`) and exact values (`bg-[oklch(65.03%_0.11008_192.46)] dark:bg-[oklch(80.08%_0.13033_181.21)]` with `token: primary` → `bg-primary`, drop the `dark:` pair since `.dark` switches it; `rounded-[0.25rem]` with `token: radius-md` → `rounded-md`), and so on, as for the shell and section components. Run `npm run tokens:check` first, as in Step 4b. Without `tokens.css`, keep the palette steps
 - Remove Design OS-specific imports. Nothing may import `@/components/*`
 - Do not copy `src/components/ui/`: that is Design OS UI, not the product's
 

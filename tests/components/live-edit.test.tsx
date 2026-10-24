@@ -12,6 +12,34 @@ import { useLiveEdit } from '@/lib/live-edit/live-edit-context'
 import type { FromPreview } from '@/lib/live-edit/protocol'
 import { APPLY_EDITS_REQUEST, type LiveSelection } from '@/lib/live-edit/selection'
 
+// The inspector reads the token model; tests choose it (null: the stone/lime fallback)
+const tokenModel = vi.hoisted(() => ({ current: null as unknown }))
+vi.mock('@/lib/design-tokens-loader', () => ({ loadDesignTokens: () => tokenModel.current }))
+
+const value = (oklch: string) => ({ hex: '', oklch, alpha: 1 })
+const voltaTokens = {
+  color: {
+    palettes: [{ name: 'stone', steps: [{ step: '900', value: value('oklch(21.6% 0.006 56.043)') }] }],
+    semantic: [{ name: 'primary', light: value('oklch(65.03% 0.11008 192.46)'), dark: value('oklch(80.08% 0.13033 181.21)') }],
+    custom: [],
+    alpha: [],
+    gradients: [],
+  },
+  typography: {
+    fontFamilies: [],
+    fontSizes: [{ name: 'xs', px: 12, rem: '0.75rem', lineHeight: { px: 16, rem: '1rem' } }],
+    fontWeights: [{ name: 'bold', value: 700 }],
+    textStyles: [{ name: 'xs-bold', label: 'Tailwind/XS/Bold', family: 'Inter', weight: 'Bold', weightValue: 700, sizePx: 12, lineHeightPx: 16, tracking: '0%', utilities: 'text-xs font-bold' }],
+  },
+  spacing: { scale: [] },
+  sizing: [],
+  radius: [],
+  opacity: [],
+  shadows: [],
+  effects: [],
+  layout: [],
+}
+
 const selection: LiveSelection = {
   target: { kind: 'screen', sectionId: 'landing', screenDesignName: 'LandingPage' },
   element: {
@@ -219,6 +247,38 @@ describe('chat with a picked element', () => {
 
 describe('inspector', () => {
   const props = { onClose: () => {}, onAddToChat: () => {}, onApply: () => {} }
+  afterEach(() => {
+    tokenModel.current = null
+  })
+
+  it('offers the roles of the design system and previews the dark value in a dark preview', async () => {
+    tokenModel.current = voltaTokens
+    const onChange = vi.fn()
+    render(<Inspector selection={{ ...selection, element: { ...selection.element, dark: true } }} onChange={onChange} {...props} />)
+    await userEvent.click(screen.getByRole('button', { name: /^Background color:/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'primary' }))
+    expect(onChange.mock.calls.at(-1)![0]).toEqual([
+      {
+        property: 'background-color',
+        from: null,
+        to: 'bg-[oklch(65.03%_0.11008_192.46)]',
+        css: { 'background-color': 'oklch(80.08% 0.13033 181.21)' },
+        token: 'primary',
+        dark: { from: null, to: 'dark:bg-[oklch(80.08%_0.13033_181.21)]' },
+      },
+    ])
+  })
+
+  it('sets size, weight and line height at once with a text style', async () => {
+    tokenModel.current = voltaTokens
+    const onChange = vi.fn()
+    render(<Inspector selection={selection} onChange={onChange} {...props} />)
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Text style' }), 'text-xs font-bold leading-4')
+    expect(onChange.mock.calls.at(-1)![0]).toEqual([
+      expect.objectContaining({ property: 'text-style', to: 'text-xs font-bold leading-4', token: 'xs-bold', css: { 'font-size': '0.75rem', 'font-weight': '700', 'line-height': '1rem' } }),
+    ])
+  })
+
 
   it('steps a scale with the arrow keys into a class swap with its preview css, and undoes it', async () => {
     const onChange = vi.fn()

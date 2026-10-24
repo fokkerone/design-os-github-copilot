@@ -22,6 +22,7 @@ import {
 import { loadDesignTokens } from '@/lib/design-tokens-loader'
 import {
   currentClass,
+  currentDarkClass,
   inspectorGroups,
   isArbitrary,
   optionFromInput,
@@ -34,9 +35,9 @@ import { shortSource, type LiveEdit, type LiveSelection } from '@/lib/live-edit/
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
 const muted = 'text-stone-500 dark:text-rwe-neutral-400'
 const surface = 'bg-rwe-sand-100 dark:bg-rwe-neutral-900'
-const field = `w-full rounded-md ${surface} px-2.5 py-1.5 text-[13px] text-rwe-neutral-900 dark:text-rwe-neutral-100 ${focusRing}`
-const iconButton = `flex size-7 items-center justify-center rounded-md ${muted} hover:bg-stone-100 hover:text-rwe-neutral-900 disabled:opacity-40 disabled:hover:bg-transparent dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-100 ${focusRing}`
-const primaryButton = `flex items-center gap-1.5 rounded-md bg-brand-blue-500 px-2.5 py-1.5 text-[12px] font-medium text-white hover:bg-brand-blue-600 dark:bg-energy-green-500 dark:text-brand-blue-900 dark:hover:bg-energy-green-400 ${focusRing}`
+const field = `w-full rounded-md ${surface} px-2 py-1 text-[12px] text-rwe-neutral-900 dark:text-rwe-neutral-100 ${focusRing}`
+const iconButton = `flex size-6 items-center justify-center rounded-md ${muted} hover:bg-stone-100 hover:text-rwe-neutral-900 disabled:opacity-40 disabled:hover:bg-transparent dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-100 ${focusRing}`
+const primaryButton = `flex items-center gap-1.5 rounded-md bg-brand-blue-500 px-2 py-1 text-[11px] font-medium text-white hover:bg-brand-blue-600 dark:bg-energy-green-500 dark:text-brand-blue-900 dark:hover:bg-energy-green-400 ${focusRing}`
 // Transparent colors show a checkerboard behind the swatch
 const checker = 'repeating-conic-gradient(#d6d3d1 0% 25%, #ffffff 0% 50%) 50% / 8px 8px'
 
@@ -45,6 +46,8 @@ interface PropertyState {
   property: InspectorProperty
   /** The class in the source, null when none sets it */
   from: string | null
+  /** The `dark:` class in the source (colors) */
+  darkFrom: string | null
   /** The class now: the edit, else the source class */
   current: string | null
   option: InspectorOption | undefined
@@ -98,24 +101,31 @@ export function Inspector({
 
   const stateOf = (property: InspectorProperty): PropertyState => {
     const from = currentClass(property, element.classes)
+    const darkFrom = currentDarkClass(property, element.classes)
     const edit = edits.find((e) => e.property === property.property)
     const current = edit?.to ?? from
-    return {
-      property,
-      from,
-      current,
-      option: property.options.find((o) => o.className === current),
-      computed: round(element.styles[property.property] ?? ''),
-      edited: !!edit,
-    }
+    // Several options can share a class (a role that is a palette step): the edit's token, else the
+    // option whose dark class the element has, else the plain one decides
+    const matches = property.options.filter((o) => o.className === current)
+    const option = edit
+      ? (matches.find((o) => o.token === edit.token) ?? matches[0])
+      : (matches.find((o) => o.dark && o.dark === darkFrom) ?? matches.find((o) => !o.dark && !o.token) ?? matches[0])
+    return { property, from, darkFrom, current, option, computed: round(element.styles[property.property] ?? ''), edited: !!edit }
   }
-  const choose = (state: PropertyState, option: InspectorOption | null) =>
-    setEdit(
-      state.property.property,
-      !option || option.className === state.from
-        ? null
-        : { property: state.property.property, from: state.from, to: option.className, css: option.css, ...(option.role && { role: option.role }) },
-    )
+  const choose = (state: PropertyState, option: InspectorOption | null) => {
+    const { property, from, darkFrom } = state
+    const same = option && option.className === from && (option.dark ?? null) === (option.dark ? darkFrom : null)
+    if (!option || same) return setEdit(property.property, null)
+    setEdit(property.property, {
+      property: property.property,
+      from,
+      to: option.className,
+      // The preview shows what the element shows: the dark value in a dark preview
+      css: element.dark && option.darkCss ? option.darkCss : option.css,
+      ...(option.token && { token: option.token }),
+      ...(option.dark && { dark: { from: darkFrom, to: option.dark } }),
+    })
+  }
 
   const contentEdit = edits.find((e) => e.property === 'content')
   const controls = { stateOf, choose }
@@ -123,20 +133,20 @@ export function Inspector({
   return (
     <aside
       aria-label="Inspector"
-      className="flex h-full w-[296px] shrink-0 flex-col overflow-hidden rounded-lg border border-stone-200 bg-rwe-sand-25 shadow-xl dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950"
+      className="flex h-full w-[248px] shrink-0 flex-col overflow-hidden rounded-lg border border-stone-200 bg-rwe-sand-25 shadow-xl dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950"
     >
-      <header className="flex items-center gap-2 border-b border-stone-200 px-3 py-2 dark:border-rwe-neutral-800">
-        <MousePointerClick className="size-4 shrink-0 text-brand-blue-500 dark:text-energy-green-500" strokeWidth={1.5} />
+      <header className="flex items-center gap-2 border-b border-stone-200 px-2.5 py-1.5 dark:border-rwe-neutral-800">
+        <MousePointerClick className="size-3.5 shrink-0 text-brand-blue-500 dark:text-energy-green-500" strokeWidth={1.5} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">
+          <p className="truncate text-[12px] font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">
             {element.componentPath.join(' › ') || 'Element'} <span className={muted}>· {element.tag}</span>
           </p>
-          <p className={`truncate font-mono text-[11px] ${muted}`} title={element.src}>
+          <p className={`truncate font-mono text-[10px] ${muted}`} title={element.src}>
             {shortSource(element.src)}
           </p>
         </div>
         <button type="button" aria-label="Close inspector" onClick={onClose} className={iconButton}>
-          <X className="size-4" strokeWidth={1.5} />
+          <X className="size-3.5" strokeWidth={1.5} />
         </button>
       </header>
 
@@ -158,33 +168,33 @@ export function Inspector({
           <GroupSection key={group.id} group={group} {...controls} guides={guides} onGuidesChange={onGuidesChange} classes={element.classes} />
         ))}
         <Section title="Classes">
-          <p className={`break-words font-mono text-[11px] ${muted}`}>{element.classes.join(' ') || '—'}</p>
+          <p className={`break-words font-mono text-[10px] ${muted}`}>{element.classes.join(' ') || '—'}</p>
         </Section>
       </div>
 
-      <footer className="flex items-center gap-1 border-t border-stone-200 px-3 py-2 dark:border-rwe-neutral-800">
+      <footer className="flex items-center gap-1 border-t border-stone-200 px-2.5 py-1.5 dark:border-rwe-neutral-800">
         <button type="button" aria-label="Undo" disabled={index === 0} onClick={() => step(index - 1)} className={iconButton}>
-          <Undo2 className="size-4" strokeWidth={1.5} />
+          <Undo2 className="size-3.5" strokeWidth={1.5} />
         </button>
         <button type="button" aria-label="Redo" disabled={index >= history.length - 1} onClick={() => step(index + 1)} className={iconButton}>
-          <Redo2 className="size-4" strokeWidth={1.5} />
+          <Redo2 className="size-3.5" strokeWidth={1.5} />
         </button>
         <button type="button" aria-label="Reset edits" disabled={edits.length === 0} onClick={() => commit([])} className={iconButton}>
-          <RotateCcw className="size-4" strokeWidth={1.5} />
+          <RotateCcw className="size-3.5" strokeWidth={1.5} />
         </button>
         {edits.length > 0 ? (
           <>
             <button type="button" aria-label="Describe in chat" title="Describe in chat" onClick={onAddToChat} className={`ml-auto ${iconButton}`}>
-              <MessageSquarePlus className="size-4" strokeWidth={1.5} />
+              <MessageSquarePlus className="size-3.5" strokeWidth={1.5} />
             </button>
             <button type="button" onClick={onApply} className={primaryButton}>
-              <Sparkles className="size-3.5" strokeWidth={1.75} />
+              <Sparkles className="size-3" strokeWidth={1.75} />
               Apply with agent
             </button>
           </>
         ) : (
           <button type="button" onClick={onAddToChat} className={`ml-auto ${primaryButton}`}>
-            <MessageSquarePlus className="size-3.5" strokeWidth={1.75} />
+            <MessageSquarePlus className="size-3" strokeWidth={1.75} />
             Describe in chat
           </button>
         )}
@@ -212,7 +222,9 @@ function GroupSection({
   const corners = byProperty(group, 'border-').filter((p) => p.property !== 'border-radius')
   // Single corners open by themselves when the element already rounds them one by one
   const [splitCorners, setSplitCorners] = useState(() => corners.some((p) => currentClass(p, classes)))
-  const render = (property: InspectorProperty) => <Field key={property.property} state={stateOf(property)} choose={choose} />
+  // A property without tokens (no blur effects in the design system) is left out
+  const render = (property: InspectorProperty) =>
+    property.options.length > 0 && <Field key={property.property} state={stateOf(property)} choose={choose} />
 
   if (group.id === 'layout') {
     const single = group.properties.filter((p) => !/^(margin|padding)-/.test(p.property))
@@ -221,12 +233,12 @@ function GroupSection({
         title={group.title}
         action={
           onGuidesChange && (
-            <label className={`flex items-center gap-1.5 text-[12px] ${muted}`}>
+            <label className={`flex items-center gap-1 text-[10px] ${muted}`}>
               <input
                 type="checkbox"
                 checked={guides}
                 onChange={(e) => onGuidesChange(e.target.checked)}
-                className="size-3.5 accent-brand-blue-500 dark:accent-energy-green-500"
+                className="size-3 accent-brand-blue-500 dark:accent-energy-green-500"
               />
               Show paddings and margins
             </label>
@@ -256,15 +268,16 @@ function GroupSection({
               aria-pressed={splitCorners}
               title="Individual corners"
               onClick={() => setSplitCorners(!splitCorners)}
-              className={`flex size-[34px] shrink-0 items-center justify-center rounded-md border border-stone-200 dark:border-rwe-neutral-800 ${
+              className={`flex size-[26px] shrink-0 items-center justify-center rounded-md border border-stone-200 dark:border-rwe-neutral-800 ${
                 splitCorners ? 'bg-stone-100 text-rwe-neutral-900 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-100' : muted
               } ${focusRing}`}
             >
-              <Scan className="size-4" strokeWidth={1.5} />
+              <Scan className="size-3.5" strokeWidth={1.5} />
             </button>
           }
         />
         {splitCorners && <Pairs>{corners.map(render)}</Pairs>}
+        {group.properties.filter((p) => p.property.endsWith('filter')).map(render)}
       </Section>
     )
   }
@@ -286,11 +299,11 @@ function Field({ state, choose, aside }: { state: PropertyState; choose: Control
     )
   return (
     <div className="min-w-0">
-      <span className={`mb-1.5 flex items-center justify-between text-[12px] ${muted}`}>
+      <span className={`mb-1 flex items-center justify-between text-[11px] ${muted}`}>
         {property.label}
-        {edited && <span className="font-mono text-[11px] text-brand-blue-500 dark:text-energy-green-500">edited</span>}
+        {edited && <span className="font-mono text-[10px] text-brand-blue-500 dark:text-energy-green-500">edited</span>}
       </span>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <div className="min-w-0 flex-1">{control}</div>
         {aside}
       </div>
@@ -329,7 +342,7 @@ function ScrubField({ state, choose }: { state: PropertyState; choose: Controls[
   }
 
   return (
-    <div className={`flex items-center gap-2 rounded-md ${surface} py-1 pl-1 pr-2.5`}>
+    <div className={`flex items-center gap-2 rounded-md ${surface} py-0.5 pl-0.5 pr-2`}>
       <span
         role="slider"
         tabIndex={-1}
@@ -348,10 +361,10 @@ function ScrubField({ state, choose }: { state: PropertyState; choose: Controls[
           if (options[next].className !== current) stepTo(next)
         }}
         onPointerUp={() => (drag.current = null)}
-        className="flex h-6 w-4 shrink-0 cursor-ew-resize items-center justify-center rounded bg-stone-300/70 dark:bg-rwe-neutral-700"
+        className="flex h-5 w-3.5 shrink-0 cursor-ew-resize items-center justify-center rounded bg-stone-300/70 dark:bg-rwe-neutral-700"
       >
-        <span className="h-3 w-px bg-stone-500 dark:bg-rwe-neutral-400" />
-        <span className="ml-0.5 h-3 w-px bg-stone-500 dark:bg-rwe-neutral-400" />
+        <span className="h-2.5 w-px bg-stone-500 dark:bg-rwe-neutral-400" />
+        <span className="ml-0.5 h-2.5 w-px bg-stone-500 dark:bg-rwe-neutral-400" />
       </span>
       <input
         aria-label={property.name ?? property.label}
@@ -368,11 +381,18 @@ function ScrubField({ state, choose }: { state: PropertyState; choose: Controls[
             stepTo(position() + (e.key === 'ArrowUp' ? 1 : -1))
           }
         }}
-        className="min-w-0 flex-1 bg-transparent font-mono text-[13px] text-rwe-neutral-900 focus:outline-none dark:text-rwe-neutral-100"
+        className="min-w-0 flex-1 bg-transparent font-mono text-[12px] text-rwe-neutral-900 focus:outline-none dark:text-rwe-neutral-100"
       />
-      {hint && <span className={`shrink-0 font-mono text-[11px] ${hint === 'not a token' ? 'text-amber-600 dark:text-amber-400' : muted}`}>{hint}</span>}
+      {hint && <span className={`shrink-0 font-mono text-[10px] ${hint === 'not a token' ? 'text-amber-600 dark:text-amber-400' : muted}`}>{hint}</span>}
     </div>
   )
+}
+
+/** Options by their group, in order of first appearance; ungrouped options under "" */
+function grouped(options: InspectorOption[]): [string, InspectorOption[]][] {
+  const map = new Map<string, InspectorOption[]>()
+  for (const o of options) map.set(o.group ?? '', [...(map.get(o.group ?? '') ?? []), o])
+  return [...map]
 }
 
 function SelectField({ state, choose }: { state: PropertyState; choose: Controls['choose'] }) {
@@ -383,35 +403,47 @@ function SelectField({ state, choose }: { state: PropertyState; choose: Controls
         aria-label={property.name ?? property.label}
         value={current ?? ''}
         onChange={(e) => choose(state, property.options.find((o) => o.className === e.target.value) ?? null)}
-        className={`${field} appearance-none pr-8`}
+        className={`${field} appearance-none pr-7`}
       >
         {!from && <option value="">{`— ${computed || 'not set'}`}</option>}
-        {property.options.map((o) => (
-          <option key={o.className} value={o.className}>
-            {o.label}
-          </option>
-        ))}
+        {grouped(property.options).map(([group, options]) =>
+          group ? (
+            <optgroup key={group} label={group}>
+              {options.map((o) => (
+                <option key={o.className} value={o.className}>
+                  {o.label}
+                </option>
+              ))}
+            </optgroup>
+          ) : (
+            options.map((o) => (
+              <option key={o.className} value={o.className}>
+                {o.label}
+              </option>
+            ))
+          ),
+        )}
       </select>
-      <ChevronDown className={`pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 ${muted}`} strokeWidth={1.5} />
+      <ChevronDown className={`pointer-events-none absolute right-2 top-1/2 size-3.5 -translate-y-1/2 ${muted}`} strokeWidth={1.5} />
     </div>
   )
 }
 
 const SEGMENT_ICONS: Record<string, React.ReactNode> = {
-  'not-italic': <Type className="size-4" strokeWidth={1.5} />,
-  italic: <Italic className="size-4" strokeWidth={1.5} />,
-  'text-left': <AlignLeft className="size-4" strokeWidth={1.5} />,
-  'text-center': <AlignCenter className="size-4" strokeWidth={1.5} />,
-  'text-right': <AlignRight className="size-4" strokeWidth={1.5} />,
-  'text-justify': <AlignJustify className="size-4" strokeWidth={1.5} />,
-  'normal-case': <Minus className="size-4" strokeWidth={1.5} />,
-  capitalize: <span className="text-[12px]">Aa</span>,
-  uppercase: <span className="text-[12px] font-semibold">AA</span>,
-  lowercase: <span className="text-[12px]">aa</span>,
-  'no-underline': <Minus className="size-4" strokeWidth={1.5} />,
-  underline: <Underline className="size-4" strokeWidth={1.5} />,
-  'line-through': <Strikethrough className="size-4" strokeWidth={1.5} />,
-  overline: <span className="text-[13px] overline">a</span>,
+  'not-italic': <Type className="size-3.5" strokeWidth={1.5} />,
+  italic: <Italic className="size-3.5" strokeWidth={1.5} />,
+  'text-left': <AlignLeft className="size-3.5" strokeWidth={1.5} />,
+  'text-center': <AlignCenter className="size-3.5" strokeWidth={1.5} />,
+  'text-right': <AlignRight className="size-3.5" strokeWidth={1.5} />,
+  'text-justify': <AlignJustify className="size-3.5" strokeWidth={1.5} />,
+  'normal-case': <Minus className="size-3.5" strokeWidth={1.5} />,
+  capitalize: <span className="text-[11px]">Aa</span>,
+  uppercase: <span className="text-[11px] font-semibold">AA</span>,
+  lowercase: <span className="text-[11px]">aa</span>,
+  'no-underline': <Minus className="size-3.5" strokeWidth={1.5} />,
+  underline: <Underline className="size-3.5" strokeWidth={1.5} />,
+  'line-through': <Strikethrough className="size-3.5" strokeWidth={1.5} />,
+  overline: <span className="text-[12px] overline">a</span>,
 }
 
 /** Icon buttons for a handful of values; without a class the computed value is the active one */
@@ -428,7 +460,7 @@ function Segmented({ state, choose }: { state: PropertyState; choose: Controls['
           aria-pressed={active(o)}
           title={`${o.label} (${o.className})`}
           onClick={() => choose(state, o)}
-          className={`flex h-7 flex-1 items-center justify-center rounded ${focusRing} ${
+          className={`flex h-6 flex-1 items-center justify-center rounded ${focusRing} ${
             active(o)
               ? 'bg-rwe-sand-25 text-rwe-neutral-900 shadow-sm dark:bg-rwe-neutral-950 dark:text-rwe-neutral-50'
               : `${muted} hover:text-rwe-neutral-900 dark:hover:text-rwe-neutral-100`
@@ -441,7 +473,7 @@ function Segmented({ state, choose }: { state: PropertyState; choose: Controls['
   )
 }
 
-function Swatch({ color, size = 'size-7' }: { color: string; size?: string }) {
+function Swatch({ color, size = 'size-6' }: { color: string; size?: string }) {
   return (
     <span aria-hidden className={`${size} inline-block shrink-0 overflow-hidden rounded-full border border-stone-300 dark:border-rwe-neutral-700`} style={{ background: checker }}>
       <span className="block size-full" style={{ background: color }} />
@@ -453,11 +485,7 @@ function Swatch({ color, size = 'size-7' }: { color: string; size?: string }) {
 function ColorField({ state, choose }: { state: PropertyState; choose: Controls['choose'] }) {
   const { property, option, current, computed } = state
   const [open, setOpen] = useState(false)
-  const groups = useMemo(() => {
-    const map = new Map<string, InspectorOption[]>()
-    for (const o of property.options) map.set(o.group ?? '', [...(map.get(o.group ?? '') ?? []), o])
-    return [...map]
-  }, [property.options])
+  const groups = useMemo(() => grouped(property.options), [property.options])
   const label = option?.label ?? (current && isArbitrary(current) ? current : computed || 'not set')
 
   return (
@@ -467,7 +495,7 @@ function ColorField({ state, choose }: { state: PropertyState; choose: Controls[
         aria-label={`${property.name ?? property.label}: ${label}`}
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className={`flex w-full items-center gap-2 rounded-md text-left ${focusRing}`}
+        className={`flex w-full items-center gap-1.5 rounded-md text-left ${focusRing}`}
       >
         <Swatch color={option?.swatch ?? computed} />
         <span className={`${field} truncate font-mono`}>{label}</span>
@@ -476,17 +504,17 @@ function ColorField({ state, choose }: { state: PropertyState; choose: Controls[
         <div className={`mt-2 max-h-80 space-y-2 overflow-y-auto rounded-md ${surface} p-2`}>
           {groups.map(([name, options]) => (
             <div key={name}>
-              <p className={`mb-1 text-[11px] ${muted}`}>{name}</p>
+              <p className={`mb-1 text-[10px] ${muted}`}>{name}</p>
               {name === 'Roles' ? (
                 <div className="space-y-0.5">
                   {options.map((o) => (
-                    <ColorOption key={o.label} option={o} selected={o.className === current} onPick={() => choose(state, o)} wide />
+                    <ColorOption key={o.label} option={o} selected={o === option} onPick={() => choose(state, o)} wide />
                   ))}
                 </div>
               ) : (
                 <div className="grid grid-cols-11 gap-1">
                   {options.map((o) => (
-                    <ColorOption key={o.className} option={o} selected={o.className === current} onPick={() => choose(state, o)} />
+                    <ColorOption key={o.label} option={o} selected={o === option} onPick={() => choose(state, o)} />
                   ))}
                 </div>
               )}
@@ -507,9 +535,10 @@ function ColorOption({ option, selected, onPick, wide }: { option: InspectorOpti
         aria-label={option.label}
         aria-pressed={selected}
         onClick={onPick}
-        className={`flex w-full items-center gap-2 rounded px-1 py-0.5 text-left text-[12px] text-rwe-neutral-900 hover:bg-stone-100 dark:text-rwe-neutral-100 dark:hover:bg-rwe-neutral-800 ${ring} ${focusRing}`}
+        className={`flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left text-[11px] text-rwe-neutral-900 hover:bg-stone-100 dark:text-rwe-neutral-100 dark:hover:bg-rwe-neutral-800 ${ring} ${focusRing}`}
       >
         <Swatch color={option.swatch ?? ''} size="size-4" />
+        {option.darkSwatch && <Swatch color={option.darkSwatch} size="size-4" />}
         <span className="truncate">{option.label}</span>
       </button>
     )
@@ -523,9 +552,9 @@ function ColorOption({ option, selected, onPick, wide }: { option: InspectorOpti
 
 function Section({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="space-y-3 px-3 py-3.5">
+    <section className="space-y-2 px-2.5 py-2.5">
       <div className="flex items-center justify-between gap-2">
-        <h3 className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{title}</h3>
+        <h3 className={`text-[10px] font-semibold uppercase tracking-wide ${muted}`}>{title}</h3>
         {action}
       </div>
       {children}
@@ -537,8 +566,8 @@ function Section({ title, action, children }: { title: string; action?: React.Re
 function Pairs({ title, children }: { title?: string; children: React.ReactNode }) {
   return (
     <div>
-      {title && <p className="mb-1.5 text-[12px] text-rwe-neutral-900 dark:text-rwe-neutral-100">{title}</p>}
-      <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">{children}</div>
+      {title && <p className="mb-1 text-[11px] text-rwe-neutral-900 dark:text-rwe-neutral-100">{title}</p>}
+      <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">{children}</div>
     </div>
   )
 }

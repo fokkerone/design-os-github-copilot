@@ -17,6 +17,8 @@ export interface PickedElement {
   classes: string[]
   /** Visible text, shortened */
   text: string
+  /** True when the preview renders in dark mode, so the inspector previews the dark values */
+  dark?: boolean
   /** True when the element holds only text, so its content can be edited in place */
   textOnly: boolean
   /** outerHTML, shortened */

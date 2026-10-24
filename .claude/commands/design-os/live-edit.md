@@ -24,7 +24,9 @@ classes: "text-6xl font-semibold text-stone-900"
 text: "The platform"
 edits:                           # inspector edits, Tailwind class swaps (optional)
   - font-size: "text-6xl" -> "text-7xl"  # preview font-size: 4.5rem
-  - background-color: "(none)" -> "bg-zinc-900"  # token: primary; preview background-color: oklch(...)
+  - background-color: "(none)" -> "bg-[oklch(65.03%_0.11008_192.46)]"; dark "(none)" -> "dark:bg-[oklch(80.08%_0.13033_181.21)]"  # token: primary; exact value
+  - border-radius: "rounded-lg" -> "rounded-[0.25rem]"  # token: radius-md; exact value
+  - text-style: "(none)" -> "text-xs font-light leading-4"  # token: xs-light
   - padding-top: "(none)" -> "pt-[13px]"  # not a token; preview padding-top: 13px
 html: |
   <h1 class="...">The platform</h1>
@@ -36,7 +38,7 @@ Then load what governs the element:
 
 1. Open `source` at the given line. The element is the JSX element starting there; `component` names the component it is written in. If the file or line does not match the `html` (the file changed since the pick), find the element by its classes and text and say so.
 2. `npm run -s techstack` — the UI library and icons. Primitives come from `src/ui/` only, never from `@/components/*`.
-3. `product/design-system/DESIGN.md` when it exists (palette steps, type scale, spacing, radius, rules). Without it the fallback applies: `stone` neutrals, `lime` accents, the Tailwind scale.
+3. `product/design-system/DESIGN.md` when it exists (colors, type scale, spacing, radius, shadows, rules) and "Token classes" in agents.md. Without it the fallback applies: `stone` neutrals, `lime` accents, the Tailwind scale.
 4. Screen designs: `product/sections/<section-id>/spec.md` and `npm run -s context -- <section-id> --screen <ScreenDesignName>` (personas, flows, the steps this screen covers). Shell: `product/shell/spec.md`.
 5. `wiki/design-changes/<section-id>.md` (or `shell.md`) when it exists: earlier changes to the same area. Don't undo a recorded change without asking.
 
@@ -49,14 +51,14 @@ Ask in **one** call, only what the request leaves open. Typical questions:
 - **Conflicts**: if the change contradicts the section spec, a flow step, a persona's design implication or a DESIGN.md rule, show the conflict and let the user decide. Never resolve it silently. The spec is binding; a change to it belongs to `/design-os:shape-section`.
 - **Responsive / dark mode**: when the change touches color or layout, ask whether it applies to `dark:` and the breakpoints as well (recommend: yes).
 
-Inspector edits in the `edits:` list are the user's explicit choice: apply them as written (`from` class replaced by `to` class) unless they conflict. `(none)` means no class set the property: add the `to` class, and when a shorthand (`p-4`, `px-6`, `rounded-lg`) already covers it, ask whether to split the shorthand or keep it next to the side class. `# token: <role>` asks for the role comment (`{/* token: primary */}`). `# not a token` marks a raw value the user typed: offer the nearest tokens first (Token or exception question).
+Inspector edits in the `edits:` list are the user's explicit choice: apply them as written (`from` class replaced by `to` class) unless they conflict. `(none)` means no class set the property: add the `to` class, and when a shorthand (`p-4`, `px-6`, `rounded-lg`) already covers it, ask whether to split the shorthand or keep it next to the side class. `# token: <name>` asks for the token comment (`{/* token: primary */}`); with `exact value` the class is the token's exact value ("Token classes" in agents.md): write it unchanged, never round it to a palette step or a Tailwind class, never convert OKLCH to hex. `; dark "<from>" -> "<to>"` is the `dark:` class swap that goes with it: replace the element's `dark:` class for the property, or add it. `text-style` sets several classes: replace the element's font size, weight, line height and tracking classes with them. `# not a token` marks a raw value the user typed: offer the nearest tokens first (Token or exception question).
 
 When the request is exactly `Apply the inspector edits to the source as listed.` (the inspector's "Apply with agent" button), the `edits:` list is the whole change. Ask only what is still open (usually the scope, when the element is in `src/ui/` or rendered in a list) and conflicts; if nothing is open, skip the questions and go straight to Step 3. A `content` edit replaces the element's text in the JSX.
 
 ## Step 3: Make the change
 
 - Edit only the files the chosen scope requires. Keep the component props-based; never import data.
-- Use palette steps, radius, shadow and the type scale from DESIGN.md, mark semantic roles with a comment (`{/* token: primary */}`), keep `dark:` variants and responsive prefixes consistent.
+- Use token classes ("Token classes" in agents.md): the Tailwind class when the token has Tailwind's value, else its exact value, colors in OKLCH. Name the token in a comment (`{/* token: primary */}`), keep `dark:` variants and responsive prefixes consistent.
 - No new dependency. A request the tech stack cannot serve is reported with `/design-os:techstack update`.
 - Vite HMR updates the preview next to the chat as soon as the file is saved; the inspector preview disappears then and the real result shows.
 

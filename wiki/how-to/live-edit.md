@@ -16,9 +16,9 @@ Live Edit changes a screen design or the shell from the preview, the way v0 does
 
 1. Open a screen design (Prototype › Sections › a screen) or the shell (Design System › Shell).
 2. Click **Select element** in the toolbar, or press `V`. Hover shows what you would pick; click picks it. `Esc` ends picking.
-3. The element appears as a chip in the chat input (`Hero › h1  src/sections/…/Hero.tsx:42`), and the **inspector** opens over the preview.
-4. Optional: change content, size, weight, alignment, colors, padding or radius in the inspector. It offers only design tokens (DESIGN.md, or stone/lime and the Tailwind scale without one). The preview shows the edit right away; nothing is written yet. Undo, redo and reset are in the inspector footer.
-5. Describe the change in the chat and send. The message carries the element (source location, component path, classes, HTML) and your inspector edits.
+3. The element appears as a chip in the chat input (`Hero › h1  src/sections/…/Hero.tsx:42`), and the **inspector** opens next to the preview (the resize handles stay free).
+4. Optional: edit the element in the inspector: Typography (text style, font, size, weight, style, line height, letter spacing, alignment, case, decoration), Color, Background (color, gradient), Layout (display, width, height, min/max width, margin, padding; "Show paddings and margins" outlines them in the preview), Border, Appearance (opacity, radius per corner, blur) and Shadow. Every value is a design token from DESIGN.md (roles like `primary`, palettes, alpha, the scales), or stone/lime and Tailwind's scale without one. Drag the grip of a number field or use the arrow keys to step through the scale; a typed value off the scale is marked "not a token". The preview shows the edit right away, in the dark value when the preview is dark; nothing is written yet. Undo, redo and reset are in the inspector footer.
+5. **Apply with agent** sends your inspector edits as they are, or describe the change in the chat and send. The message carries the element (source location, component path, classes, HTML) and your inspector edits.
 6. The agent asks 1–3 short questions: scope (this element, the component, every screen), tokens instead of raw values, conflicts with the spec, a flow or the design system.
 7. The agent edits the file, and the preview shows the real result. Ask for adjustments in the chat.
 8. When you're done, the agent records the change: a capture in `wiki/raw/`, compiled into `wiki/design-changes/<section-id>.md` (or `shell.md`).
@@ -35,7 +35,7 @@ Remove the chip with its × to send a normal message instead.
 ## Limits
 
 - Only screen designs and the shell. The clickdummy opens in its own tab without a picker.
-- The inspector preview uses inline styles; the agent writes Tailwind classes. Responsive and `dark:` variants are discussed in the questions, not edited in the inspector.
+- The inspector preview uses inline styles; the agent writes token classes ("Token classes" in agents.md): the Tailwind class when the token has Tailwind's value, else the exact value, colors in OKLCH, with a `token:` comment. Semantic colors bring their `dark:` class; other responsive and `dark:` variants are discussed in the questions.
 - Elements rendered by a component from a library (not in `src/`) are picked at the nearest element of your own code.
 
 ## Related

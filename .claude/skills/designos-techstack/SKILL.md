@@ -165,7 +165,7 @@ Ask (one call, up to 4 questions):
 
 Switch persona: *"Act as a Compatibility Critic reviewing this stack. Find every way it could fight the prototype, the design tokens or the target codebase."* Check and present the findings as one multiSelect question (which should be fixed?). Skip checks that find nothing.
 
-- **Library against Tailwind and tokens.** Mantine, MUI, Chakra and HeroUI bring their own styling system. The prototype styles with Tailwind palette steps from `DESIGN.md`. State the consequence: the library is wrapped in the product UI layer (`src/ui/`) and themed from the tokens, which costs extra work per component. Recommend shadcn/ui or headless.
+- **Library against Tailwind and tokens.** Mantine, MUI, Chakra and HeroUI bring their own styling system. The prototype styles with Tailwind token classes from `DESIGN.md` ("Token classes" in agents.md). State the consequence: the library is wrapped in the product UI layer (`src/ui/`) and themed from the tokens, which costs extra work per component. Recommend shadcn/ui or headless.
 - **Target against prototype.** A Next.js target with server components means exported components that hold state need `'use client'`. Add that as a constraint.
 - **Base mismatch.** The `ui-base` differs from the target codebase's (Radix UI against Base UI): the exported components would not match the app's. Align with the target.
 - **Dependency weight.** More than 5 extra packages, or two libraries for the same area (two chart libraries, two form libraries): remove one.
@@ -309,7 +309,7 @@ Screen designs, the shell and the clickdummy import UI primitives **only** from 
 - **Never run `npx shadcn@latest add`.** `components.json` points to `src/components/ui`, so it would overwrite Design OS UI.
 - **shadcn/ui: port a component with `npx shadcn@latest view @shadcn/<name>`** (read-only; use `@<registry>/<name>` for a registry from the stack, and `npx shadcn@latest docs <name>` for the API). Create `src/ui/<name>.tsx` from the printed source and change it:
   1. Imports become relative. `cn` comes from `src/ui/utils.ts` (`clsx` + `tailwind-merge`; create it with the first component).
-  2. **Semantic utilities become palette steps** from `product/design-system/DESIGN.md` (`bg-primary` → `bg-teal-600`, `text-muted-foreground` → `text-zinc-500`, `border-border` → `border-zinc-200`, with the `dark:` pair). Mark the role in a comment beside the class string (`// token: primary`). Without `DESIGN.md`, use `stone` for neutrals and `lime` for accents. `npm run test:tokens` fails on semantic utilities in `src/ui/`, because inside Design OS they resolve to the Design OS theme.
+  2. **Semantic utilities become token classes** from `product/design-system/DESIGN.md` ("Token classes" in agents.md): the palette step when the role has its value (`text-muted-foreground` → `text-zinc-500`), else the exact OKLCH value (`bg-primary` → `bg-[oklch(65.03%_0.11008_192.46)]`), with the `dark:` pair. Mark the role in a comment beside the class string (`// token: primary`). Without `DESIGN.md`, use `stone` for neutrals and `lime` for accents. `npm run test:tokens` fails on semantic utilities in `src/ui/`, because inside Design OS they resolve to the Design OS theme.
   3. Respect `ui-base`: `asChild` with Radix UI, `render` with Base UI. Respect `ui-style`.
   4. Port only what a screen needs. Compose from what `src/ui/` already has before porting another primitive.
   5. Keep the primitives accessible: Dialog, Sheet and Drawer get a title, Avatar gets a fallback. Follow the rules in `.claude/skills/shadcn/rules/`.
@@ -330,7 +330,7 @@ Screen designs, the shell and the clickdummy import UI primitives **only** from 
 | 08 Design screen | `@08-design-screen` · `/design-os:design-screen` | Composes screens from `src/ui/`, ports missing primitives (rule 3), uses only listed packages, and reports which primitives and packages the screen needs |
 | 09 Screenshot | `@09-screenshot-design` · `/design-os:screenshot-design` | Nothing stack-specific |
 | 10 Clickdummy | `@10-clickdummy` · `/design-os:clickdummy` | Imports from `src/ui/`, keeps state-based navigation in the prototype, records the `routing` decision for the export |
-| 11 Export | `@11-export-product` · `/design-os:export-product` | Copies the stack to `product-plan/techstack.md` and `src/ui/` to `product-plan/ui/`, maps palette steps back to semantic utilities with `tokens.css`, lists the packages and registries, and **pre-fills "My tech stack"** in the prompts, asking only about undecided areas |
+| 11 Export | `@11-export-product` · `/design-os:export-product` | Copies the stack to `product-plan/techstack.md` and `src/ui/` to `product-plan/ui/`, maps token classes back to semantic utilities with `tokens.css`, lists the packages and registries, and **pre-fills "My tech stack"** in the prompts, asking only about undecided areas |
 
 ### 5. When the stack changes
 

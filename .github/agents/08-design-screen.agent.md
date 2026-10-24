@@ -195,7 +195,7 @@ Follow rule 3 of "Applying the stack" in the `designos-techstack` skill:
 - **Compose only from `src/ui/`.** Import primitives with relative paths (`../../../ui/button` from `components/`, `../../ui/button` from the preview wrapper). Never import `@/components/*`: that is the Design OS UI.
 - **Port a missing primitive** (shadcn/ui): read its source with `npx shadcn@latest view @shadcn/<name>` (read-only; use `@<registry>/<name>` for a registry listed in the stack) and create `src/ui/<name>.tsx`. NEVER run `npx shadcn@latest add`: it would overwrite Design OS UI. When porting:
   - Use relative imports, and `cn` from `src/ui/utils.ts` (create it with the first primitive).
-  - Replace semantic utilities (`bg-primary`, `text-muted-foreground`, `border-border`, ...) with palette steps from `product/design-system/DESIGN.md` (with the `dark:` pair) and mark the role in a comment (`// token: primary`). Without `DESIGN.md`, use `stone` and `lime`.
+  - Replace semantic utilities (`bg-primary`, `text-muted-foreground`, `border-border`, ...) with token classes from `product/design-system/DESIGN.md` (with the `dark:` pair, see "Token classes" in agents.md) and mark the role in a comment (`// token: primary`). Without `DESIGN.md`, use `stone` and `lime`.
   - Respect `ui-base` (`asChild` for Radix UI, `render` for Base UI) and `ui-style`.
   - Port only what the screen needs. Compose from what `src/ui/` already has before porting another primitive.
 - **Packages:** use only packages listed in the stack. Ask before installing one (including what a ported primitive imports), and use the stack's `package-manager`.
@@ -214,8 +214,8 @@ Follow rule 3 of "Applying the stack" in the `designos-techstack` skill:
 **If `product/design-system/DESIGN.md` exists (imported design tokens — takes precedence):**
 
 - It is the source of truth. Read sections 2 (rules), 3 (color), 4 (typography), 6 (radius) and 7 (shadows).
-- Use only token values listed there: palette steps (e.g. `zinc-500`), the radius and shadow scale, the type scale. No arbitrary values (`bg-[#…]`, `p-[13px]`).
-- Map semantic roles from section 3.1 to the palette step with the same value where one exists, and note the semantic token in a comment (e.g. `{/* token: primary */}`) so the export can switch to `bg-primary` with `tokens.css`.
+- Use only token values listed there: palette, semantic colors, the radius and shadow scale, the type scale. Write each as a token class ("Token classes" in agents.md): the Tailwind class when the token has Tailwind's default value (`zinc-500`, `p-4`), else its exact value as an arbitrary class, colors in OKLCH (`bg-[oklch(65.03%_0.11008_192.46)]`, `rounded-[0.25rem]`). No arbitrary values that are no token (`bg-[#…]`, `p-[13px]`).
+- Semantic roles from section 3.1: the palette step with the same value where one exists, else the role's exact OKLCH value; always note the semantic token in a comment (e.g. `{/* token: primary */}`) so the export can switch to `bg-primary` with `tokens.css`.
 - Light and dark values come from the Light/Dark columns; use `dark:` variants accordingly.
 - Never use Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, `border-border`, `bg-card`, ...) and never import from `@/components/` — in the preview they resolve to the Design OS theme, not the product. `npm run test:tokens` fails on both (see "Token separation" in agents.md).
 

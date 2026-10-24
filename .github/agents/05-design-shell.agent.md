@@ -38,7 +38,7 @@ If design tokens are missing, show a warning but continue:
 
 ## Step 1b: Check for Brand Identity in Design System
 
-If `product/design-system/DESIGN.md` exists (generated from imported design tokens), it is the source of truth for colors, typography, radius and shadows — follow it and use only the token values listed there. Use palette steps (e.g. `teal-600`), never Design OS semantic utilities like `bg-primary` or imports from `@/components/` (see "Token separation" in agents.md).
+If `product/design-system/DESIGN.md` exists (generated from imported design tokens), it is the source of truth for colors, typography, radius and shadows — follow it and use only the token values listed there. Use token classes ("Token classes" in agents.md: `teal-600` when the token has Tailwind's value, else the exact value such as `bg-[oklch(65.03%_0.11008_192.46)]`, with `// token: primary`), never Design OS semantic utilities like `bg-primary` or imports from `@/components/` (see "Token separation" in agents.md).
 
 Check if `product/design-system/design-system.json` exists and contains personality, voice, or uiStyle fields.
 
@@ -231,7 +231,7 @@ The shell imports UI primitives (button, avatar, dropdown menu, sheet, ...) only
 
 - Read the source with `npx shadcn@latest view @shadcn/<name>` and create `src/ui/<name>.tsx` from it. Never run `npx shadcn@latest add`.
 - Imports become relative; `cn` comes from `src/ui/utils.ts`.
-- Semantic utilities become palette steps from `product/design-system/DESIGN.md` (with the `dark:` pair), with the role in a comment: `// token: primary`.
+- Semantic utilities become token classes from `product/design-system/DESIGN.md` (with the `dark:` pair, see "Token classes" in agents.md), with the role in a comment: `// token: primary`.
 - Respect the stack's `ui-base` and `ui-style`, and keep the primitives accessible.
 - Ask before installing an npm package a ported file needs, and report it.
 
@@ -241,7 +241,7 @@ The shell imports UI primitives (button, avatar, dropdown menu, sheet, ...) only
 - Apply design tokens if they exist (colors, fonts)
 - Support light and dark mode with `dark:` variants
 - Be mobile responsive
-- Style with Tailwind CSS (fixed runtime), using the product's palette steps
+- Style with Tailwind CSS (fixed runtime), using the product's token classes
 - Take icons from the stack's `icons` area (default: `lucide-react`), imported in one place per file
 
 ## Step 7: Create Shell Preview
