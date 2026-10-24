@@ -1,21 +1,25 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { useLiveEdit } from '@/lib/live-edit/live-edit-context'
-import { readMessage, type FromPreview, type ToPreview } from '@/lib/live-edit/protocol'
+import { readMessage, type FromPreview, type ToPreview, type TreeNode } from '@/lib/live-edit/protocol'
 import type { LiveSelection, LiveTarget } from '@/lib/live-edit/selection'
 
 export const sameTarget = (a: LiveTarget, b: LiveTarget) =>
   a.kind === 'shell' ? b.kind === 'shell' : b.kind === 'screen' && a.sectionId === b.sectionId && a.screenDesignName === b.screenDesignName
 
 /** CSS and text the preview shows for the inspector edits of a selection */
-export function previewOf(selection: LiveSelection): { style: Record<string, string>; text?: string } {
+export function previewOf(selection: LiveSelection): { style: Record<string, string>; text?: string; props?: Record<string, unknown> } {
   const style: Record<string, string> = {}
   let text: string | undefined
+  let props: Record<string, unknown> | undefined
   for (const edit of selection.edits) {
-    if (edit.property === 'content') text = edit.to
+    if (edit.prop) props = { ...props, [edit.prop.name]: edit.prop.value }
+    else if (edit.property === 'content') text = edit.to
     else Object.assign(style, edit.css)
   }
-  return { style, text }
+  return { style, text, ...(props && { props }) }
 }
+
+const hasPreview = ({ style, text, props }: ReturnType<typeof previewOf>) => Object.keys(style).length > 0 || text !== undefined || !!props
 
 const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
@@ -29,6 +33,10 @@ export function useLivePreview(iframeRef: RefObject<HTMLIFrameElement | null>, t
   const [picking, setPicking] = useState(false)
   // "Show paddings and margins" in the inspector
   const [guides, setGuides] = useState(false)
+  // The component tree the preview sends, for the Layers tab
+  const [nodes, setNodes] = useState<TreeNode[]>([])
+  // A selection made in the tree keeps the focus in the tree, a click in the preview moves it to the chat
+  const fromTree = useRef(false)
   const selection = live?.selection && sameTarget(live.selection.target, target) ? live.selection : null
 
   const post = useCallback(
@@ -56,20 +64,23 @@ export function useLivePreview(iframeRef: RefObject<HTMLIFrameElement | null>, t
           live.select(null)
         } else if (selection) {
           // A draft keeps its inspector edits: select the element again and show them
-          post({ type: 'dos:select', src: selection.element.src, index: selection.element.index })
-          const { style, text } = previewOf(selection)
-          if (Object.keys(style).length > 0 || text !== undefined) post({ type: 'dos:preview', style, text })
+          post({ type: 'dos:select', src: selection.element.src, index: selection.element.index, kind: selection.element.kind })
+          const preview = previewOf(selection)
+          if (hasPreview(preview)) post({ type: 'dos:preview', ...preview })
           post({ type: 'dos:guides', active: guides })
         }
       } else if (message.type === 'dos:picked') {
         live?.select({ target, element: message.element, edits: [] })
         setPicking(false)
-        live?.focusComposer()
+        if (!fromTree.current) live?.focusComposer()
+        fromTree.current = false
+      } else if (message.type === 'dos:tree') {
+        setNodes(message.nodes)
       } else if (message.type === 'dos:cancel') {
         setPicking(false)
       } else if (message.type === 'dos:updated' && selection && live?.sent) {
         // The agent's change arrived through HMR: the real result replaces the preview
-        post({ type: 'dos:deselect' })
+        post({ type: 'dos:deselect', keep: true })
         live.select(null)
       }
     }
@@ -91,9 +102,9 @@ export function useLivePreview(iframeRef: RefObject<HTMLIFrameElement | null>, t
       post({ type: 'dos:deselect' })
       return
     }
-    const { style, text } = previewOf(selection)
-    if (Object.keys(style).length === 0 && text === undefined) post({ type: 'dos:reset' })
-    else post({ type: 'dos:preview', style, text })
+    const preview = previewOf(selection)
+    if (!hasPreview(preview)) post({ type: 'dos:reset' })
+    else post({ type: 'dos:preview', ...preview })
   }, [selection, post])
 
   // V toggles the picker, Escape ends it
@@ -109,11 +120,23 @@ export function useLivePreview(iframeRef: RefObject<HTMLIFrameElement | null>, t
   }, [live])
 
   if (!live) return null
+  const draft = selection && !live.sent ? selection : null
+  const picked = draft?.element
   return {
+    nodes,
+    /** The tree node of the selection, found again in every new tree */
+    selectedNodeId: picked
+      ? nodes.find((n) => n.kind === (picked.kind ?? 'element') && (n.kind === 'component' ? n.call : n.src) === picked.src && n.index === (picked.index ?? 0))?.id ?? null
+      : null,
+    hoverNode: (id: string | null) => post({ type: 'dos:hover', id }),
+    selectNode: (id: string) => {
+      fromTree.current = true
+      post({ type: 'dos:select-node', id })
+    },
     picking,
     setPicking,
     /** The selection made in this preview, while it is still a draft for the chat */
-    selection: selection && !live.sent ? selection : null,
+    selection: draft,
     setEdits: live.setEdits,
     dismiss: () => live.select(null),
     focusComposer: live.focusComposer,

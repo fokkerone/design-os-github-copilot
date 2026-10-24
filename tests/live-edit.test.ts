@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { buildLiveEditMessage, LIVE_EDIT_COMMAND, parseLiveEditMessage, selectionLabel, serializeSelection, type LiveSelection } from '@/lib/live-edit/selection'
 import { currentClass, currentDarkClass, inspectorGroups, inspectorProperties, optionFromInput } from '@/lib/live-edit/inspector-options'
 import { sameColor, spacingClass, tokenClass } from '@/lib/live-edit/token-class'
@@ -40,6 +40,30 @@ describe('live edit message', () => {
     expect(block).toContain('text: "The \\"platform\\""')
     expect(block).toContain('  - font-size: "text-6xl" -> "text-7xl"  # preview font-size: 4.5rem')
     expect(block).toContain('  <h1 class="text-6xl font-semibold">The platform</h1>')
+  })
+
+  it('carries a component with its call site, definition and props', () => {
+    const component: LiveSelection = {
+      ...selection,
+      element: {
+        ...selection.element,
+        kind: 'component',
+        src: 'src/sections/landing/components/Hero.tsx:50:9',
+        component: 'Button',
+        componentPath: ['LandingPage', 'Hero', 'Button'],
+        definition: 'src/ui/button.tsx:41:5',
+        props: [['variant', '"outline"'], ['onClick', 'ƒ']],
+        tag: 'button',
+      },
+      edits: [],
+    }
+    const block = serializeSelection(component)
+    expect(block).toContain('kind: component\ncall: src/sections/landing/components/Hero.tsx:50:9\ndefinition: src/ui/button.tsx:41:5')
+    expect(block).toContain('component: LandingPage › Hero › Button\nprops:\n  variant: "outline"\n  onClick: ƒ\nroot element: button')
+    expect(block).not.toContain('source:')
+    expect(selectionLabel(component)).toBe('<Button> in Hero')
+    // The command explains the component block
+    expect(readFileSync(LIVE_EDIT_COMMAND, 'utf8')).toContain('kind: component')
   })
 
   it('never lets the html close the fence', () => {

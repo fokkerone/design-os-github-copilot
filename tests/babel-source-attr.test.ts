@@ -31,9 +31,16 @@ describe('babel-source-attr', () => {
     expect(out).toContain('data-dos-comp="Hero"')
   })
 
-  it('leaves component elements alone', () => {
+  it('marks component elements with their call site, not with a source', () => {
     const out = transform(hero, 'src/sections/landing/components/Hero.tsx')
-    expect(out).toMatch(/<Button>Go<\/Button>/)
+    expect(out).toContain('<Button data-dos-call="src/sections/landing/components/Hero.tsx:5:7" data-dos-name="Button">Go</Button>')
+    const member = transform('const A = () => <Card.Header title="x" />', 'src/ui/a.tsx')
+    expect(member).toContain('<Card.Header title="x" data-dos-call="src/ui/a.tsx:1:17" data-dos-name="Card.Header" />')
+  })
+
+  it('leaves fragments alone', () => {
+    const out = transform('const A = () => <><Fragment key="a"><i /></Fragment><React.Fragment><b /></React.Fragment></>', 'src/ui/a.tsx')
+    expect(out).not.toContain('data-dos-call')
   })
 
   it('covers the shell and the product UI layer, not the Design OS app', () => {
@@ -41,6 +48,7 @@ describe('babel-source-attr', () => {
     expect(transform(hero, 'src/ui/button.tsx')).toContain('data-dos-src')
     expect(transform(hero, 'src/components/ScreenDesignPage.tsx')).not.toContain('data-dos-src')
     expect(transform(hero, 'tests/x.tsx')).not.toContain('data-dos-src')
+    expect(transform(hero, 'src/components/ScreenDesignPage.tsx')).not.toContain('data-dos-call')
   })
 
   it('finds the component of arrow functions and forwardRef', () => {
@@ -54,5 +62,6 @@ describe('babel-source-attr', () => {
     const once = transform(hero, 'src/sections/landing/components/Hero.tsx')
     const twice = transform(once, 'src/sections/landing/components/Hero.tsx')
     expect(twice.match(/data-dos-src/g)).toHaveLength(2)
+    expect(twice.match(/data-dos-call/g)).toHaveLength(1)
   })
 })

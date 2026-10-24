@@ -32,11 +32,35 @@ html: |
   <h1 class="...">The platform</h1>
 ```
 
+A component picked in the **Layers** tree (the component tree next to the preview) has `kind: component` instead of `source` and `element`:
+
+```live-edit
+target: screen-design
+section: account
+screen: Login
+kind: component
+call: src/sections/account/components/LoginForm.tsx:58:9      # where <Button> is used
+definition: src/ui/button.tsx:41:5                           # where Button's own markup is written
+component: Login › LoginForm › Button
+props:
+  type: "submit"
+  disabled: false
+  onClick: ƒ
+root element: button
+classes: "inline-flex h-9 … bg-teal-600"                     # of the element the component renders
+edits:                                                       # prop edits from the inspector (optional)
+  - prop size: "lg" -> "sm"  # options of Button: default, sm, lg, icon
+  - prop variant: "outline" -> (none)  # options of Button: default, outline, ghost, destructive; remove the prop
+  - prop disabled: (none) -> true
+```
+
+`- prop <name>: <from> -> <to>` edits a prop of the JSX element at `call`, never the definition. The values are JSON: `"sm"` becomes `size="sm"`, `true` becomes `disabled` (or `disabled={true}`), a number `{3}`, `false` `={false}`. `(none)` as `from` adds the prop, `(none)` as `to` removes it (the component's default applies). An `options of` note lists what the prop's type allows (a union of strings, cva() variants): the value is one of them, apply it as written. The user saw the result live in the preview.
+
 The text after the block is the user's change request. If there is no block, ask the user to pick an element with "Select element" in the preview, then stop.
 
 Then load what governs the element:
 
-1. Open `source` at the given line. The element is the JSX element starting there; `component` names the component it is written in. If the file or line does not match the `html` (the file changed since the pick), find the element by its classes and text and say so.
+1. Open `source` at the given line (for `kind: component`: `call`, the JSX element `<Button …>` starting there; read `definition` too). The element is the JSX element starting there; `component` names the component it is written in. If the file or line does not match the `html` (the file changed since the pick), find the element by its classes and text and say so.
 2. `npm run -s techstack` — the UI library and icons. Primitives come from `src/ui/` only, never from `@/components/*`.
 3. `product/design-system/DESIGN.md` when it exists (colors, type scale, spacing, radius, shadows, rules) and "Token classes" in agents.md. Without it the fallback applies: `stone` neutrals, `lime` accents, the Tailwind scale.
 4. Screen designs: `product/sections/<section-id>/spec.md` and `npm run -s context -- <section-id> --screen <ScreenDesignName>` (personas, flows, the steps this screen covers). Shell: `product/shell/spec.md`.
@@ -46,7 +70,7 @@ Then load what governs the element:
 
 Ask in **one** call, only what the request leaves open. Typical questions:
 
-- **Scope**: only this element / every use of this component / the same element in all screens of the section. Recommend the narrowest scope that fulfils the request. When the element is in `src/ui/` (a shared primitive), say that the change affects every screen.
+- **Scope**: only this element / every use of this component / the same element in all screens of the section. For `kind: component` the default is **this usage**: change the props and `className` at `call`. Only a change the props and `className` cannot express (or the user's wish for every usage) edits `definition`; ask before you do. Recommend the narrowest scope that fulfils the request. When the element is in `src/ui/` (a shared primitive), say that the change affects every screen.
 - **Token or exception**: when the request names a value that is not in DESIGN.md (e.g. "#ff6600", "13px"), offer the nearest tokens first and the raw value last.
 - **Conflicts**: if the change contradicts the section spec, a flow step, a persona's design implication or a DESIGN.md rule, show the conflict and let the user decide. Never resolve it silently. The spec is binding; a change to it belongs to `/design-os:shape-section`.
 - **Responsive / dark mode**: when the change touches color or layout, ask whether it applies to `dark:` and the breakpoints as well (recommend: yes).

@@ -9,7 +9,8 @@ import { loadAppShell, hasShellComponents, loadShellInfo } from '@/lib/shell-loa
 import { loadProductData } from '@/lib/product-loader'
 import React from 'react'
 import { paths } from '@/lib/paths'
-import { Inspector, PickButton } from '@/components/live-edit/Inspector'
+import { PickButton } from '@/components/live-edit/Inspector'
+import { LiveEditPanel } from '@/components/live-edit/LiveEditPanel'
 import { useLivePicker } from '@/components/live-edit/useLivePicker'
 import { useProductFonts } from '@/lib/product-fonts'
 import { useLivePreview } from '@/components/live-edit/useLivePreview'
@@ -201,17 +202,14 @@ export function ScreenDesignPage() {
         </div>
 
         {/* Live Edit: the inspector sits next to the preview, so the resize handles stay free */}
-        {live?.selection && (
+        {live && (live.picking || live.selection) && (
           <div className="flex shrink-0 py-6 pr-4">
-            <Inspector
-              key={live.selection.element.src}
-              selection={live.selection}
-              onChange={live.setEdits}
-              onClose={live.dismiss}
-              onAddToChat={live.focusComposer}
-              onApply={live.apply}
-              guides={live.guides}
-              onGuidesChange={live.setGuides}
+            <LiveEditPanel
+              live={live}
+              onClose={() => {
+                live.setPicking(false)
+                live.dismiss()
+              }}
             />
           </div>
         )}

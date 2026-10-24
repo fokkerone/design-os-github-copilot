@@ -2,7 +2,9 @@
  * Live Edit picker: runs inside the preview iframe. Plain DOM with inline styles, so it adds
  * nothing to the product UI it inspects (no classes, no React, no CSS).
  */
-import type { FromPreview, PickedElement } from './protocol'
+import { boxOf, buildTree, definitionOf, fiberName, hostsOf, serializeProps, type ComponentTree } from './component-tree'
+import { applyOverrides, originalsOf, propRenderer } from './prop-override'
+import type { FromPreview, PickedElement, TreeNode } from './protocol'
 
 const SOURCE_ATTR = 'data-dos-src'
 const COMPONENT_ATTR = 'data-dos-comp'
@@ -176,28 +178,86 @@ function placeGuides(margin: HTMLElement, padding: HTMLElement, el: HTMLElement 
   })
 }
 
-function place(overlay: HTMLElement, el: HTMLElement | null) {
-  if (!el || !el.isConnected) {
+type Box = { top: number; left: number; width: number; height: number }
+
+function place(overlay: HTMLElement, box: Box | null, label = '') {
+  if (!box) {
     overlay.style.display = 'none'
     return
   }
-  const r = el.getBoundingClientRect()
-  Object.assign(overlay.style, { display: 'block', top: `${r.top}px`, left: `${r.left}px`, width: `${r.width}px`, height: `${r.height}px` })
+  Object.assign(overlay.style, { display: 'block', top: `${box.top}px`, left: `${box.left}px`, width: `${box.width}px`, height: `${box.height}px` })
+  const tag = overlay.firstChild as HTMLElement
+  // Unchanged text stays untouched: every write is a mutation the tree observer would see
+  if (tag.textContent !== label) tag.textContent = label
+}
+
+const elementBox = (el: HTMLElement | null): Box | null => (el?.isConnected ? el.getBoundingClientRect() : null)
+
+function elementLabel(el: HTMLElement | null): string {
+  if (!el) return ''
   const name = el.getAttribute(COMPONENT_ATTR)
-  ;(overlay.firstChild as HTMLElement).textContent = name ? `${el.tagName.toLowerCase()} · ${name}` : el.tagName.toLowerCase()
+  return name ? `${el.tagName.toLowerCase()} · ${name}` : el.tagName.toLowerCase()
+}
+
+/** "Button · LoginForm.tsx:40" */
+const componentLabel = (node: TreeNode) => `${node.name} · ${(node.call ?? '').split('/').pop()?.replace(/:\d+$/, '') ?? ''}`
+
+/** A component picked in the tree: its call site, definition and props, plus the styles of its outermost element */
+export function describeComponent(tree: ComponentTree, node: TreeNode, overridable = false): PickedElement {
+  const fiber = tree.fiber(node.id)!
+  const host = hostsOf(fiber)[0]
+  const base: PickedElement = host
+    ? describe(host)
+    : { src: '', component: null, componentPath: [], tag: '', classes: [], text: '', textOnly: false, html: '', styles: {} }
+  const componentPath: string[] = []
+  for (let n: TreeNode | undefined = node; n; n = tree.nodes.find((m) => m.id === n!.parentId)) {
+    if (n.kind === 'component') componentPath.unshift(n.name)
+  }
+  return {
+    ...base,
+    kind: 'component',
+    src: node.call ?? '',
+    index: node.index,
+    nodeId: node.id,
+    component: fiberName(fiber),
+    componentPath,
+    definition: definitionOf(fiber),
+    props: serializeProps(fiber.memoizedProps),
+    values: plainValues(fiber.memoizedProps),
+    overridable,
+    // Text edits belong to the element, not to a component
+    textOnly: false,
+  }
+}
+
+/** The props the inspector can edit: plain values, without children, className and Live Edit attributes */
+function plainValues(props: Record<string, unknown> | null): Record<string, string | number | boolean | null> {
+  const out: Record<string, string | number | boolean | null> = {}
+  for (const [key, value] of Object.entries(props ?? {})) {
+    if (key === 'children' || key === 'className' || key.startsWith('data-dos-')) continue
+    if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') out[key] = value
+  }
+  return out
 }
 
 export interface Picker {
   setActive(active: boolean): void
-  /** Show inspector edits on the selected element until they are reset */
-  preview(style: Record<string, string>, text?: string): void
+  /** Show inspector edits on the selected element (props on a component) until they are reset */
+  preview(style: Record<string, string>, text?: string, props?: Record<string, unknown>): void
   /** Undo every preview on the selected element */
   reset(): void
-  /** Select the element by its source location, e.g. after the preview reloaded */
-  select(src: string, index?: number): void
+  /** Select the element (component) by its source location (call site), e.g. after the preview reloaded */
+  select(src: string, index?: number, kind?: 'element' | 'component'): void
+  /** Send the component tree, e.g. when the page is ready for it */
+  sendTree(): void
+  /** Highlight a tree node, null removes the highlight */
+  hover(id: string | null): void
+  /** Select a tree node and report it like a click */
+  selectNode(id: string): void
   /** Show the margins and paddings of the selected element */
   setGuides(on: boolean): void
-  deselect(): void
+  /** `keep`: leave the props the source renders now, the agent's edit arrived */
+  deselect(keep?: boolean): void
   destroy(): void
 }
 
@@ -214,8 +274,48 @@ export function createPicker(doc: Document, post: (message: FromPreview) => void
   // The text the preview put in, so a restore never overwrites text an HMR update brought
   let previewText: string | null = null
   // Where the selection comes from and what it shows, so a re-rendered element gets both again
-  let source: { src: string; index: number } | null = null
+  let source: { src: string; index: number; kind: 'element' | 'component' } | null = null
   let shown: { style: Record<string, string>; text?: string } | null = null
+  // The component tree, rebuilt after renders; the tree node under the mouse in the tree panel
+  let tree: ComponentTree = buildTree(doc)
+  let sentTree = ''
+  let hoveredNode: string | null = null
+  // Props the preview sets on the selected component, live through React's DevTools internals
+  let overrides: Record<string, unknown> | null = null
+  // The source values they replace, put back when the inspector drops them
+  let originals: Record<string, unknown> = {}
+  const renderer = () => propRenderer(doc.defaultView)
+
+  const rebuild = () => {
+    tree = buildTree(doc)
+    const json = JSON.stringify(tree.nodes)
+    if (json !== sentTree) {
+      sentTree = json
+      post({ type: 'dos:tree', nodes: tree.nodes })
+    }
+  }
+  const sourceNode = () => (source?.kind === 'component' ? tree.find('component', source.src, source.index) : undefined)
+  // The fibers of a tree swap with every commit: override on the current one
+  const currentFiber = () => {
+    tree = buildTree(doc)
+    const node = sourceNode()
+    return node ? tree.fiber(node.id) : undefined
+  }
+  const applyProps = () => {
+    const r = renderer()
+    const fiber = overrides && r ? currentFiber() : undefined
+    if (!r || !fiber || !overrides) return
+    originals = originalsOf(fiber, Object.keys(overrides), originals)
+    applyOverrides(r, fiber, overrides)
+  }
+  /** Back to the props in the source; `keep` when the source itself changed (the agent's edit arrived) */
+  const releaseProps = (keep = false) => {
+    const r = renderer()
+    const fiber = overrides && r && !keep ? currentFiber() : undefined
+    if (r && fiber) applyOverrides(r, fiber, originals)
+    overrides = null
+    originals = {}
+  }
 
   const attach = (el: HTMLElement | null) => {
     selected = el
@@ -231,16 +331,43 @@ export function createPicker(doc: Document, post: (message: FromPreview) => void
     }
   }
   // HMR and React re-renders can swap the element for a new one: look it up again
+  const find = (src: string, index: number, kind: 'element' | 'component'): HTMLElement | null => {
+    if (kind === 'element') return withSource(doc, src)[index] ?? null
+    const node = tree.find('component', src, index)
+    const fiber = node && tree.fiber(node.id)
+    return fiber ? (hostsOf(fiber)[0] ?? null) : null
+  }
   const reattach = () => {
     if (!source || (selected && selected.isConnected)) return
-    attach(withSource(doc, source.src)[source.index] ?? null)
+    if (source.kind === 'component') rebuild()
+    attach(find(source.src, source.index, source.kind))
     apply()
   }
 
+  const nodeBox = (id: string | undefined): Box | null => {
+    const fiber = id ? tree.fiber(id) : undefined
+    return fiber ? boxOf(fiber) : null
+  }
   const reposition = () => {
-    place(hoverBox, active ? hovered : null)
-    place(selectedBox, selected)
+    const hoverNode = hoveredNode ? tree.nodes.find((n) => n.id === hoveredNode) : undefined
+    if (hoverNode) place(hoverBox, nodeBox(hoverNode.id), hoverNode.kind === 'component' ? componentLabel(hoverNode) : elementLabel(tree.fiber(hoverNode.id)?.stateNode as HTMLElement))
+    else place(hoverBox, active ? elementBox(hovered) : null, elementLabel(hovered))
+    const node = sourceNode()
+    if (node) place(selectedBox, nodeBox(node.id), componentLabel(node))
+    else place(selectedBox, elementBox(selected), elementLabel(selected))
     placeGuides(marginGuide, paddingGuide, guides ? selected : null)
+  }
+
+  const pickElement = (el: HTMLElement) => {
+    releaseProps()
+    restore()
+    const element = describe(el)
+    element.nodeId = tree.nodeOfElement(el)
+    attach(el)
+    source = { src: element.src, index: element.index ?? 0, kind: 'element' }
+    shown = null
+    reposition()
+    post({ type: 'dos:picked', element })
   }
 
   const onMove = (e: MouseEvent) => {
@@ -253,13 +380,7 @@ export function createPicker(doc: Document, post: (message: FromPreview) => void
     e.preventDefault()
     e.stopPropagation()
     if (!el) return
-    restore()
-    const element = describe(el)
-    attach(el)
-    source = { src: element.src, index: element.index ?? 0 }
-    shown = null
-    reposition()
-    post({ type: 'dos:picked', element })
+    pickElement(el)
   }
   const onKey = (e: KeyboardEvent) => {
     if (e.key === 'Escape') post({ type: 'dos:cancel' })
@@ -286,12 +407,22 @@ export function createPicker(doc: Document, post: (message: FromPreview) => void
   }
   const view = doc.defaultView
   view?.addEventListener('scroll', reposition, true)
-  const observer = view ? new view.MutationObserver(() => {
+  let rebuildTimer: ReturnType<typeof setTimeout> | undefined
+  const observer = view ? new view.MutationObserver((records) => {
+    if (records.every((r) => (r.target as Element).closest?.(`[${OVERLAY_ATTR}]`) || (r.target.parentElement?.closest(`[${OVERLAY_ATTR}]`)))) return
+    clearTimeout(rebuildTimer)
+    rebuildTimer = setTimeout(() => {
+      rebuild()
+      // A render of the component around it hands in the source props again
+      applyProps()
+      reposition()
+    }, 100)
     if (!source || selected?.isConnected) return
     reattach()
     reposition()
   }) : null
-  observer?.observe(doc.body, { childList: true, subtree: true })
+  // Class changes are renders too (a prop override changes a variant's classes)
+  observer?.observe(doc.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] })
   view?.addEventListener('resize', reposition)
 
   return {
@@ -303,31 +434,70 @@ export function createPicker(doc: Document, post: (message: FromPreview) => void
       if (!active) hovered = null
       reposition()
     },
-    preview(style, text) {
+    preview(style, text, props) {
       reattach()
       restore()
       shown = { style, text }
       apply()
+      // A prop that is no longer overridden gets its source value back
+      const back = Object.fromEntries(Object.entries(originals).filter(([k]) => !props || !(k in props)))
+      const r = renderer()
+      const fiber = r && Object.keys(back).length ? currentFiber() : undefined
+      if (r && fiber) applyOverrides(r, fiber, back)
+      for (const k of Object.keys(back)) delete originals[k]
+      overrides = props && Object.keys(props).length ? props : null
+      applyProps()
       reposition()
     },
     reset() {
       reattach()
+      releaseProps()
       restore()
       shown = null
       reposition()
     },
-    select(src, index = 0) {
+    select(src, index = 0, kind = 'element') {
+      releaseProps()
       restore()
-      source = { src, index }
+      source = { src, index, kind }
       shown = null
-      attach(withSource(doc, src)[index] ?? null)
+      if (kind === 'component') rebuild()
+      attach(find(src, index, kind))
       reposition()
+    },
+    sendTree() {
+      sentTree = ''
+      rebuild()
+    },
+    hover(id) {
+      hoveredNode = id
+      reposition()
+    },
+    selectNode(id) {
+      const node = tree.nodes.find((n) => n.id === id)
+      const fiber = node && tree.fiber(id)
+      if (!node || !fiber) return
+      if (node.kind === 'element') {
+        pickElement(fiber.stateNode as HTMLElement)
+        return
+      }
+      releaseProps()
+      restore()
+      // Releasing rebuilt the tree: find the node again by what survives a rebuild
+      const again = tree.find('component', node.call ?? '', node.index) ?? node
+      const element = describeComponent(tree, again, !!renderer())
+      attach(hostsOf(tree.fiber(again.id) ?? fiber)[0] ?? null)
+      source = { src: node.call ?? '', index: node.index, kind: 'component' }
+      shown = null
+      reposition()
+      post({ type: 'dos:picked', element })
     },
     setGuides(on) {
       guides = on
       reposition()
     },
-    deselect() {
+    deselect(keep) {
+      releaseProps(keep)
       restore()
       attach(null)
       source = null
@@ -335,8 +505,10 @@ export function createPicker(doc: Document, post: (message: FromPreview) => void
       reposition()
     },
     destroy() {
+      releaseProps()
       if (active) listen(false)
       observer?.disconnect()
+      clearTimeout(rebuildTimer)
       view?.removeEventListener('scroll', reposition, true)
       view?.removeEventListener('resize', reposition)
       doc.documentElement.style.cursor = ''

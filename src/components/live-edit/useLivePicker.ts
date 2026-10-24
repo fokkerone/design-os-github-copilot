@@ -19,14 +19,17 @@ export function useLivePicker() {
       const message = readMessage<ToPreview>(event)
       if (!message) return
       if (message.type === 'dos:pick') picker.setActive(message.active)
-      else if (message.type === 'dos:preview') picker.preview(message.style, message.text)
+      else if (message.type === 'dos:preview') picker.preview(message.style, message.text, message.props)
       else if (message.type === 'dos:reset') picker.reset()
-      else if (message.type === 'dos:select') picker.select(message.src, message.index)
-      else if (message.type === 'dos:deselect') picker.deselect()
+      else if (message.type === 'dos:select') picker.select(message.src, message.index, message.kind)
+      else if (message.type === 'dos:hover') picker.hover(message.id)
+      else if (message.type === 'dos:select-node') picker.selectNode(message.id)
+      else if (message.type === 'dos:deselect') picker.deselect(message.keep)
       else if (message.type === 'dos:guides') picker.setGuides(message.active)
     }
     window.addEventListener('message', onMessage)
     post({ type: 'dos:ready' })
+    picker.sendTree()
 
     const onUpdate = () => post({ type: 'dos:updated' })
     import.meta.hot?.on('vite:afterUpdate', onUpdate)

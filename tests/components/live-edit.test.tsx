@@ -7,14 +7,28 @@ import { AssistantRuntimeProvider, useLocalRuntime, type ChatModelAdapter } from
 import { ChatPane } from '@/components/chat/ChatPane'
 import { LiveEditProvider } from '@/components/chat/ChatProvider'
 import { Inspector } from '@/components/live-edit/Inspector'
+import { LiveEditPanel } from '@/components/live-edit/LiveEditPanel'
+import type { useLivePreview } from '@/components/live-edit/useLivePreview'
 import { createPicker } from '@/lib/live-edit/picker'
 import { useLiveEdit } from '@/lib/live-edit/live-edit-context'
-import type { FromPreview } from '@/lib/live-edit/protocol'
+import type { FromPreview, TreeNode } from '@/lib/live-edit/protocol'
 import { APPLY_EDITS_REQUEST, type LiveSelection } from '@/lib/live-edit/selection'
 
 // The inspector reads the token model; tests choose it (null: the stone/lime fallback)
 const tokenModel = vi.hoisted(() => ({ current: null as unknown }))
 vi.mock('@/lib/design-tokens-loader', () => ({ loadDesignTokens: () => tokenModel.current }))
+// The declared props of the product components, without the demo product's files
+vi.mock('virtual:component-props', () => ({
+  default: {
+    'src/ui/button.tsx': {
+      Button: [
+        { name: 'variant', kind: 'choice', options: ['default', 'outline', 'ghost'], default: 'default', optional: true },
+        { name: 'size', kind: 'choice', options: ['default', 'sm'], default: 'default', optional: true },
+        { name: 'loading', kind: 'boolean', optional: true },
+      ],
+    },
+  },
+}))
 
 const value = (oklch: string) => ({ hex: '', oklch, alpha: 1 })
 const voltaTokens = {
@@ -328,5 +342,118 @@ describe('inspector', () => {
     render(<Inspector selection={selection} onChange={onChange} {...props} />)
     await userEvent.type(screen.getByRole('textbox', { name: 'Content' }), '!')
     expect(onChange.mock.calls.at(-1)![0]).toEqual([{ property: 'content', from: 'The platform', to: 'The platform!', css: {} }])
+  })
+})
+
+describe('layers', () => {
+  const nodes: TreeNode[] = [
+    { id: '0', parentId: null, name: 'Login', kind: 'component', index: 0, depth: 0 },
+    { id: '1', parentId: '0', name: 'div', kind: 'element', src: 'src/sections/account/Login.tsx:3:3', index: 0, depth: 1 },
+    { id: '2', parentId: '1', name: 'LoginForm', kind: 'component', call: 'src/sections/account/Login.tsx:4:5', index: 0, depth: 2 },
+    { id: '3', parentId: '2', name: 'Button', kind: 'component', call: 'src/sections/account/components/LoginForm.tsx:58:9', index: 0, depth: 3 },
+    { id: '4', parentId: '3', name: 'button', kind: 'element', src: 'src/ui/button.tsx:41:5', index: 0, depth: 4 },
+  ]
+  const component: LiveSelection = {
+    ...selection,
+    element: {
+      ...selection.element,
+      kind: 'component',
+      src: 'src/sections/account/components/LoginForm.tsx:58:9',
+      index: 0,
+      component: 'Button',
+      componentPath: ['Login', 'LoginForm', 'Button'],
+      definition: 'src/ui/button.tsx:41:5',
+      props: [['variant', '"outline"'], ['onClick', 'ƒ']],
+      values: { variant: 'outline' },
+      overridable: true,
+      tag: 'button',
+      classes: ['bg-teal-600'],
+      textOnly: false,
+    },
+  }
+  const live = (over: Partial<NonNullable<ReturnType<typeof useLivePreview>>> = {}) =>
+    ({
+      picking: true,
+      setPicking: vi.fn(),
+      selection: null,
+      setEdits: vi.fn(),
+      dismiss: vi.fn(),
+      focusComposer: vi.fn(),
+      apply: vi.fn(),
+      guides: false,
+      setGuides: vi.fn(),
+      nodes,
+      selectedNodeId: null,
+      hoverNode: vi.fn(),
+      selectNode: vi.fn(),
+      ...over,
+    }) as NonNullable<ReturnType<typeof useLivePreview>>
+
+  it('shows the components, hovers and selects them', async () => {
+    const user = userEvent.setup()
+    const l = live()
+    render(<LiveEditPanel live={l} onClose={() => {}} />)
+    expect(screen.getByRole('tab', { name: 'Inspect' })).toBeDisabled()
+    const items = screen.getAllByRole('treeitem')
+    // Elements are hidden by default: their children move up
+    expect(items.map((i) => [i.textContent, i.getAttribute('aria-level')])).toEqual([
+      ['Login', '1'],
+      ['LoginFormLogin.tsx:4', '2'],
+      ['ButtonLoginForm.tsx:58', '3'],
+    ])
+    await user.hover(items[2])
+    expect(l.hoverNode).toHaveBeenLastCalledWith('3')
+    await user.click(items[2])
+    expect(l.selectNode).toHaveBeenCalledWith('3')
+    // The highlight goes when the tree does
+    const { unmount } = render(<LiveEditPanel live={live({ hoverNode: l.hoverNode })} onClose={() => {}} />)
+    unmount()
+    expect(l.hoverNode).toHaveBeenLastCalledWith(null)
+    await user.click(screen.getByLabelText('Elements'))
+    expect(screen.getAllByRole('treeitem')).toHaveLength(5)
+    await user.type(screen.getByLabelText('Filter components'), 'butt')
+    expect(screen.getAllByRole('treeitem').map((i) => i.textContent)).toEqual(['Login', 'div', 'LoginFormLogin.tsx:4', 'ButtonLoginForm.tsx:58', 'button'])
+  })
+
+  it('collapses and walks the tree with the keyboard', async () => {
+    const user = userEvent.setup()
+    const l = live()
+    render(<LiveEditPanel live={l} onClose={() => {}} />)
+    await user.click(screen.getByLabelText('Collapse LoginForm'))
+    expect(screen.getAllByRole('treeitem')).toHaveLength(2)
+    screen.getByRole('tree').focus()
+    await user.keyboard('{ArrowDown}{ArrowDown}{ArrowRight}{ArrowDown}{Enter}')
+    expect(l.selectNode).toHaveBeenLastCalledWith('3')
+  })
+
+  it('opens the inspector of a picked component with its call site, definition and props', async () => {
+    const { rerender } = render(<LiveEditPanel live={live()} onClose={() => {}} />)
+    const l = live({ selection: component, selectedNodeId: '3' })
+    rerender(<LiveEditPanel live={l} onClose={() => {}} />)
+    expect(screen.getByRole('tab', { name: 'Inspect' })).toHaveAttribute('aria-selected', 'true')
+    const inspector = screen.getByRole('complementary', { name: 'Inspector' })
+    expect(inspector).toHaveTextContent('<Button> in LoginForm')
+    expect(inspector).toHaveTextContent('src/sections/account/components/LoginForm.tsx:58')
+    expect(inspector).toHaveTextContent('src/ui/button.tsx:41')
+    expect(inspector).toHaveTextContent('onClickƒ')
+    // No style fields for components yet
+    expect(screen.queryByText('Typography')).not.toBeInTheDocument()
+
+    // Variants are choices; picking one is a prop edit the preview shows live
+    expect(screen.getByLabelText('variant')).toHaveValue('outline')
+    expect(screen.getByLabelText('size')).toHaveValue('default')
+    // Declared props show also when the call site does not set them
+    expect(screen.getByLabelText('loading')).not.toBeChecked()
+    const user = userEvent.setup()
+    await user.selectOptions(screen.getByLabelText('size'), 'sm')
+    expect(l.setEdits).toHaveBeenLastCalledWith([expect.objectContaining({ property: 'prop:size', from: '(none)', to: '"sm"', prop: { name: 'size', value: 'sm', options: ['default', 'sm'] } })])
+    await user.selectOptions(screen.getByLabelText('variant'), 'default')
+    expect(l.setEdits).toHaveBeenLastCalledWith(expect.arrayContaining([expect.objectContaining({ property: 'prop:variant', from: '"outline"', to: '(none)' })]))
+  })
+
+  it('marks the component of a picked element when elements are hidden', async () => {
+    render(<LiveEditPanel live={live({ selection: { ...selection, element: { ...selection.element, src: 'src/ui/button.tsx:41:5', index: 0 } }, selectedNodeId: '4' })} onClose={() => {}} />)
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'Layers' }))
+    expect(screen.getByRole('treeitem', { selected: true })).toHaveTextContent('Button')
   })
 })

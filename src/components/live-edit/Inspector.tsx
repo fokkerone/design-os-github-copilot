@@ -5,6 +5,7 @@ import {
   AlignLeft,
   AlignRight,
   ChevronDown,
+  Component,
   Italic,
   MessageSquarePlus,
   Minus,
@@ -31,11 +32,13 @@ import {
   type InspectorProperty,
 } from '@/lib/live-edit/inspector-options'
 import { shortSource, type LiveEdit, type LiveSelection } from '@/lib/live-edit/selection'
+import { panelClass } from './panel'
+import { propEdit, propFields, type PropField } from '@/lib/live-edit/component-props'
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
 const muted = 'text-stone-500 dark:text-rwe-neutral-400'
 const surface = 'bg-rwe-sand-100 dark:bg-rwe-neutral-900'
-const field = `w-full rounded-md ${surface} px-2 py-1 text-[12px] text-rwe-neutral-900 dark:text-rwe-neutral-100 ${focusRing}`
+const fieldClass = `w-full rounded-md ${surface} px-2 py-1 text-[12px] text-rwe-neutral-900 dark:text-rwe-neutral-100 ${focusRing}`
 const iconButton = `flex size-6 items-center justify-center rounded-md ${muted} hover:bg-stone-100 hover:text-rwe-neutral-900 disabled:opacity-40 disabled:hover:bg-transparent dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-100 ${focusRing}`
 const primaryButton = `flex items-center gap-1.5 rounded-md bg-brand-blue-500 px-2 py-1 text-[11px] font-medium text-white hover:bg-brand-blue-600 dark:bg-energy-green-500 dark:text-brand-blue-900 dark:hover:bg-energy-green-400 ${focusRing}`
 // Transparent colors show a checkerboard behind the swatch
@@ -69,6 +72,7 @@ export function Inspector({
   onApply,
   guides = false,
   onGuidesChange,
+  tabs,
 }: {
   selection: LiveSelection
   onChange: (edits: LiveEdit[]) => void
@@ -78,6 +82,8 @@ export function Inspector({
   /** "Show paddings and margins" in the preview */
   guides?: boolean
   onGuidesChange?: (on: boolean) => void
+  /** The Layers | Inspect tabs, above the header */
+  tabs?: React.ReactNode
 }) {
   const groups = useMemo(() => inspectorGroups(loadDesignTokens()), [])
   // Undo and redo walk through the edit lists of this element
@@ -129,18 +135,27 @@ export function Inspector({
 
   const contentEdit = edits.find((e) => e.property === 'content')
   const controls = { stateOf, choose }
+  const isComponent = element.kind === 'component'
 
   return (
-    <aside
-      aria-label="Inspector"
-      className="flex h-full w-[248px] shrink-0 flex-col overflow-hidden rounded-lg border border-stone-200 bg-rwe-sand-25 shadow-xl dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950"
-    >
+    <aside aria-label="Inspector" className={panelClass}>
+      {tabs}
       <header className="flex items-center gap-2 border-b border-stone-200 px-2.5 py-1.5 dark:border-rwe-neutral-800">
-        <MousePointerClick className="size-3.5 shrink-0 text-brand-blue-500 dark:text-energy-green-500" strokeWidth={1.5} />
+        {isComponent ? (
+          <Component className="size-3.5 shrink-0 text-brand-blue-500 dark:text-energy-green-500" strokeWidth={1.5} />
+        ) : (
+          <MousePointerClick className="size-3.5 shrink-0 text-brand-blue-500 dark:text-energy-green-500" strokeWidth={1.5} />
+        )}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[12px] font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">
-            {element.componentPath.join(' › ') || 'Element'} <span className={muted}>· {element.tag}</span>
-          </p>
+          {isComponent ? (
+            <p className="truncate text-[12px] font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100" title={element.componentPath.join(' › ')}>
+              {`<${element.component}>`} {element.componentPath.length > 1 && <span className={muted}>in {element.componentPath.at(-2)}</span>}
+            </p>
+          ) : (
+            <p className="truncate text-[12px] font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">
+              {element.componentPath.join(' › ') || 'Element'} <span className={muted}>· {element.tag}</span>
+            </p>
+          )}
           <p className={`truncate font-mono text-[10px] ${muted}`} title={element.src}>
             {shortSource(element.src)}
           </p>
@@ -151,7 +166,8 @@ export function Inspector({
       </header>
 
       <div className="flex-1 divide-y divide-stone-200 overflow-y-auto dark:divide-rwe-neutral-800">
-        {element.textOnly && (
+        {isComponent && <ComponentDetails element={element} edits={edits} setEdit={setEdit} />}
+        {!isComponent && element.textOnly && (
           <Section title="Content">
             <textarea
               aria-label="Content"
@@ -160,11 +176,11 @@ export function Inspector({
               onChange={(e) =>
                 setEdit('content', e.target.value === element.text ? null : { property: 'content', from: element.text, to: e.target.value, css: {} })
               }
-              className={`${field} resize-y`}
+              className={`${fieldClass} resize-y`}
             />
           </Section>
         )}
-        {groups.map((group) => (
+        {!isComponent && groups.map((group) => (
           <GroupSection key={group.id} group={group} {...controls} guides={guides} onGuidesChange={onGuidesChange} classes={element.classes} />
         ))}
         <Section title="Classes">
@@ -200,6 +216,125 @@ export function Inspector({
         )}
       </footer>
     </aside>
+  )
+}
+
+/** A component picked in the tree: where it is defined, and its props to edit (variants, plain values) */
+function ComponentDetails({
+  element,
+  edits,
+  setEdit,
+}: {
+  element: LiveSelection['element']
+  edits: LiveEdit[]
+  setEdit: (property: string, edit: LiveEdit | null) => void
+}) {
+  const fields = useMemo(() => propFields(element), [element])
+  const editable = element.overridable !== false
+  const valueOf = (field: PropField) => {
+    const edit = edits.find((e) => e.property === `prop:${field.name}`)
+    return edit ? edit.prop?.value : field.value
+  }
+  const change = (field: PropField, next: string | number | boolean | undefined) => setEdit(`prop:${field.name}`, propEdit(field, next))
+
+  return (
+    <>
+      {element.definition && (
+        <Section title="Defined in">
+          <p className={`break-all font-mono text-[10px] ${muted}`} title={element.definition}>
+            {shortSource(element.definition)}
+          </p>
+        </Section>
+      )}
+      <Section title="Props">
+        {fields.length === 0 && <p className={`text-[11px] ${muted}`}>No props</p>}
+        <div className="space-y-1.5">
+          {fields.map((field) => {
+            const value = valueOf(field)
+            const edited = edits.some((e) => e.property === `prop:${field.name}`)
+            const label = (
+              <span
+                className={`w-16 shrink-0 truncate text-[11px] ${edited ? 'font-medium text-brand-blue-500 dark:text-energy-green-500' : muted}`}
+                title={field.from ? `${field.name} (from ${field.from})` : field.name}
+              >
+                {field.name}
+              </span>
+            )
+            if (field.kind === 'readonly' || !editable) {
+              const text = field.shown ?? (value !== undefined ? JSON.stringify(value) : field.type ?? '—')
+              return (
+                <div key={field.name} className="flex items-center gap-2">
+                  {label}
+                  <span className={`truncate font-mono text-[11px] ${field.shown || value !== undefined ? 'text-rwe-neutral-900 dark:text-rwe-neutral-100' : muted}`} title={text}>
+                    {text}
+                  </span>
+                </div>
+              )
+            }
+            if (field.kind === 'choice') {
+              return (
+                <label key={field.name} className="flex items-center gap-2">
+                  {label}
+                  <span className="relative min-w-0 flex-1">
+                    <select
+                      aria-label={field.name}
+                      value={String(value ?? field.default ?? '')}
+                      onChange={(e) => change(field, e.target.value === '' ? undefined : e.target.value)}
+                      className={`${fieldClass} appearance-none pr-6`}
+                    >
+                      {field.default === undefined && value === undefined && <option value="">— not set</option>}
+                      {field.options!.map((o) => (
+                        <option key={o} value={o}>
+                          {o === field.default ? `${o} (default)` : o}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className={`pointer-events-none absolute right-1.5 top-1/2 size-3 -translate-y-1/2 ${muted}`} strokeWidth={1.75} />
+                  </span>
+                </label>
+              )
+            }
+            if (field.kind === 'boolean') {
+              return (
+                <label key={field.name} className="flex items-center gap-2">
+                  {label}
+                  <input
+                    type="checkbox"
+                    aria-label={field.name}
+                    checked={(value ?? field.default) === true}
+                    onChange={(e) => change(field, e.target.checked)}
+                    className="size-3.5 accent-brand-blue-500 dark:accent-energy-green-500"
+                  />
+                </label>
+              )
+            }
+            return (
+              <label key={field.name} className="flex items-center gap-2">
+                {label}
+                <input
+                  key={String(value)}
+                  aria-label={field.name}
+                  type={field.kind === 'number' ? 'number' : 'text'}
+                  defaultValue={value === undefined || value === null ? '' : String(value)}
+                  placeholder={field.default !== undefined ? String(field.default) : 'not set'}
+                  // Typing previews on Enter or when the field is left, not on every key
+                  onBlur={(e) => {
+                    const raw = e.target.value
+                    // An emptied field removes the prop
+                    change(field, raw === '' ? undefined : field.kind === 'number' ? Number(raw) : raw)
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+                  className={`${fieldClass} font-mono`}
+                />
+              </label>
+            )
+          })}
+        </div>
+        <p className={`text-[10px] ${muted}`}>
+          {editable ? 'Changes preview live; Apply with agent writes them at the call site.' : 'Live prop changes need the dev server. Describe them in the chat.'}
+        </p>
+      </Section>
+    </>
   )
 }
 
@@ -403,7 +538,7 @@ function SelectField({ state, choose }: { state: PropertyState; choose: Controls
         aria-label={property.name ?? property.label}
         value={current ?? ''}
         onChange={(e) => choose(state, property.options.find((o) => o.className === e.target.value) ?? null)}
-        className={`${field} appearance-none pr-7`}
+        className={`${fieldClass} appearance-none pr-7`}
       >
         {!from && <option value="">{`— ${computed || 'not set'}`}</option>}
         {grouped(property.options).map(([group, options]) =>
@@ -498,7 +633,7 @@ function ColorField({ state, choose }: { state: PropertyState; choose: Controls[
         className={`flex w-full items-center gap-1.5 rounded-md text-left ${focusRing}`}
       >
         <Swatch color={option?.swatch ?? computed} />
-        <span className={`${field} truncate font-mono`}>{label}</span>
+        <span className={`${fieldClass} truncate font-mono`}>{label}</span>
       </button>
       {open && (
         <div className={`mt-2 max-h-80 space-y-2 overflow-y-auto rounded-md ${surface} p-2`}>

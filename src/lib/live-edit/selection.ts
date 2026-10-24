@@ -22,6 +22,11 @@ export interface LiveEdit {
   token?: string
   /** The `dark:` class swap that goes with it (semantic colors, shadows) */
   dark?: { from: string | null; to: string }
+  /**
+   * A prop edit on a component (property `prop:<name>`): the value the preview sets, undefined
+   * removes the prop; `options` are the choices the prop's type allows
+   */
+  prop?: { name: string; value: string | number | boolean | undefined; options?: string[] }
 }
 
 export interface LiveSelection {
@@ -35,7 +40,8 @@ const FENCE = 'live-edit'
 
 /** "Hero › h1" — what the chip shows */
 export function selectionLabel(selection: LiveSelection): string {
-  const { component, tag } = selection.element
+  const { component, componentPath, tag, kind } = selection.element
+  if (kind === 'component') return componentPath.length > 1 ? `<${component}> in ${componentPath.at(-2)}` : `<${component}>`
   return component ? `${component} › ${tag}` : tag
 }
 
@@ -54,15 +60,31 @@ export function serializeSelection(selection: LiveSelection): string {
   const lines = [
     target.kind === 'screen' ? 'target: screen-design' : 'target: shell',
     ...(target.kind === 'screen' ? [`section: ${target.sectionId}`, `screen: ${target.screenDesignName}`] : []),
-    `source: ${element.src}`,
-    `component: ${element.componentPath.join(' › ') || '(unknown)'}`,
-    `element: ${element.tag}`,
+    ...(element.kind === 'component'
+      ? [
+          'kind: component',
+          `call: ${element.src}`,
+          ...(element.definition ? [`definition: ${element.definition}`] : []),
+          `component: ${element.componentPath.join(' › ') || '(unknown)'}`,
+          ...(element.props?.length ? ['props:', ...element.props.map(([k, v]) => `  ${k}: ${v}`)] : []),
+          `root element: ${element.tag || '(none)'}`,
+        ]
+      : [`source: ${element.src}`, `component: ${element.componentPath.join(' › ') || '(unknown)'}`, `element: ${element.tag}`]),
     `classes: ${q(element.classes.join(' '))}`,
   ]
   if (element.text) lines.push(`text: ${q(element.text)}`)
   if (edits.length) {
     lines.push('edits:')
     for (const edit of edits) {
+      if (edit.prop) {
+        // Prop edits: `from` and `to` are already JSON values or (none)
+        const notes = [
+          edit.prop.options && `options of ${element.component ?? 'the component'}: ${edit.prop.options.join(', ')}`,
+          edit.prop.value === undefined && 'remove the prop',
+        ].filter(Boolean)
+        lines.push(`  - prop ${edit.prop.name}: ${edit.from ?? '(none)'} -> ${edit.to}${notes.length ? `  # ${notes.join('; ')}` : ''}`)
+        continue
+      }
       const css = Object.entries(edit.css).map(([k, v]) => `${k}: ${v}`).join('; ')
       const raw = /\[.+\]/.test(edit.to)
       const notes = [
