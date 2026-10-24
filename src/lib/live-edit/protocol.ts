@@ -73,6 +73,10 @@ export type ToPreview =
   | { type: 'dos:select-node'; id: string }
   /** `keep`: the agent's change arrived, the preview keeps what the source now renders */
   | { type: 'dos:deselect'; keep?: boolean }
+  /** The prop edits are in the source now: keep showing them, no need to put anything back */
+  | { type: 'dos:commit' }
+  /** Report the selection again (dos:picked), e.g. after HMR brought new source props */
+  | { type: 'dos:describe' }
   /** Shows the margins and paddings of the selected element */
   | { type: 'dos:guides'; active: boolean }
 
@@ -85,7 +89,7 @@ export type FromPreview =
   /** The component tree, after every render */
   | { type: 'dos:tree'; nodes: TreeNode[] }
 
-const TYPES = new Set(['dos:pick', 'dos:preview', 'dos:reset', 'dos:select', 'dos:deselect', 'dos:guides', 'dos:hover', 'dos:select-node', 'dos:tree', 'dos:ready', 'dos:picked', 'dos:cancel', 'dos:updated'])
+const TYPES = new Set(['dos:pick', 'dos:preview', 'dos:reset', 'dos:select', 'dos:deselect', 'dos:guides', 'dos:hover', 'dos:select-node', 'dos:commit', 'dos:describe', 'dos:tree', 'dos:ready', 'dos:picked', 'dos:cancel', 'dos:updated'])
 
 /** The Live Edit message in an event, or null for anything else (other origins, other messages) */
 export function readMessage<T extends ToPreview | FromPreview>(event: MessageEvent, origin = window.location.origin): T | null {

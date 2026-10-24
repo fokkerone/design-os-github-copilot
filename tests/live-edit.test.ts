@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
-import { buildLiveEditMessage, LIVE_EDIT_COMMAND, parseLiveEditMessage, selectionLabel, serializeSelection, type LiveSelection } from '@/lib/live-edit/selection'
+import { buildLiveEditMessage, LIVE_EDIT_COMMAND, RECORD_EDITS_REQUEST, parseLiveEditMessage, selectionLabel, serializeSelection, type LiveSelection } from '@/lib/live-edit/selection'
 import { currentClass, currentDarkClass, inspectorGroups, inspectorProperties, optionFromInput } from '@/lib/live-edit/inspector-options'
 import { sameColor, spacingClass, tokenClass } from '@/lib/live-edit/token-class'
 import { expandSlashCommand } from '@/lib/harness'
@@ -62,8 +62,10 @@ describe('live edit message', () => {
     expect(block).toContain('component: LandingPage › Hero › Button\nprops:\n  variant: "outline"\n  onClick: ƒ\nroot element: button')
     expect(block).not.toContain('source:')
     expect(selectionLabel(component)).toBe('<Button> in Hero')
-    // The command explains the component block
-    expect(readFileSync(LIVE_EDIT_COMMAND, 'utf8')).toContain('kind: component')
+    // The command explains the component block and the record-only request
+    const command = readFileSync(LIVE_EDIT_COMMAND, 'utf8')
+    expect(command).toContain('kind: component')
+    expect(command).toContain(RECORD_EDITS_REQUEST)
   })
 
   it('never lets the html close the fence', () => {

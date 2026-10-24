@@ -77,6 +77,8 @@ Ask in **one** call, only what the request leaves open. Typical questions:
 
 Inspector edits in the `edits:` list are the user's explicit choice: apply them as written (`from` class replaced by `to` class) unless they conflict. `(none)` means no class set the property: add the `to` class, and when a shorthand (`p-4`, `px-6`, `rounded-lg`) already covers it, ask whether to split the shorthand or keep it next to the side class. `# token: <name>` asks for the token comment (`{/* token: primary */}`); with `exact value` the class is the token's exact value ("Token classes" in agents.md): write it unchanged, never round it to a palette step or a Tailwind class, never convert OKLCH to hex. `; dark "<from>" -> "<to>"` is the `dark:` class swap that goes with it: replace the element's `dark:` class for the property, or add it. `text-style` sets several classes: replace the element's font size, weight, line height and tracking classes with them. `# not a token` marks a raw value the user typed: offer the nearest tokens first (Token or exception question).
 
+When the request is exactly `The inspector already wrote these edits to the source. Do not edit files: record the change in the wiki (Step 4).` (the inspector's "Write to source", then "Record in wiki"), the `edits:` list is already in the file at `call`. Ask nothing and change no file: check that the call site shows the edits (say so if it does not), then go straight to Step 4 and record them as the user's choice.
+
 When the request is exactly `Apply the inspector edits to the source as listed.` (the inspector's "Apply with agent" button), the `edits:` list is the whole change. Ask only what is still open (usually the scope, when the element is in `src/ui/` or rendered in a list) and conflicts; if nothing is open, skip the questions and go straight to Step 3. A `content` edit replaces the element's text in the JSX.
 
 ## Step 3: Make the change
@@ -84,6 +86,7 @@ When the request is exactly `Apply the inspector edits to the source as listed.`
 - Edit only the files the chosen scope requires. Keep the component props-based; never import data.
 - Use token classes ("Token classes" in agents.md): the Tailwind class when the token has Tailwind's value, else its exact value, colors in OKLCH. Name the token in a comment (`{/* token: primary */}`), keep `dark:` variants and responsive prefixes consistent.
 - No new dependency. A request the tech stack cannot serve is reported with `/design-os:techstack update`.
+- A change that needs a new reusable piece of UI, or new variants, goes to `src/ui/` (named PascalCase export, `cva()` variants), not into the screen, so Design System › Components lists it. Run `npm run -s ui:check` after it and fix every finding.
 - Vite HMR updates the preview next to the chat as soon as the file is saved; the inspector preview disappears then and the real result shows.
 
 Tell the user in one or two sentences what changed (file:line) and ask with the question tool whether it fits or needs adjustments. Repeat Step 3 for adjustments.

@@ -24,6 +24,8 @@ export function useLivePicker() {
       else if (message.type === 'dos:select') picker.select(message.src, message.index, message.kind)
       else if (message.type === 'dos:hover') picker.hover(message.id)
       else if (message.type === 'dos:select-node') picker.selectNode(message.id)
+      else if (message.type === 'dos:commit') picker.commit()
+      else if (message.type === 'dos:describe') picker.describeAgain()
       else if (message.type === 'dos:deselect') picker.deselect(message.keep)
       else if (message.type === 'dos:guides') picker.setGuides(message.active)
     }

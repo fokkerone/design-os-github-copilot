@@ -256,6 +256,10 @@ export interface Picker {
   selectNode(id: string): void
   /** Show the margins and paddings of the selected element */
   setGuides(on: boolean): void
+  /** The prop edits went into the source: forget them without putting the old values back */
+  commit(): void
+  /** Report the selection again with what the source renders now */
+  describeAgain(): void
   /** `keep`: leave the props the source renders now, the agent's edit arrived */
   deselect(keep?: boolean): void
   destroy(): void
@@ -495,6 +499,23 @@ export function createPicker(doc: Document, post: (message: FromPreview) => void
     setGuides(on) {
       guides = on
       reposition()
+    },
+    commit() {
+      releaseProps(true)
+    },
+    describeAgain() {
+      if (!source) return
+      if (source.kind === 'element') {
+        reattach()
+        if (!selected) return
+        const element = describe(selected)
+        element.nodeId = tree.nodeOfElement(selected)
+        post({ type: 'dos:picked', element })
+        return
+      }
+      rebuild()
+      const node = sourceNode()
+      if (node) post({ type: 'dos:picked', element: describeComponent(tree, node, !!renderer()) })
     },
     deselect(keep) {
       releaseProps(keep)

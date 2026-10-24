@@ -9,7 +9,7 @@ import { OpenCodeClient } from '@/lib/chat/v2/api'
 import { toThreadMessages } from '@/lib/chat/v2/convert'
 import { useOpenCodeSession } from '@/lib/chat/v2/use-session'
 import { LiveEditContext } from '@/lib/live-edit/live-edit-context'
-import { APPLY_EDITS_REQUEST, buildLiveEditMessage, type LiveEdit, type LiveSelection } from '@/lib/live-edit/selection'
+import { APPLY_EDITS_REQUEST, buildLiveEditMessage, RECORD_EDITS_REQUEST, type LiveEdit, type LiveSelection } from '@/lib/live-edit/selection'
 
 const textOf = (message: AppendMessage) =>
   message.content.map((part) => (part.type === 'text' ? part.text : '')).join('')
@@ -110,9 +110,18 @@ export function LiveEditProvider({ children }: { children: ReactNode }) {
     aui.thread().append(buildLiveEditMessage(selection, APPLY_EDITS_REQUEST))
     setSent(true)
   }, [aui, selection, sent])
+  const record = useCallback(
+    (edits: LiveEdit[]) => {
+      if (!selection || edits.length === 0) return
+      window.dispatchEvent(new Event(SHOW_CHAT_EVENT))
+      // The source already has them: the selection stays a draft for further edits
+      aui.thread().append(buildLiveEditMessage({ ...selection, edits }, RECORD_EDITS_REQUEST))
+    },
+    [aui, selection],
+  )
   const value = useMemo(
-    () => ({ selection, sent, select, setEdits, markSent, focusComposer, apply }),
-    [selection, sent, select, setEdits, markSent, focusComposer, apply],
+    () => ({ selection, sent, select, setEdits, markSent, focusComposer, apply, record }),
+    [selection, sent, select, setEdits, markSent, focusComposer, apply, record],
   )
   return <LiveEditContext.Provider value={value}>{children}</LiveEditContext.Provider>
 }

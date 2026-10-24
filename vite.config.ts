@@ -12,6 +12,8 @@ import tailwindTheme from './scripts/tailwind-theme.mjs'
 import reactDevtoolsHook from './scripts/react-devtools-hook.mjs'
 // @ts-expect-error plain ESM script, tested in tests/component-props.test.ts
 import componentProps from './scripts/component-props.mjs'
+// @ts-expect-error plain ESM script, tested in tests/live-edit-writer.test.ts
+import liveEditWriter from './scripts/live-edit-writer.mjs'
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
@@ -25,6 +27,8 @@ export default defineConfig(({ command }) => ({
     reactDevtoolsHook(),
     // Live Edit: the props of the product components as data (virtual:component-props)
     componentProps(),
+    // Live Edit: writes prop edits from the inspector into the JSX at the call site
+    liveEditWriter(),
     // Starts OpenCode for this checkout and proxies /opencode to it (env switches: see the script)
     opencodeServePlugin(),
   ],

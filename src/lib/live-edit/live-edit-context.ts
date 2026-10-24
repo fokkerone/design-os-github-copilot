@@ -17,6 +17,8 @@ export interface LiveEditContextValue {
   focusComposer: () => void
   /** Sends the selection with its inspector edits to the agent, which writes them to the source */
   apply: () => void
+  /** Sends edits the inspector already wrote to the source, for the agent to record in the wiki */
+  record: (edits: LiveEdit[]) => void
 }
 
 /** null outside a ChatProvider: the previews then offer no picker */

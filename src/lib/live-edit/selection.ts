@@ -103,6 +103,8 @@ export function serializeSelection(selection: LiveSelection): string {
 
 /** The request sent with "Apply with agent": the inspector edits are the whole change */
 export const APPLY_EDITS_REQUEST = 'Apply the inspector edits to the source as listed.'
+/** The inspector wrote the edits itself ("Write to source"): the agent only records them */
+export const RECORD_EDITS_REQUEST = 'The inspector already wrote these edits to the source. Do not edit files: record the change in the wiki (Step 4).'
 
 /** The chat message for a change request on a picked element */
 export function buildLiveEditMessage(selection: LiveSelection, request: string): string {

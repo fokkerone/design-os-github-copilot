@@ -386,6 +386,8 @@ describe('layers', () => {
       selectedNodeId: null,
       hoverNode: vi.fn(),
       selectNode: vi.fn(),
+      writeToSource: vi.fn(),
+      record: vi.fn(),
       ...over,
     }) as NonNullable<ReturnType<typeof useLivePreview>>
 
@@ -449,6 +451,28 @@ describe('layers', () => {
     expect(l.setEdits).toHaveBeenLastCalledWith([expect.objectContaining({ property: 'prop:size', from: '(none)', to: '"sm"', prop: { name: 'size', value: 'sm', options: ['default', 'sm'] } })])
     await user.selectOptions(screen.getByLabelText('variant'), 'default')
     expect(l.setEdits).toHaveBeenLastCalledWith(expect.arrayContaining([expect.objectContaining({ property: 'prop:variant', from: '"outline"', to: '(none)' })]))
+  })
+
+  it('writes prop edits to the source, then offers the wiki record', async () => {
+    const user = userEvent.setup()
+    const edit = { property: 'prop:size', from: '(none)', to: '"sm"', css: {}, prop: { name: 'size', value: 'sm' as const, options: ['default', 'sm'] } }
+    const writeToSource = vi.fn(async () => ({ ok: true as const, file: 'src/sections/account/components/LoginForm.tsx' }))
+    const record = vi.fn()
+    render(<LiveEditPanel live={live({ selection: { ...component, edits: [edit] }, selectedNodeId: '3', writeToSource, record })} onClose={() => {}} />)
+    await user.click(screen.getByRole('button', { name: 'Write to source' }))
+    expect(writeToSource).toHaveBeenCalled()
+    expect(await screen.findByRole('status')).toHaveTextContent('Written to LoginForm.tsx')
+    await user.click(screen.getByRole('button', { name: 'Record in wiki' }))
+    expect(record).toHaveBeenCalledWith([edit])
+    expect(screen.getByRole('status')).toHaveTextContent('Sent to the wiki record')
+  })
+
+  it('shows why writing failed', async () => {
+    const edit = { property: 'prop:size', from: '(none)', to: '"sm"', css: {}, prop: { name: 'size', value: 'sm' as const } }
+    const writeToSource = vi.fn(async () => ({ ok: false as const, error: 'No JSX element at 40:11' }))
+    render(<LiveEditPanel live={live({ selection: { ...component, edits: [edit] }, selectedNodeId: '3', writeToSource })} onClose={() => {}} />)
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Write to source' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('Could not write: No JSX element at 40:11')
   })
 
   it('marks the component of a picked element when elements are hidden', async () => {

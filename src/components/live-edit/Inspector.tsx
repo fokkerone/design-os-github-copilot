@@ -12,6 +12,7 @@ import {
   MousePointerClick,
   Redo2,
   RotateCcw,
+  Save,
   Scan,
   Sparkles,
   Strikethrough,
@@ -73,6 +74,8 @@ export function Inspector({
   guides = false,
   onGuidesChange,
   tabs,
+  onWrite,
+  onRecord,
 }: {
   selection: LiveSelection
   onChange: (edits: LiveEdit[]) => void
@@ -84,6 +87,10 @@ export function Inspector({
   onGuidesChange?: (on: boolean) => void
   /** The Layers | Inspect tabs, above the header */
   tabs?: React.ReactNode
+  /** Component prop edits: writes them into the JSX at the call site, without the agent */
+  onWrite?: () => Promise<{ ok: true; file: string } | { ok: false; error: string }>
+  /** Sends what was written to the agent, which records it in the wiki */
+  onRecord?: (edits: LiveEdit[]) => void
 }) {
   const groups = useMemo(() => inspectorGroups(loadDesignTokens()), [])
   // Undo and redo walk through the edit lists of this element
@@ -136,6 +143,24 @@ export function Inspector({
   const contentEdit = edits.find((e) => e.property === 'content')
   const controls = { stateOf, choose }
   const isComponent = element.kind === 'component'
+  // "Write to source": what went in (for the wiki record), or why it failed
+  const [writing, setWriting] = useState(false)
+  const [written, setWritten] = useState<{ edits: LiveEdit[]; file: string; recorded?: boolean } | null>(null)
+  const [writeError, setWriteError] = useState<string | null>(null)
+  const canWrite = isComponent && !!onWrite && edits.length > 0 && edits.every((e) => e.prop)
+  const write = async () => {
+    if (!onWrite) return
+    setWriting(true)
+    setWriteError(null)
+    const sentEdits = edits
+    const result = await onWrite()
+    setWriting(false)
+    if (result.ok) {
+      setWritten({ edits: [...(written?.recorded ? [] : (written?.edits ?? [])), ...sentEdits], file: result.file })
+      setHistory([[]])
+      setIndex(0)
+    } else setWriteError(result.error)
+  }
 
   return (
     <aside aria-label="Inspector" className={panelClass}>
@@ -188,6 +213,33 @@ export function Inspector({
         </Section>
       </div>
 
+      {(written || writeError) && (
+        <div role="status" className="space-y-1 border-t border-stone-200 px-2.5 py-1.5 text-[11px] dark:border-rwe-neutral-800">
+          {writeError ? (
+            <p className="text-red-600 dark:text-red-400">Could not write: {writeError}</p>
+          ) : (
+            written && (
+              <div className="flex items-center gap-2">
+                <p className={`min-w-0 flex-1 truncate ${muted}`} title={written.file}>
+                  {written.recorded ? 'Sent to the wiki record' : `Written to ${written.file.split('/').pop()}`}
+                </p>
+                {onRecord && !written.recorded && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onRecord(written.edits)
+                      setWritten({ ...written, recorded: true })
+                    }}
+                    className={`shrink-0 rounded px-1.5 py-0.5 font-medium text-brand-blue-500 hover:bg-stone-100 dark:text-energy-green-500 dark:hover:bg-rwe-neutral-800 ${focusRing}`}
+                  >
+                    Record in wiki
+                  </button>
+                )}
+              </div>
+            )
+          )}
+        </div>
+      )}
       <footer className="flex items-center gap-1 border-t border-stone-200 px-2.5 py-1.5 dark:border-rwe-neutral-800">
         <button type="button" aria-label="Undo" disabled={index === 0} onClick={() => step(index - 1)} className={iconButton}>
           <Undo2 className="size-3.5" strokeWidth={1.5} />
@@ -198,7 +250,20 @@ export function Inspector({
         <button type="button" aria-label="Reset edits" disabled={edits.length === 0} onClick={() => commit([])} className={iconButton}>
           <RotateCcw className="size-3.5" strokeWidth={1.5} />
         </button>
-        {edits.length > 0 ? (
+        {canWrite ? (
+          <>
+            <button type="button" aria-label="Describe in chat" title="Describe in chat" onClick={onAddToChat} className={`ml-auto ${iconButton}`}>
+              <MessageSquarePlus className="size-3.5" strokeWidth={1.5} />
+            </button>
+            <button type="button" aria-label="Apply with agent" title="Apply with agent" onClick={onApply} className={iconButton}>
+              <Sparkles className="size-3.5" strokeWidth={1.5} />
+            </button>
+            <button type="button" onClick={write} disabled={writing} className={`${primaryButton} disabled:opacity-60`}>
+              <Save className="size-3" strokeWidth={1.75} />
+              {writing ? 'Writing…' : 'Write to source'}
+            </button>
+          </>
+        ) : edits.length > 0 ? (
           <>
             <button type="button" aria-label="Describe in chat" title="Describe in chat" onClick={onAddToChat} className={`ml-auto ${iconButton}`}>
               <MessageSquarePlus className="size-3.5" strokeWidth={1.5} />

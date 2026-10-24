@@ -87,6 +87,8 @@ export function LiveEditPanel({ live, onClose }: { live: NonNullable<ReturnType<
         onClose={live.dismiss}
         onAddToChat={live.focusComposer}
         onApply={live.apply}
+        onWrite={live.writeToSource}
+        onRecord={live.record}
         guides={live.guides}
         onGuidesChange={live.setGuides}
       />

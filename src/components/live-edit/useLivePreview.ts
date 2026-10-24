@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { useLiveEdit } from '@/lib/live-edit/live-edit-context'
 import { readMessage, type FromPreview, type ToPreview, type TreeNode } from '@/lib/live-edit/protocol'
 import type { LiveSelection, LiveTarget } from '@/lib/live-edit/selection'
+import { writePropsToSource } from '@/lib/live-edit/write-props'
 
 export const sameTarget = (a: LiveTarget, b: LiveTarget) =>
   a.kind === 'shell' ? b.kind === 'shell' : b.kind === 'screen' && a.sectionId === b.sectionId && a.screenDesignName === b.screenDesignName
@@ -37,6 +38,8 @@ export function useLivePreview(iframeRef: RefObject<HTMLIFrameElement | null>, t
   const [nodes, setNodes] = useState<TreeNode[]>([])
   // A selection made in the tree keeps the focus in the tree, a click in the preview moves it to the chat
   const fromTree = useRef(false)
+  // "Write to source" ran: the next HMR update brings the new source props
+  const wrote = useRef(false)
   const selection = live?.selection && sameTarget(live.selection.target, target) ? live.selection : null
 
   const post = useCallback(
@@ -82,6 +85,11 @@ export function useLivePreview(iframeRef: RefObject<HTMLIFrameElement | null>, t
         // The agent's change arrived through HMR: the real result replaces the preview
         post({ type: 'dos:deselect', keep: true })
         live.select(null)
+      } else if (message.type === 'dos:updated' && selection && wrote.current) {
+        // What "Write to source" wrote arrived: the inspector shows the new source props
+        wrote.current = false
+        fromTree.current = true
+        post({ type: 'dos:describe' })
       }
     }
     window.addEventListener('message', onMessage)
@@ -129,6 +137,19 @@ export function useLivePreview(iframeRef: RefObject<HTMLIFrameElement | null>, t
       ? nodes.find((n) => n.kind === (picked.kind ?? 'element') && (n.kind === 'component' ? n.call : n.src) === picked.src && n.index === (picked.index ?? 0))?.id ?? null
       : null,
     hoverNode: (id: string | null) => post({ type: 'dos:hover', id }),
+    /** Writes the prop edits into the JSX at the call site, without the agent */
+    writeToSource: async () => {
+      if (!draft) return { ok: false as const, error: 'Nothing selected' }
+      const result = await writePropsToSource(draft)
+      if (result.ok) {
+        wrote.current = true
+        // The source has the edits now: the preview keeps them until HMR renders the source
+        post({ type: 'dos:commit' })
+        live.setEdits([])
+      }
+      return result
+    },
+    record: live.record,
     selectNode: (id: string) => {
       fromTree.current = true
       post({ type: 'dos:select-node', id })
