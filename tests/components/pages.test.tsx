@@ -10,6 +10,7 @@ import { PersonasPage } from '@/components/PersonasPage'
 import { FlowsPage } from '@/components/FlowsPage'
 import { DesignPage } from '@/components/DesignPage'
 import { ShellDesignPage } from '@/components/ShellDesignPage'
+import { ComponentsPage } from '@/components/ComponentsPage'
 import { ClickdummyPage } from '@/components/ClickdummyPage'
 import { PageTabs } from '@/components/PageTabs'
 import { defaultTechstack } from '@/lib/model/techstack'
@@ -81,14 +82,19 @@ describe('step pages (empty project)', () => {
     expect(screen.getByText(/no user flows|no flows/i)).toBeInTheDocument()
   })
 
-  it('Design System has the Tokens and Shell tabs on both pages', () => {
+  it('Design System has the Tokens and Components tabs on both pages', () => {
     const { unmount } = at('/design-system', <DesignPage />)
     expect(screen.getByRole('link', { name: 'Tokens' })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: 'Shell' })).toHaveAttribute('href', '/design-system/shell')
+    expect(screen.getByRole('link', { name: 'Components' })).toHaveAttribute('href', '/design-system/components')
     unmount()
-    at('/design-system/shell', <ShellDesignPage />)
-    expect(screen.getByRole('link', { name: 'Shell' })).toHaveAttribute('aria-current', 'page')
+    at('/design-system/components', <ComponentsPage />)
+    expect(screen.getByRole('link', { name: 'Components' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: 'Tokens' })).toHaveAttribute('href', '/design-system')
+  })
+
+  it('Shell is a Prototype step of its own, without the Design System tabs', () => {
+    at('/prototype/shell', <ShellDesignPage />)
+    expect(screen.queryByRole('link', { name: 'Tokens' })).not.toBeInTheDocument()
   })
 
   it('Prototype preview shows its status without a launch link while nothing is assembled', () => {

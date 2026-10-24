@@ -234,7 +234,7 @@ Repeat 7a–7d for every section in roadmap order.
 
 **What happens**
 1. If the spec suggests several views (list, detail, form), you pick which one to design first.
-2. The agent applies your design system (colors, fonts, voice for labels and empty states, UI style) and builds the screen from `src/ui/` primitives and the icons of your tech stack. A missing primitive is ported into `src/ui/`; only packages from the stack are used, and installing one is asked first.
+2. The agent applies your design system (colors, fonts, voice for labels and empty states, UI style) and builds the screen from `src/ui/` primitives and the icons of your tech stack. A missing primitive is ported into `src/ui/`; only packages from the stack are used, and installing one is asked first. Every primitive a design uses lives in `src/ui/`, so **Design System › Components** lists it with its variants and the screens that use it; `npm run ui:check` reports imports that bypass the layer.
 3. Run the command again for every further view.
 
 - **Result:** props-based components in `src/sections/<section-id>/components/` (no imported data, all actions as callbacks, responsive, light and dark mode) and a preview wrapper `src/sections/<section-id>/<ViewName>.tsx` that feeds the sample data.

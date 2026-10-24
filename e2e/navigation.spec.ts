@@ -2,6 +2,7 @@ import { test, expect, hasSampleProject } from './fixtures'
 
 const routes: [string, RegExp, string][] = [
   ['Vision', /prototype\/vision$/, 'Vision'],
+  ['Shell', /prototype\/shell$/, 'Shell'],
   ['Roadmap', /prototype\/roadmap$/, 'Roadmap'],
   ['Sections', /prototype\/sections$/, 'Sections'],
   ['Export', /prototype\/export$/, 'Export'],
@@ -37,15 +38,15 @@ test.describe('navigation', () => {
     await expect(page.getByText('hello', { exact: true })).toBeVisible()
   })
 
-  test('Roadmap and Data Shape, Tokens and Shell are tabs', async ({ page, opencode }) => {
+  test('Roadmap and Data Shape, Tokens and Components are tabs', async ({ page, opencode }) => {
     void opencode
     await page.goto('/prototype/roadmap')
     await page.getByRole('link', { name: 'Data Shape' }).click()
     await expect(page).toHaveURL(/roadmap\/data-shape$/)
     await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /^Roadmap/ })).toHaveAttribute('aria-current', 'page')
     await page.goto('/design-system')
-    await page.getByRole('link', { name: 'Shell', exact: true }).click()
-    await expect(page).toHaveURL(/design-system\/shell$/)
+    await page.getByRole('link', { name: 'Components', exact: true }).click()
+    await expect(page).toHaveURL(/design-system\/components$/)
   })
 
   test('old routes redirect, unknown routes say so', async ({ page, opencode }) => {
@@ -54,7 +55,8 @@ test.describe('navigation', () => {
       ['/sections', /prototype\/sections$/],
       ['/data-shape', /prototype\/roadmap\/data-shape$/],
       ['/design', /design-system$/],
-      ['/shell/design', /design-system\/shell$/],
+      ['/shell/design', /prototype\/shell$/],
+      ['/design-system/shell', /prototype\/shell$/],
       ['/export', /prototype\/export$/],
       ['/clickdummy', /prototype\/preview$/],
     ] as const) {
@@ -69,7 +71,7 @@ test.describe('navigation', () => {
 
   test('fullscreen previews render without the shell', async ({ page, opencode }) => {
     void opencode
-    await page.goto('/design-system/shell/fullscreen')
+    await page.goto('/prototype/shell/fullscreen')
     await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)
     await page.goto('/prototype/preview/fullscreen')
     await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)

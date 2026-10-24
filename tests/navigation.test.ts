@@ -38,11 +38,12 @@ describe('navigation structure', () => {
     ])
   })
 
-  it('puts the five steps under Prototype', () => {
+  it('puts the six steps under Prototype', () => {
     const nav = buildNavigation('/prototype/vision', none)
-    expect(nav[0].children?.map((c) => c.label)).toEqual(['Vision', 'Roadmap', 'Sections', 'Prototype', 'Export'])
+    expect(nav[0].children?.map((c) => c.label)).toEqual(['Vision', 'Shell', 'Roadmap', 'Sections', 'Prototype', 'Export'])
     expect(nav[0].children?.map((c) => c.href)).toEqual([
       '/prototype/vision',
+      '/prototype/shell',
       '/prototype/roadmap',
       '/prototype/sections',
       '/prototype/preview',
@@ -75,7 +76,8 @@ describe('active entry', () => {
     ['/flows', ['flows']],
     ['/flows/signup', ['flows']],
     ['/design-system', ['design-system']],
-    ['/design-system/shell', ['design-system']],
+    ['/prototype/shell', ['prototype', 'shell']],
+    ['/design-system/components', ['design-system']],
     ['/techstack', ['techstack']],
     ['/wiki', ['wiki']],
     ['/wiki/product/overview', ['wiki']],
@@ -125,10 +127,11 @@ describe('step status', () => {
     expect(byId(nav, 'roadmap').status).toBe('current')
   })
 
-  it('counts the design system as done with tokens or shell', () => {
+  it('counts the design system as done with tokens, the shell on its own', () => {
     expect(byId(buildNavigation('/', { ...none, hasDesignSystem: true }), 'design-system').status).toBe('completed')
-    expect(byId(buildNavigation('/', { ...none, hasShell: true }), 'design-system').status).toBe('completed')
-    expect(byId(buildNavigation('/', none), 'design-system').status).toBe('upcoming')
+    expect(byId(buildNavigation('/', { ...none, hasShell: true }), 'design-system').status).toBe('upcoming')
+    expect(byId(buildNavigation('/', { ...none, hasShell: true }), 'shell').status).toBe('completed')
+    expect(byId(buildNavigation('/', none), 'shell').status).toBe('upcoming')
   })
 
   it('completes tech stack, personas and flows from their artifacts', () => {
@@ -153,8 +156,10 @@ describe('legacyRedirect', () => {
     ['/prototype', '/prototype/vision'],
     ['/data-shape', '/prototype/roadmap/data-shape'],
     ['/design', '/design-system'],
-    ['/shell/design', '/design-system/shell'],
-    ['/shell/design/fullscreen', '/design-system/shell/fullscreen'],
+    ['/shell/design', '/prototype/shell'],
+    ['/shell/design/fullscreen', '/prototype/shell/fullscreen'],
+    ['/design-system/shell', '/prototype/shell'],
+    ['/design-system/shell/fullscreen', '/prototype/shell/fullscreen'],
     ['/sections', '/prototype/sections'],
     ['/sections/citizen-chat', '/prototype/sections/citizen-chat'],
     [
@@ -194,7 +199,7 @@ describe('legacyRedirect', () => {
 describe('isFullscreenPath', () => {
   it('detects fullscreen routes that render outside the shell', () => {
     expect(isFullscreenPath('/prototype/sections/a/screen-designs/B/fullscreen')).toBe(true)
-    expect(isFullscreenPath('/design-system/shell/fullscreen')).toBe(true)
+    expect(isFullscreenPath('/prototype/shell/fullscreen')).toBe(true)
     expect(isFullscreenPath('/prototype/preview/fullscreen')).toBe(true)
     expect(isFullscreenPath('/prototype/sections/a')).toBe(false)
     expect(isFullscreenPath('/prototype/preview')).toBe(false)

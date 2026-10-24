@@ -4,4 +4,6 @@ declare module 'virtual:component-props' {
   /** file → component → its props */
   const props: Record<string, Record<string, DeclaredProp[]>>
   export default props
+  /** src/ui/ file → component → the design files that import it */
+  export const usage: Record<string, Record<string, string[]>>
 }

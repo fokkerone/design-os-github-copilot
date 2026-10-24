@@ -176,6 +176,7 @@ Follow rule 3 of "Applying the stack" in the `designos-techstack` skill:
 - **Packages:** use only packages listed in the stack. Ask before installing one (including what a ported primitive imports), and use the stack's `package-manager`.
 - **Icons** come from the stack's `icons` area (default `lucide-react`). Import them at the top of the file like any dependency.
 - The rules against `@/components/*` and semantic utilities apply to `src/ui/` as well: `npm run test:tokens` covers it as a product directory.
+- **Every primitive the screen uses lives in `src/ui/`**, so Design System › Components lists it (the `designos-techstack` skill, rule 3, "Every component a design uses"). A reusable piece of UI the screen needs, even a hand-written one, goes to `src/ui/<name>.tsx` as a named PascalCase export with typed props and `cva()` variants. `cva()` and primitive libraries (Radix, Base UI ...) appear only in `src/ui/`. After creating or changing a component run `npm run -s ui:check` and fix every finding.
 
 ### Design Requirements
 

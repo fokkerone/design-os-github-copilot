@@ -18,13 +18,14 @@ export const appRoutes: RouteObject[] = [
     ...page(() => import('@/components/ClickdummyFullscreen'), 'ClickdummyFullscreen'),
   },
   {
-    path: '/design-system/shell/fullscreen',
+    path: '/prototype/shell/fullscreen',
     ...page(() => import('@/components/ShellDesignPage'), 'ShellDesignFullscreen'),
   },
   {
     element: <AppFrame />,
     children: [
       { path: '/prototype/vision', ...page(() => import('@/components/VisionPage'), 'VisionPage') },
+      { path: '/prototype/shell', ...page(() => import('@/components/ShellDesignPage'), 'ShellDesignPage') },
       { path: '/prototype/roadmap', ...page(() => import('@/components/RoadmapPage'), 'RoadmapPage') },
       { path: '/prototype/roadmap/data-shape', ...page(() => import('@/components/DataShapePage'), 'DataShapePage') },
       { path: '/prototype/sections', ...page(() => import('@/components/SectionsPage'), 'SectionsPage') },
@@ -40,7 +41,7 @@ export const appRoutes: RouteObject[] = [
       { path: '/flows', ...page(() => import('@/components/FlowsPage'), 'FlowsPage') },
       { path: '/flows/:flowId', ...page(() => import('@/components/FlowPage'), 'FlowPage') },
       { path: '/design-system', ...page(() => import('@/components/DesignPage'), 'DesignPage') },
-      { path: '/design-system/shell', ...page(() => import('@/components/ShellDesignPage'), 'ShellDesignPage') },
+      { path: '/design-system/components', ...page(() => import('@/components/ComponentsPage'), 'ComponentsPage') },
       { path: '/techstack', ...page(() => import('@/components/TechstackPage'), 'TechstackPage') },
       { path: '/wiki', ...page(() => import('@/components/WikiPage'), 'WikiPage') },
       { path: '/wiki/*', ...page(() => import('@/components/WikiArticlePage'), 'WikiArticlePage') },

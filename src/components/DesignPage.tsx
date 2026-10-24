@@ -1,15 +1,12 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AppLayout } from "@/components/AppLayout";
 import { AgentPrompt, StepName } from "@/components/AgentPrompt";
-import { EmptyState } from "@/components/EmptyState";
 import { StepIndicator, type StepStatus } from "@/components/StepIndicator";
 import { NextPhaseButton } from "@/components/NextPhaseButton";
 import { PageTabs } from "@/components/PageTabs";
 import { designSystemTabs } from "@/components/tabs";
-import { paths } from "@/lib/paths";
 import { loadProductData } from "@/lib/product-loader";
 import {
   hasDesignResources,
@@ -22,7 +19,6 @@ import {
 } from "@/lib/design-tokens-loader";
 import { DesignTokensView } from "@/components/design-tokens";
 import {
-  ChevronRight,
   Layout,
   FileImage,
   FileText,
@@ -89,39 +85,9 @@ function categorizeResources(files: string[]): {
   return categories;
 }
 
-/**
- * Determine the status of each step on the Design page
- * Steps: 1. Design System, 2. Shell Design
- */
-function getDesignPageStepStatuses(
-  hasDesignSystem: boolean,
-  hasShell: boolean,
-): StepStatus[] {
-  const statuses: StepStatus[] = [];
-
-  // Step 1: Design System
-  if (hasDesignSystem) {
-    statuses.push("completed");
-  } else {
-    statuses.push("current");
-  }
-
-  // Step 2: Shell
-  if (hasShell) {
-    statuses.push("completed");
-  } else if (hasDesignSystem) {
-    statuses.push("current");
-  } else {
-    statuses.push("upcoming");
-  }
-
-  return statuses;
-}
-
 export function DesignPage() {
   const productData = useMemo(() => loadProductData(), []);
   const designSystem = productData.designSystem;
-  const shell = productData.shell;
   const tokensState = useMemo(() => loadDesignTokensState(), []);
   const designGuide = useMemo(() => loadDesignGuide(), []);
   const hasAgentDesignSystem = !!(
@@ -130,13 +96,8 @@ export function DesignPage() {
 
   const hasDesignSystemValue =
     hasAgentDesignSystem || tokensState.status === "ok";
-  const hasShell = !!shell?.spec;
-  const allStepsComplete = hasDesignSystemValue && hasShell;
-
-  const stepStatuses = getDesignPageStepStatuses(
-    hasDesignSystemValue,
-    hasShell,
-  );
+  const allStepsComplete = hasDesignSystemValue;
+  const stepStatuses: StepStatus[] = [hasDesignSystemValue ? "completed" : "current"];
 
   // Get resource files for display
   const resourceFiles = getDesignResourceFiles();
@@ -153,12 +114,12 @@ export function DesignPage() {
             Design System
           </h1>
           <p className='text-stone-600 dark:text-rwe-neutral-400'>
-            Define the visual foundation and application shell for your product.
+            Define the visual foundation of your product: tokens, brand and components.
           </p>
         </div>
 
         {/* Step 1: Design System */}
-        <StepIndicator step={1} status={stepStatuses[0]}>
+        <StepIndicator step={1} status={stepStatuses[0]} isLast={!allStepsComplete}>
           {tokensState.status === "ok" && (
             <DesignTokensView tokens={tokensState.tokens} guide={designGuide} />
           )}
@@ -398,101 +359,9 @@ export function DesignPage() {
           )}
         </StepIndicator>
 
-        {/* Step 2: Application Shell */}
-        <StepIndicator
-          step={2}
-          status={stepStatuses[1]}
-          isLast={!allStepsComplete}
-        >
-          {!shell?.spec ? (
-            <EmptyState type='shell' />
-          ) : (
-            <Card className='border-stone-200 dark:border-rwe-neutral-700 shadow-sm'>
-              <CardHeader className='pb-4'>
-                <CardTitle className='text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100'>
-                  Application Shell
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                {/* Overview */}
-                {shell.spec.overview && (
-                  <p className='text-stone-600 dark:text-rwe-neutral-400 leading-relaxed'>
-                    {shell.spec.overview}
-                  </p>
-                )}
-
-                {/* Navigation items */}
-                {shell.spec.navigationItems.length > 0 && (
-                  <div>
-                    <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-2'>
-                      Navigation
-                    </h4>
-                    <ul className='space-y-1'>
-                      {shell.spec.navigationItems.map((item, index) => {
-                        // Parse markdown-style bold: **text** → <strong>text</strong>
-                        const parts = item.split(/\*\*([^*]+)\*\*/);
-                        return (
-                          <li
-                            key={index}
-                            className='flex items-center gap-2 text-stone-700 dark:text-rwe-neutral-300'
-                          >
-                            <span className='w-1 h-1 rounded-full bg-stone-400 dark:bg-rwe-neutral-500' />
-                            {parts.map((part, i) =>
-                              i % 2 === 1 ? (
-                                <strong key={i} className='font-semibold'>
-                                  {part}
-                                </strong>
-                              ) : (
-                                <span key={i}>{part}</span>
-                              ),
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                )}
-
-                {/* View Shell Design Link */}
-                {shell.hasComponents && (
-                  <div className='pt-2 border-t border-stone-100 dark:border-rwe-neutral-800'>
-                    <Link
-                      to={paths.shell}
-                      className='flex items-center justify-between gap-4 py-2 hover:text-stone-900 dark:hover:text-rwe-neutral-100 transition-colors group'
-                    >
-                      <div className='flex items-center gap-3'>
-                        <div className='w-8 h-8 rounded-md bg-stone-200 dark:bg-rwe-neutral-700 flex items-center justify-center'>
-                          <Layout
-                            className='w-4 h-4 text-stone-600 dark:text-rwe-neutral-300'
-                            strokeWidth={1.5}
-                          />
-                        </div>
-                        <span className='font-medium text-stone-700 dark:text-rwe-neutral-300 group-hover:text-stone-900 dark:group-hover:text-rwe-neutral-100'>
-                          View Shell Design
-                        </span>
-                      </div>
-                      <ChevronRight
-                        className='w-4 h-4 text-stone-400 dark:text-rwe-neutral-500'
-                        strokeWidth={1.5}
-                      />
-                    </Link>
-                  </div>
-                )}
-
-                {/* Edit hint */}
-                <div className='bg-stone-100 dark:bg-rwe-neutral-800 rounded-md px-4 py-2.5'>
-                  <p className='text-xs text-stone-500 dark:text-rwe-neutral-400'>
-                    Use <StepName step='design-shell' /> to update
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </StepIndicator>
-
         {/* Next Phase Button - shown when all steps complete */}
         {allStepsComplete && (
-          <StepIndicator step={3} status='current' isLast>
+          <StepIndicator step={2} status='current' isLast>
             <NextPhaseButton nextPhase='sections' />
           </StepIndicator>
         )}

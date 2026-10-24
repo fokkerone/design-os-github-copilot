@@ -343,6 +343,7 @@ useEffect(() => {
 After creating the files:
 
 1. Run `npx tsc --noEmit` to check for TypeScript errors. Fix any issues.
+   Run `npm run -s ui:check`: the clickdummy imports primitives only from `src/ui/`. Fix every finding.
 2. Start the dev server with `npm run dev` (in background)
 3. Navigate to `http://localhost:3000/clickdummy/preview`
 4. Verify:

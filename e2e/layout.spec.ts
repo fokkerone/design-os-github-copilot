@@ -6,7 +6,7 @@ test.describe('layout', () => {
     await page.goto('/')
     await expect(page).toHaveURL(/\/prototype\/vision$/)
     const nav = page.getByRole('navigation', { name: 'Main' })
-    for (const label of ['Prototype', 'Vision', 'Roadmap', 'Sections', 'Export', 'Personas', 'User Flows', 'Design System', 'Tech Stack', 'Wiki']) {
+    for (const label of ['Prototype', 'Vision', 'Shell', 'Roadmap', 'Sections', 'Export', 'Personas', 'User Flows', 'Design System', 'Tech Stack', 'Wiki']) {
       await expect(nav.getByText(label, { exact: true }).first()).toBeVisible()
     }
     await expect(nav.getByRole('link', { name: /^Vision/ })).toHaveAttribute('aria-current', 'page')

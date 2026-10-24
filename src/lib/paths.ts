@@ -4,6 +4,8 @@ const seg = encodeURIComponent
 
 export const paths = {
   vision: '/prototype/vision',
+  shell: '/prototype/shell',
+  shellFullscreen: '/prototype/shell/fullscreen',
   roadmap: '/prototype/roadmap',
   dataShape: '/prototype/roadmap/data-shape',
   sections: '/prototype/sections',
@@ -19,8 +21,7 @@ export const paths = {
   flows: '/flows',
   flow: (id: string) => `/flows/${seg(id)}`,
   designSystem: '/design-system',
-  shell: '/design-system/shell',
-  shellFullscreen: '/design-system/shell/fullscreen',
+  components: '/design-system/components',
   techstack: '/techstack',
   wiki: '/wiki',
 } as const

@@ -1,7 +1,7 @@
 /**
  * Navigation model of the Design OS app: pure functions, no React, no loaders.
  *
- *   Prototype  (Vision, Roadmap, Sections, Prototype, Export)
+ *   Prototype  (Vision, Shell, Roadmap, Sections, Prototype, Export)
  *   Personas, User Flows, Design System, Tech Stack, Wiki
  *
  * `buildNavigation` derives active entries and step status from the path and a set of
@@ -12,6 +12,7 @@
 export type NavIconName =
   | 'prototype'
   | 'vision'
+  | 'shell'
   | 'roadmap'
   | 'sections'
   | 'preview'
@@ -72,6 +73,7 @@ const DEFS: Def[] = [
     done: () => false,
     children: [
       { id: 'vision', label: 'Vision', href: '/prototype/vision', icon: 'vision', match: ['/prototype/vision'], done: (f) => f.hasOverview },
+      { id: 'shell', label: 'Shell', href: '/prototype/shell', icon: 'shell', match: ['/prototype/shell'], done: (f) => f.hasShell },
       { id: 'roadmap', label: 'Roadmap', href: '/prototype/roadmap', icon: 'roadmap', match: ['/prototype/roadmap'], done: (f) => f.hasRoadmap },
       { id: 'sections', label: 'Sections', href: '/prototype/sections', icon: 'sections', match: ['/prototype/sections'], done: (f) => f.sectionsWithScreenDesigns > 0 },
       { id: 'preview', label: 'Prototype', href: '/prototype/preview', icon: 'preview', match: ['/prototype/preview'], done: (f) => f.hasClickdummy },
@@ -80,7 +82,7 @@ const DEFS: Def[] = [
   },
   { id: 'personas', label: 'Personas', href: '/personas', icon: 'personas', match: ['/personas'], done: (f) => f.personaCount > 0, badge: (f) => f.personaCount || undefined },
   { id: 'flows', label: 'User Flows', href: '/flows', icon: 'flows', match: ['/flows'], done: (f) => f.flowCount > 0, badge: (f) => f.flowCount || undefined },
-  { id: 'design-system', label: 'Design System', href: '/design-system', icon: 'design-system', match: ['/design-system'], done: (f) => f.hasDesignSystem || f.hasShell },
+  { id: 'design-system', label: 'Design System', href: '/design-system', icon: 'design-system', match: ['/design-system'], done: (f) => f.hasDesignSystem },
   { id: 'techstack', label: 'Tech Stack', href: '/techstack', icon: 'techstack', match: ['/techstack'], done: (f) => f.hasTechstack },
   { id: 'wiki', label: 'Wiki', href: '/wiki', icon: 'wiki', match: ['/wiki'], done: () => false },
 ]
@@ -113,7 +115,8 @@ export function buildNavigation(pathname: string, facts: NavFacts): NavItem[] {
 
 /** Routes of the old phase-based layout, in the order they are checked */
 const LEGACY: [from: string, to: string][] = [
-  ['/shell/design', '/design-system/shell'],
+  ['/shell/design', '/prototype/shell'],
+  ['/design-system/shell', '/prototype/shell'],
   ['/data-shape', '/prototype/roadmap/data-shape'],
   ['/design', '/design-system'],
   ['/sections', '/prototype/sections'],

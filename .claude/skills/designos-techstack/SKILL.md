@@ -314,6 +314,12 @@ Screen designs, the shell and the clickdummy import UI primitives **only** from 
   4. Port only what a screen needs. Compose from what `src/ui/` already has before porting another primitive.
   5. Keep the primitives accessible: Dialog, Sheet and Drawer get a title, Avatar gets a fallback. Follow the rules in `.claude/skills/shadcn/rules/`.
   6. Install the npm packages the ported file imports (for example `radix-ui` or `@radix-ui/react-*`, `class-variance-authority`) only after asking, and only when they are not installed yet.
+- **Every component a design uses is in `src/ui/`, so Design System › Components lists it.** The page (`/design-system/components`) reads `src/ui/` on every change, with the variants from the props types and the design files that import each component. It lists what is there, so a primitive kept anywhere else is missing from it:
+  1. A reusable piece of UI (button, badge, tabs, avatar, a field with label and error ...) is a file in `src/ui/`, even when it is written by hand and used once. A screen or the shell keeps only what belongs to that screen: its layout and its section components.
+  2. One file per primitive family (`card.tsx` holds `Card`, `CardHeader` ...). Export each component as a named PascalCase function with a typed props interface; write variants with `cva()` and `defaultVariants`, so the page and the Live Edit inspector show the options and the default.
+  3. `cva()` is used only in `src/ui/`. A component with variants is a primitive.
+  4. A primitive library (Radix, Base UI, cmdk, vaul, sonner ...) is imported only in `src/ui/`. Screens, shell and clickdummy import the wrapper.
+  5. After creating, porting or changing a component, run `npm run -s ui:check`. It lists the components with their users and exits 1 for every import that bypasses the layer (a primitive library, `@/components/*`, `cva()` outside `src/ui/`). Fix every finding before you report, and name the new or changed components in the report.
 - **Another component library:** list its packages in **Packages**; screens import it only through `src/ui/` wrappers that apply the tokens, never directly.
 - **Headless or none:** `src/ui/` holds small Tailwind primitives written by hand.
 - **Icons** come from the `icons` area. Import them in screens and shell like any dependency, one place per file.

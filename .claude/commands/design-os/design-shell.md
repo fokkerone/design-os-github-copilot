@@ -200,6 +200,7 @@ The shell imports UI primitives (button, avatar, dropdown menu, sheet, ...) only
 - Semantic utilities become token classes from `product/design-system/DESIGN.md` (with the `dark:` pair, see "Token classes" in agents.md), with the role in a comment: `// token: primary`.
 - Respect the stack's `ui-base` and `ui-style`, and keep the primitives accessible.
 - Ask before installing an npm package a ported file needs, and report it.
+- Every primitive the shell uses (also a hand-written one) is a file in `src/ui/` with named PascalCase exports and `cva()` variants, so Design System › Components lists it. `cva()` and primitive libraries appear only in `src/ui/`. After creating or changing a component run `npm run -s ui:check` and fix every finding.
 
 **Component Requirements:**
 - Use props for all data and callbacks (portable)

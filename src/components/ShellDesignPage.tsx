@@ -2,8 +2,10 @@ import { Suspense, useState, useRef, useCallback, useEffect } from 'react'
 import { PanelLeft, Maximize2, GripVertical, Smartphone, Tablet, Monitor } from 'lucide-react'
 import { RenderComponent } from '@/components/RenderComponent'
 import { loadShellPreview } from '@/lib/shell-loader'
-import { PageTabs } from '@/components/PageTabs'
-import { designSystemTabs } from '@/components/tabs'
+import { AppLayout } from '@/components/AppLayout'
+import { EmptyState } from '@/components/EmptyState'
+import { ShellCard } from '@/components/ShellCard'
+import { loadProductData } from '@/lib/product-loader'
 import { paths } from '@/lib/paths'
 import { PickButton } from '@/components/live-edit/Inspector'
 import { LiveEditPanel } from '@/components/live-edit/LiveEditPanel'
@@ -17,7 +19,23 @@ const MIN_WIDTH = 320
 const DEFAULT_WIDTH_PERCENT = 100
 const SHELL_TARGET: LiveTarget = { kind: 'shell' }
 
+/** Prototype › Shell: the shell preview, or how to design it while there is none */
 export function ShellDesignPage() {
+  if (getLazyShellPreview()) return <ShellPreviewPage />
+  const shell = loadProductData().shell
+  return (
+    <AppLayout>
+      <h1 className="mb-2 text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100">Application Shell</h1>
+      <p className="mb-6 text-stone-600 dark:text-rwe-neutral-400">The persistent navigation and layout that wraps all sections.</p>
+      <div className="space-y-6">
+        {shell?.spec && <ShellCard shell={shell} />}
+        <EmptyState type="shell" />
+      </div>
+    </AppLayout>
+  )
+}
+
+function ShellPreviewPage() {
   const [widthPercent, setWidthPercent] = useState(DEFAULT_WIDTH_PERCENT)
   const containerRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
@@ -68,7 +86,6 @@ export function ShellDesignPage() {
 
   return (
     <div className="h-full min-h-[480px] bg-stone-100 dark:bg-rwe-neutral-900 animate-fade-in flex flex-col overflow-hidden">
-      <div className="shrink-0 px-4 pt-3 bg-rwe-sand-25 dark:bg-rwe-neutral-950"><PageTabs label="Design system views" tabs={designSystemTabs} /></div>
       {/* Header */}
       <header className="border-b border-stone-200 dark:border-rwe-neutral-800 bg-rwe-sand-25 dark:bg-rwe-neutral-950 shrink-0 z-50">
         <div className="px-4 py-2 flex items-center gap-4">

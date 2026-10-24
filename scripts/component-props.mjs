@@ -18,6 +18,7 @@ import path from 'node:path'
 import { parse } from '@babel/parser'
 import traverseModule from '@babel/traverse'
 import ts from 'typescript'
+import { analyzeUiLayer, DESIGN_DIRS } from './ui-layer.mjs'
 
 const traverse = traverseModule.default ?? traverseModule
 const ID = 'virtual:component-props'
@@ -205,7 +206,8 @@ export function collectProps(root, include = DEFAULT_INCLUDE, oldProgram) {
       }
       // The component's own props first, then the library's
       props.sort((a, b) => Number(!!a.from) - Number(!!b.from))
-      if (props.length) (all[rel] ??= {})[exported.name] = props
+      // Also without props of their own, so the UI layer lists every component
+      ;(all[rel] ??= {})[exported.name] = props
     }
   }
   return { props: all, program }
@@ -228,12 +230,15 @@ export default function componentProps(options = {}) {
       for (const file of filesIn(root, include)) this.addWatchFile(file)
       const result = collectProps(root, include, program)
       program = result.program
-      return `export default ${JSON.stringify(result.props)}`
+      for (const file of filesIn(root, DESIGN_DIRS)) this.addWatchFile(file)
+      // Where each component of src/ui/ is used, for Design System › Components
+      const usage = analyzeUiLayer(root).components
+      return `export default ${JSON.stringify(result.props)}\nexport const usage = ${JSON.stringify(usage)}`
     },
     // A changed component file can change its props: update the inspector with it
     handleHotUpdate({ file, server, modules }) {
       const rel = path.relative(root, file).split(path.sep).join('/')
-      if (!include.some((dir) => rel.startsWith(`${dir}/`))) return
+      if (![...include, ...DESIGN_DIRS].some((dir) => rel.startsWith(`${dir}/`))) return
       const mod = server.moduleGraph.getModuleById(RESOLVED)
       if (!mod) return
       server.moduleGraph.invalidateModule(mod)

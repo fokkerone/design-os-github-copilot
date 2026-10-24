@@ -24,6 +24,7 @@ const samples: [string, string][] = [
   ['designSystem', paths.designSystem],
   ['shell', paths.shell],
   ['shellFullscreen', paths.shellFullscreen],
+  ['components', paths.components],
   ['techstack', paths.techstack],
   ['wiki', paths.wiki],
 ]

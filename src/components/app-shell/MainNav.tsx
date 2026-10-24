@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
-  BookOpen, Check, FileText, GitBranch, Layers, LayoutList, MousePointerClick, Package, Palette,
+  BookOpen, Check, FileText, GitBranch, Layers, LayoutList, MousePointerClick, Package, Palette, PanelLeft,
   Route, Users, Wrench, type LucideIcon,
 } from 'lucide-react'
 import type { NavIconName, NavItem } from '@/lib/navigation'
@@ -9,6 +9,7 @@ import type { NavIconName, NavItem } from '@/lib/navigation'
 const icons: Record<NavIconName, LucideIcon> = {
   prototype: MousePointerClick,
   vision: FileText,
+  shell: PanelLeft,
   roadmap: Route,
   sections: LayoutList,
   preview: MousePointerClick,

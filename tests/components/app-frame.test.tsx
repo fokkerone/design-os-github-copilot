@@ -121,7 +121,7 @@ describe('route table', () => {
     expect(outside).toEqual(
       expect.arrayContaining([
         '/prototype/sections/:sectionId/screen-designs/:screenDesignName/fullscreen',
-        '/design-system/shell/fullscreen',
+        '/prototype/shell/fullscreen',
       ]),
     )
     expect(paths(frame.children!).filter((p) => p.endsWith('/fullscreen'))).toEqual([])

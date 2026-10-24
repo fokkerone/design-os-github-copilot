@@ -8,5 +8,5 @@ export const roadmapTabs: PageTab[] = [
 
 export const designSystemTabs: PageTab[] = [
   { to: paths.designSystem, label: 'Tokens' },
-  { to: paths.shell, label: 'Shell' },
+  { to: paths.components, label: 'Components' },
 ]
