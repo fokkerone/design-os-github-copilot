@@ -178,6 +178,8 @@ Show a compact summary: Ask, rules, step count, edge-case count, sections touche
 
 Then run `npm run validate:mermaid -- product/flows/<flow-id>.md`. If the diagram fails to parse, fix it following the Mermaid Conventions and re-run until it passes. Never hand over a flow with an invalid diagram.
 
+**Product truth (`product/PRODUCT.md`).** After writing, keep `product/PRODUCT.md` in step through the `designos-product-md` skill (`.claude/skills/designos-product-md/SKILL.md`): create it when it does not exist (and the overview does), otherwise update only Capabilities and Constraints and Operating Context (mode `update`, one confirmation). Never run `/impeccable init`.
+
 ## Step 11 — Ingest into the project brain
 
 Immediately compile the flow into the wiki by following the `designos-wiki-ingest` skill with source `product/flows/<flow-id>.md` (type `product`, domain `flows`, using the **flow page** format defined there). Use the template `wiki/_templates/flow.md`. This creates or updates `wiki/flows/<flow-id>.md` and `wiki/flows/Home.md`, and records the hash in `wiki/_manifest.json`.

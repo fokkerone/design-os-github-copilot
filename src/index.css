@@ -4,6 +4,8 @@
 
 @source "../src/shell";
 @source "../src/sections";
+/* The wiki holds no classes; scanning it would turn every new page (a comment) into a full reload */
+@source not "../wiki";
 
 /* dark: applies inside .dark unless a nearer .light scope opts out, so the app shell can
    switch to light even while the page runs in dark mode. */

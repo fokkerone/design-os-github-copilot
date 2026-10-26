@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { WikiLayout } from '@/components/WikiLayout'
 import { WikiMarkdown } from '@/components/WikiMarkdown'
 import { getWikiPage, type FrontmatterValue } from '@/lib/wiki-loader'
+import { useWikiRevision } from '@/lib/use-wiki-revision'
 import { extractWikiHeadings } from '@/lib/wiki-markdown'
 import { paths } from '@/lib/paths'
 
@@ -38,6 +39,7 @@ function Property({ label, children }: { label: string; children: React.ReactNod
 
 export function WikiArticlePage() {
   const path = useParams()['*'] || 'Home'
+  useWikiRevision()
   const page = getWikiPage(path)
 
   // The page title is shown above; drop the duplicate H1 from the body

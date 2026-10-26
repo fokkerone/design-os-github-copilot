@@ -45,6 +45,8 @@ If data.json or types.ts don't exist:
 
 Stop here if any file is missing.
 
+**Product truth (`product/PRODUCT.md`).** If `product/PRODUCT.md` does not exist and `product/product-overview.md` does, create it first with the `designos-product-md` skill (`.claude/skills/designos-product-md/SKILL.md`) (mode `create`, one confirmation), then go on with this step. If the user picks **Later**, continue without it.
+
 ## Step 2: Check for Design System and Shell
 
 Check for optional enhancements:

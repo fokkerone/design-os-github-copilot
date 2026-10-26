@@ -106,6 +106,10 @@ Before proposing sections, run `npm run -s context` (see the `designos-context` 
 - **Flows exist:** every section a flow lists must be in the roadmap. When you update a roadmap, never rename or remove a section that a flow, persona or spec refers to without telling the user which files refer to it.
 - **After the roadmap is written:** suggest two to five user flows that are worth designing next, preferring flows that cross sections, one line each ("Submit a meter reading: Account → Meter Readings"). Do not create them. Point to the `@userflow` agent.
 
+## Product truth (`product/PRODUCT.md`)
+
+After writing the file, keep `product/PRODUCT.md` in step through the `designos-product-md` skill (`.claude/skills/designos-product-md/SKILL.md`): create it when it does not exist, otherwise update only Capabilities and Constraints and Operating Context (mode `update`, one confirmation). Never run `/impeccable init`.
+
 ## Important Notes
 
 - **Always ask clarifying questions before generating** — never auto-generate from the product overview alone

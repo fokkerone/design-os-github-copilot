@@ -34,9 +34,9 @@ Comments are annotations on the preview, like v0: a numbered pin on an element w
 
 ## impeccable in Design OS
 
-- impeccable is installed in the project for Claude Code, GitHub Copilot and OpenCode (the Design OS chat). Its engine is downloaded once on first use.
-- It reads the same context as every Design OS step: `npm run impeccable:context` (also run by `npm run dev`) links `.agents/context/DESIGN.md` to `product/design-system/DESIGN.md` and `.agents/context/PRODUCT.md` to `wiki/product/PRODUCT.md`.
-- `wiki/product/PRODUCT.md` is compiled by `/design-os:wiki-ingest --product` from the overview, personas, tech stack and flows. Without it impeccable still works on the design as it is.
+- impeccable is installed in the project for Claude Code, GitHub Copilot and OpenCode (the Design OS chat), engine included.
+- It reads the same context as every Design OS step: `npm run impeccable:context` (also run by `npm run dev`) links `.agents/context/DESIGN.md` to `product/design-system/DESIGN.md` and `.agents/context/PRODUCT.md` to `product/PRODUCT.md`.
+- `product/PRODUCT.md` holds the product truth impeccable designs against: users, purpose, positioning, context, principles. `/design-os:product-vision` creates it with the overview, and a comment creates it first when it is still missing (one confirmation). Roadmap, personas, tech stack and user flows keep their sections current.
 - Do not run `/impeccable init`, `document`, `shape`, `live` or `generate` here: Design OS steps own product truth, the design system, specs and the picker.
 
 ## Related

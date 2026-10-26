@@ -8,6 +8,7 @@ import { MermaidDiagram } from '@/components/MermaidDiagram'
 import { loadFlow } from '@/lib/flow-loader'
 import { loadPersona } from '@/lib/persona-loader'
 import { getWikiPage } from '@/lib/wiki-loader'
+import { useWikiRevision } from '@/lib/use-wiki-revision'
 import type { ParsedSpec } from '@/types/section'
 
 interface SpecCardProps {
@@ -146,6 +147,7 @@ function LinkedPersonaItem({ text, personaId }: LinkedPersonaItemProps) {
 }
 
 export function SpecCard({ spec, sectionTitle, sectionName }: SpecCardProps) {
+  useWikiRevision()
   const [personasOpen, setPersonasOpen] = useState(false)
   const [userFlowsOpen, setUserFlowsOpen] = useState(false)
   const [uiReqOpen, setUiReqOpen] = useState(false)

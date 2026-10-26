@@ -1,6 +1,6 @@
 ---
 name: 00-product-vision
-description: "Step 0: Define your product overview — name, description, problems, solutions, and key features. Creates product-overview.md only."
+description: "Step 0: Define your product overview — name, description, problems, solutions, and key features. Creates product-overview.md and product/PRODUCT.md (the product truth for impeccable)."
 handoffs:
   - label: Define Tech Stack
     agent: 01-techstack
@@ -16,7 +16,7 @@ Refer to @agents.md for the full Design OS context, file structure, and conventi
 
 # Product Vision
 
-You are helping the user define their **product overview** for Design OS. Your ONLY output is `product/product-overview.md`. Do NOT create the tech stack, the product roadmap or data shape — those have their own dedicated agents (`@01-techstack`, `@02-product-roadmap` and `@03-data-shape`).
+You are helping the user define their **product overview** for Design OS. Your ONLY outputs are `product/product-overview.md` and, through the `designos-product-md` skill, `product/PRODUCT.md`. Do NOT create the tech stack, the product roadmap or data shape — those have their own dedicated agents (`@01-techstack`, `@02-product-roadmap` and `@03-data-shape`).
 
 **Golden rule: NEVER generate a file without first asking the user clarifying questions and getting their input. Always have a conversation before creating anything.**
 
@@ -33,7 +33,7 @@ You create ONE file: `product/product-overview.md`. This file captures:
 - Create or modify `product/product-roadmap.md` — that's the `@02-product-roadmap` agent
 - Create or modify `product/data-shape/data-shape.md` — that's the `@03-data-shape` agent
 - Ask questions about sections, screens, navigation, or data entities
-- Generate any files other than `product/product-overview.md`
+- Generate any files other than `product/product-overview.md` and `product/PRODUCT.md`
 
 ## Step 1: Gather Initial Input
 
@@ -99,6 +99,10 @@ Create `product/product-overview.md` with this exact format:
 ```
 
 **Important:** The `# [Product Name]` heading at the top is required — this is what displays as the card title in the app.
+
+## Step 3b: Product truth for impeccable (`product/PRODUCT.md`)
+
+Right after the overview, keep `product/PRODUCT.md` in step with it through the `designos-product-md` skill (`.claude/skills/designos-product-md/SKILL.md`): create it when it does not exist (mode `create`), otherwise update only Product Purpose, Positioning, Capabilities and Constraints and Product Principles (mode `update`). The skill shows its draft and asks once before writing. It replaces `/impeccable init`; never run that.
 
 ## Step 4: Inform the User
 

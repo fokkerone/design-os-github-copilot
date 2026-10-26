@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen, Search } from 'lucide-react'
 import { WikiLayout } from '@/components/WikiLayout'
 import { Input } from '@/components/ui/input'
 import type { WikiHeading } from '@/lib/wiki-markdown'
 import { getWikiDomains, getWikiLog, getWikiPage, hasWikiContent, type WikiPage as WikiPageData } from '@/lib/wiki-loader'
+import { useWikiRevision } from '@/lib/use-wiki-revision'
 
 const LOG_KIND_STYLES: Record<string, string> = {
   ingest: 'bg-brand-blue-100 text-brand-blue-800 dark:bg-energy-green-900/40 dark:text-energy-green-300',
@@ -61,8 +62,9 @@ function PageRow({ page }: { page: WikiPageData }) {
 
 export function WikiPage() {
   const [query, setQuery] = useState('')
-  const domains = useMemo(() => getWikiDomains(), [])
-  const log = useMemo(() => getWikiLog().slice(0, 8), [])
+  useWikiRevision()
+  const domains = getWikiDomains()
+  const log = getWikiLog().slice(0, 8)
   const vaultPages = ['Home', 'log', '_meta/taxonomy', '_lint-report', '_insights']
     .map((path) => getWikiPage(path))
     .filter((page): page is WikiPageData => page !== null)

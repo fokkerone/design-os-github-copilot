@@ -10,6 +10,7 @@
  */
 
 import { parseFrontmatter, type FrontmatterValue } from './model/frontmatter.ts'
+import { getWikiFiles, getWikiRevision } from './wiki-files.ts'
 
 export { parseFrontmatter, type FrontmatterValue }
 
@@ -33,11 +34,6 @@ export interface WikiLogEntry {
   kind: string
   text: string
 }
-
-const wikiFiles = import.meta.glob(
-  ['/wiki/**/*.md', '!/wiki/_templates/**', '!/wiki/raw/**', '!/wiki/_archives/**', '!/wiki/.obsidian/**'],
-  { query: '?raw', import: 'default', eager: true }
-) as Record<string, string>
 
 function asString(value: FrontmatterValue | undefined): string {
   return typeof value === 'string' ? value : ''
@@ -67,22 +63,30 @@ function parsePage(filePath: string, md: string): WikiPage {
   }
 }
 
-const pages: WikiPage[] = Object.entries(wikiFiles)
-  .map(([filePath, md]) => parsePage(filePath, md))
-  .sort((a, b) => a.path.localeCompare(b.path))
+let parsed: { revision: number; pages: WikiPage[]; byPath: Map<string, WikiPage> } | null = null
 
-const pagesByPath = new Map(pages.map((page) => [page.path, page]))
+/** The parsed pages, rebuilt after a hot update of the wiki files (src/lib/wiki-files.ts) */
+function vault() {
+  const revision = getWikiRevision()
+  if (parsed?.revision !== revision) {
+    const pages = Object.entries(getWikiFiles())
+      .map(([filePath, md]) => parsePage(filePath, md))
+      .sort((a, b) => a.path.localeCompare(b.path))
+    parsed = { revision, pages, byPath: new Map(pages.map((page) => [page.path, page])) }
+  }
+  return parsed
+}
 
 export function getWikiPages(): WikiPage[] {
-  return pages
+  return vault().pages
 }
 
 export function getWikiPage(path: string): WikiPage | null {
-  return pagesByPath.get(path.replace(/\/$/, '')) || null
+  return vault().byPath.get(path.replace(/\/$/, '')) || null
 }
 
 /** Domains shipped with the repository instead of compiled from sources */
-export const SYSTEM_DOMAINS = ['how-to']
+export const SYSTEM_DOMAINS = ['how-to', 'comments']
 
 /** Whether the vault holds any compiled knowledge (beyond Home, log and the shipped how-to guides) */
 export function hasWikiContent(): boolean {
@@ -91,7 +95,7 @@ export function hasWikiContent(): boolean {
 
 /** Content pages: everything except indexes, the log and underscore files */
 export function getContentPages(): WikiPage[] {
-  return pages.filter((page) => !page.isIndex && page.domain !== '' && !page.domain.startsWith('_'))
+  return getWikiPages().filter((page) => !page.isIndex && page.domain !== '' && !page.domain.startsWith('_'))
 }
 
 /** Content pages grouped by domain folder, domains sorted by name, system domains last */
@@ -111,7 +115,8 @@ export function getWikiDomains(): { domain: string; pages: WikiPage[] }[] {
  */
 export function resolveWikiLink(target: string): string | null {
   const clean = target.trim().replace(/\.md$/, '').replace(/#.*$/, '')
-  if (pagesByPath.has(clean)) return clean
+  const { pages, byPath } = vault()
+  if (byPath.has(clean)) return clean
   const name = clean.split('/').pop()
   const byName = pages.filter((page) => page.path.split('/').pop() === name)
   return byName.length === 1 ? byName[0].path : null
@@ -119,7 +124,7 @@ export function resolveWikiLink(target: string): string | null {
 
 /** Entries of wiki/log.md, newest first */
 export function getWikiLog(): WikiLogEntry[] {
-  const log = pagesByPath.get('log')
+  const log = getWikiPage('log')
   if (!log) return []
   const entries: WikiLogEntry[] = []
   for (const match of log.body.matchAll(/^## \[(\d{4}-\d{2}-\d{2})\]\s+([\w-]+)\s*\|\s*(.+)$/gm)) {

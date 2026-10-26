@@ -19,7 +19,7 @@ Domains are concern-centric, not source-centric. A page's domain describes *what
 
 | Domain | Folder | What goes here | Typical source |
 |--------|--------|----------------|----------------|
-| `product` | `product/` | Vision, target users, problems & solutions, value proposition, key features; `PRODUCT.md`, the product truth for impeccable (template `_templates/impeccable-product.md`) | `product/product-overview.md`, personas, tech stack, flows |
+| `product` | `product/` | Vision, target users, problems & solutions, value proposition, key features; the product truth for impeccable compiled from `product/PRODUCT.md` | `product/product-overview.md`, `product/PRODUCT.md`, personas, tech stack, flows |
 | `roadmap` | `roadmap/` | Sections, scope, sequencing, in/out decisions | `product/product-roadmap.md` |
 | `data` | `data/` | Entities, relationships, shared vocabulary | `product/data-shape/data-shape.md` |
 | `techstack` | `techstack/` | Tech stack of the prototype and the export: UI library, icons, registries and reference repos, packages, app patterns, tooling, target framework | `product/techstack/techstack.md` |

@@ -1,6 +1,6 @@
 # Product Vision
 
-You are helping the user define their **product overview** for Design OS. Your ONLY output is `product/product-overview.md`. Do NOT create the tech stack, the product roadmap or data shape — those have their own dedicated commands (`/design-os:techstack`, `/design-os:product-roadmap` and `/design-os:data-shape`).
+You are helping the user define their **product overview** for Design OS. Your ONLY outputs are `product/product-overview.md` and, through the `designos-product-md` skill, `product/PRODUCT.md`. Do NOT create the tech stack, the product roadmap or data shape — those have their own dedicated commands (`/design-os:techstack`, `/design-os:product-roadmap` and `/design-os:data-shape`).
 
 **Important:** Ask every question with the `AskUserQuestion` tool (structured multiple choice), never as plain prose: 2–4 options, your recommendation first with the suffix `(Recommended)`, `multiSelect: true` for non-exclusive choices, up to 4 independent questions per call, no own "Other" option (it is added automatically), short labels.
 
@@ -19,7 +19,7 @@ You create ONE file: `product/product-overview.md`. This file captures:
 - Create or modify `product/product-roadmap.md` — that's the `/design-os:product-roadmap` command
 - Create or modify `product/data-shape/data-shape.md` — that's the `/design-os:data-shape` command
 - Ask questions about sections, screens, navigation, or data entities
-- Generate any files other than `product/product-overview.md`
+- Generate any files other than `product/product-overview.md` and `product/PRODUCT.md`
 
 ## Step 1: Gather Initial Input
 
@@ -85,6 +85,10 @@ Create `product/product-overview.md` with this exact format:
 ```
 
 **Important:** The `# [Product Name]` heading at the top is required — this is what displays as the card title in the app.
+
+## Step 3b: Product truth for impeccable (`product/PRODUCT.md`)
+
+Right after the overview, keep `product/PRODUCT.md` in step with it through the `designos-product-md` skill (`.claude/skills/designos-product-md/SKILL.md`): create it when it does not exist (mode `create`), otherwise update only Product Purpose, Positioning, Capabilities and Constraints and Product Principles (mode `update`). The skill shows its draft and asks once before writing. It replaces `/impeccable init`; never run that.
 
 ## Step 4: Inform the User
 

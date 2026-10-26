@@ -161,6 +161,8 @@ Show a compact summary: name/archetype, kind, priority, job story, top goals, to
 
 Set `status: draft` for a new persona; `active` once at least one flow or section spec links it (Step 12); `validated` when confidence is `high`; `retired` when it no longer represents a target segment.
 
+**Product truth (`product/PRODUCT.md`).** After writing, keep `product/PRODUCT.md` in step through the `designos-product-md` skill (`.claude/skills/designos-product-md/SKILL.md`): create it when it does not exist (and the overview does), otherwise update only Users, Operating Context, Accessibility & Inclusion and Product Principles (mode `update`, one confirmation). Never run `/impeccable init`.
+
 ## Step 11 — Ingest into the project brain
 
 Immediately compile the persona into the wiki by following the `designos-wiki-ingest` skill with source `product/personas/<persona-id>.md` (type `product`, domain `personas`, using the **persona page** format defined there). Use the template `wiki/_templates/persona.md`. This creates or updates `wiki/personas/<persona-id>.md` and `wiki/personas/Home.md`, and records the hash in `wiki/_manifest.json`.

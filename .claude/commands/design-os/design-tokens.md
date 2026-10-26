@@ -23,6 +23,8 @@ If it doesn't exist:
 
 Stop here if the prerequisite is missing.
 
+**Product truth (`product/PRODUCT.md`).** If `product/PRODUCT.md` does not exist and `product/product-overview.md` does, create it first with the `designos-product-md` skill (`.claude/skills/designos-product-md/SKILL.md`) (mode `create`, one confirmation), then go on with this step. If the user picks **Later**, continue without it.
+
 ## Step 1a: Load the Tech Stack
 
 Run `npm run -s techstack` and follow the `designos-techstack` skill, section "Applying the stack" (`.claude/skills/designos-techstack/SKILL.md`).

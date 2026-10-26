@@ -3,6 +3,7 @@ import { changeComment, loadComments, type CommentChange } from '@/lib/comments/
 import type { DesignComment } from '@/lib/comments/format'
 import { buildCommentMessage } from '@/lib/comments/message'
 import { useLiveEdit } from '@/lib/live-edit/live-edit-context'
+import { useWikiRevision } from '@/lib/use-wiki-revision'
 import { readMessage, type FromPreview, type ToPreview } from '@/lib/live-edit/protocol'
 import type { LiveTarget } from '@/lib/live-edit/selection'
 
@@ -52,14 +53,12 @@ export function useLiveComments(iframeRef: RefObject<HTMLIFrameElement | null>, 
     [post],
   )
 
-  // The comments of this screen, and again after every update (the agent marks them resolved)
+  // The comments of this screen, and again whenever a wiki page changes (the agent marks them
+  // resolved): a hot update of wiki/comments/*.md, never a page reload
+  const wikiRevision = useWikiRevision()
   useEffect(() => {
     void refresh()
-    const onUpdate = () => void refresh()
-    import.meta.hot?.on('vite:afterUpdate', onUpdate)
-    // Vitest's hot context has no off()
-    return () => import.meta.hot?.off?.('vite:afterUpdate', onUpdate)
-  }, [targetKey, refresh])
+  }, [targetKey, wikiRevision, refresh])
 
   useEffect(() => {
     post({ type: 'dos:comments', items: comments, showResolved })

@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/AppLayout'
 import { CommandHint, CoverageBar, FlowChip, IssueList, SectionChip } from '@/components/PlanningContext'
 import { getProjectModel, sectionTitle } from '@/lib/project-model'
 import { getWikiPage } from '@/lib/wiki-loader'
+import { useWikiRevision } from '@/lib/use-wiki-revision'
 import { paths } from '@/lib/paths'
 
 const cardClass = 'border-stone-200 dark:border-rwe-neutral-700 shadow-sm'
@@ -34,6 +35,7 @@ function LabeledList({ items }: { items: Record<string, string> }) {
  */
 export function PersonaPage() {
   const { personaId = '' } = useParams<{ personaId: string }>()
+  useWikiRevision()
   const model = getProjectModel()
   const persona = model.getPersona(personaId)
 

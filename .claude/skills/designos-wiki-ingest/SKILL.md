@@ -189,15 +189,12 @@ Rules for tech stack pages:
 - `wiki/techstack/Home.md` uses the default table of `wiki/_templates/domain-home.md`.
 - Run `npm run -s wiki -- sync-meta product/techstack/techstack.md` right after the ingest.
 
-### 6d. PRODUCT.md for impeccable (`wiki/product/PRODUCT.md`)
+### 6d. PRODUCT.md (`product/PRODUCT.md`)
 
-The design skill impeccable (`.claude/skills/impeccable`) reads durable product truth from a `PRODUCT.md`. In Design OS that file is a **wiki page compiled from the wiki and `product/`**, never written by `/impeccable init`. `npm run impeccable:context` links it to `.agents/context/PRODUCT.md`, where impeccable finds it.
+`product/PRODUCT.md` is the durable product truth the design skill impeccable reads (through `.agents/context/PRODUCT.md`). It is a product source like the overview, written only by the `designos-product-md` skill, never by the wiki.
 
-- **When:** on every `--product` ingest that compiled the overview, a persona, the tech stack, a flow or the roadmap, and on a decision page about users, positioning or principles. Create it on the first such ingest.
-- **Template:** `wiki/_templates/impeccable-product.md`. Keep the `# Product` heading, the `<!-- impeccable:product-schema 1 -->` marker and the section names exactly; impeccable parses them. `## Platform` is the bare value `web`.
-- **Content:** a synthesis, not a copy. Each section names its sources as `[[wikilinks]]` (personas, flows, tech stack, overview, decisions); untested persona claims keep their assumption label. Omit a section the sources do not answer, and say in **Evidence on Hand** what does not exist yet. No visual values: colors, fonts and spacing live in `product/design-system/DESIGN.md`.
-- **Record it** with `npm run -s wiki -- record <source> … --updated product/PRODUCT` (or `--created`) together with the source that triggered it, and list it in `wiki/product/Home.md`.
-- After writing it, run `npm run -s impeccable:context` so the link exists.
+- **Compile it** like any product artifact: it shows as `new` or `changed` in `npm run -s wiki -- pending`. Route it to the `product` domain: update the overview's product page (users, positioning, principles, operating context) with `[[wikilinks]]` to the personas, flows and tech stack it names, instead of copying the file into the wiki.
+- **Never write `product/PRODUCT.md`** from an ingest. When an ingested source (overview, persona, tech stack, roadmap, flow) contradicts it, mark the conflict on the wiki page and suggest the `designos-product-md` skill in `update` mode, which changes only the affected sections.
 
 **Source fidelity (grounding invariant).** Every number, date, name, and direct quote must be located in the source (grep/read) *before* you write it, and written exactly as found (`42K` stays `42K`). Derived values must show their components. If you cannot locate a value, drop it or state it without precision.
 

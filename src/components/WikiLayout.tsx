@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { AppLayout } from '@/components/AppLayout'
 import { getWikiDomains, getWikiPage, type WikiPage } from '@/lib/wiki-loader'
+import { useWikiRevision } from '@/lib/use-wiki-revision'
 import type { WikiHeading } from '@/lib/wiki-markdown'
 
 interface WikiLayoutProps {
@@ -34,7 +35,8 @@ function NavLink({ to, active, children }: { to: string; active: boolean; childr
 }
 
 function WikiNav({ currentPath }: { currentPath: string }) {
-  const domains = useMemo(() => getWikiDomains(), [])
+  useWikiRevision()
+  const domains = getWikiDomains()
   const vaultPages = VAULT_PATHS.map((path) => getWikiPage(path)).filter((page): page is WikiPage => page !== null)
 
   return (

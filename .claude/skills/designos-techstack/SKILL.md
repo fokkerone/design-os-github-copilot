@@ -187,6 +187,8 @@ Set `status: draft` while open questions exist that block a decision, `confirmed
 
 Run `npm run -s techstack -- --check`. Fix every error and re-run until it passes. Warnings are shown to the user. The check rejects: changes to the runtime areas, unknown or duplicate areas, a non-shadcn UI library without a package row.
 
+**Product truth (`product/PRODUCT.md`).** After writing, keep `product/PRODUCT.md` in step through the `designos-product-md` skill (`.claude/skills/designos-product-md/SKILL.md`): create it when it does not exist (and the overview does), otherwise update only Platform and Stack (mode `update`, one confirmation). Never run `/impeccable init`.
+
 ## Step 10 — Ingest into the project brain
 
 Immediately compile the file into the wiki by following the `designos-wiki-ingest` skill with source `product/techstack/techstack.md` (type `product`, domain `techstack`, using the **tech stack page** format defined there). Use the template `wiki/_templates/techstack.md`. This creates or updates `wiki/techstack/techstack.md` and `wiki/techstack/Home.md` and records the hash in `wiki/_manifest.json`.

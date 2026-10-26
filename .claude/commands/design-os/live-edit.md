@@ -66,6 +66,8 @@ Then load what governs the element:
 4. Screen designs: `product/sections/<section-id>/spec.md` and `npm run -s context -- <section-id> --screen <ScreenDesignName>` (personas, flows, the steps this screen covers). Shell: `product/shell/spec.md`.
 5. `wiki/design-changes/<section-id>.md` (or `shell.md`) when it exists: earlier changes to the same area. Don't undo a recorded change without asking.
 
+**Product truth (`product/PRODUCT.md`).** If `product/PRODUCT.md` does not exist and `product/product-overview.md` does, create it first with the `designos-product-md` skill (`.claude/skills/designos-product-md/SKILL.md`) (mode `create`, one confirmation), then go on with this step. If the user picks **Later**, continue without it.
+
 ## Step 2: Ask (always, 1–3 questions)
 
 Ask in **one** call, only what the request leaves open. Typical questions:

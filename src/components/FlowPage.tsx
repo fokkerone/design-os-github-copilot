@@ -14,6 +14,7 @@ import {
 } from '@/components/PlanningContext'
 import { getProjectModel, sectionTitle } from '@/lib/project-model'
 import { getWikiPage } from '@/lib/wiki-loader'
+import { useWikiRevision } from '@/lib/use-wiki-revision'
 import { paths } from '@/lib/paths'
 
 const cardClass = 'border-stone-200 dark:border-rwe-neutral-700 shadow-sm'
@@ -26,6 +27,7 @@ const labelClass = 'text-xs font-medium uppercase tracking-wide text-stone-500 d
  */
 export function FlowPage() {
   const { flowId = '' } = useParams<{ flowId: string }>()
+  useWikiRevision()
   const model = getProjectModel()
   const flow = model.getFlow(flowId)
 

@@ -7,6 +7,17 @@ argument-hint: "[shape · audit|critique · animate|bolder|colorize|delight|layo
 license: Apache 2.0
 ---
 
+<!-- design-os:begin (managed by npm run impeccable:context) -->
+## Design OS
+
+This project plans its product in Design OS. These rules come before the rest of this skill:
+
+- **PRODUCT.md is `product/PRODUCT.md`** (read through `.agents/context/PRODUCT.md`). Never create or write a PRODUCT.md at the project root. When it is missing, or `init` or `teach` is asked for, follow `.claude/skills/designos-product-md/SKILL.md` instead of reference/init.md; it writes `product/PRODUCT.md` in the same format.
+- **DESIGN.md is generated** from the design tokens (`npm run tokens:build` writes `product/design-system/DESIGN.md`). Never write it, also not through `document`; fix the token inputs in `product/design-system/import/` instead.
+- **Code-led:** prototypes are built in code (`buildPath: code`), never from generated image comps.
+- Comments from the preview arrive as a `design-comment` block: follow `.claude/commands/design-os/comment.md`.
+<!-- design-os:end -->
+
 This skill gives you the tools and permission to make design that earns the name out-of-distribution craft. Work as an award-winning design director would: production-grade code, a clear POV, a deep grasp of what the client and its users need, and exceptional craft.
 
 Core principles:
