@@ -1,18 +1,12 @@
-import { Suspense, useMemo, useState, useRef, useCallback, useEffect } from 'react'
+import { useMemo, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Maximize2, GripVertical, Layout, Smartphone, Tablet, Monitor, LayoutDashboard, CalendarDays, Users, BookOpen, Circle } from 'lucide-react'
+import { ArrowLeft, Maximize2, GripVertical, Layout, Smartphone, Tablet, Monitor } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { RenderComponent } from '@/components/RenderComponent'
 import { ScreenContextBar } from '@/components/ScreenContextBar'
-import { loadScreenDesignComponent, sectionUsesShell } from '@/lib/section-loader'
-import { loadAppShell, hasShellComponents, loadShellInfo } from '@/lib/shell-loader'
 import { loadProductData } from '@/lib/product-loader'
-import React from 'react'
 import { paths } from '@/lib/paths'
 import { PickButton } from '@/components/live-edit/Inspector'
 import { LiveEditPanel } from '@/components/live-edit/LiveEditPanel'
-import { useLivePicker } from '@/components/live-edit/useLivePicker'
-import { useProductFonts } from '@/lib/product-fonts'
 import { useLivePreview } from '@/components/live-edit/useLivePreview'
 import { useLiveComments, useOneMode } from '@/components/live-edit/useLiveComments'
 import { CommentButton } from '@/components/live-edit/CommentButton'
@@ -84,29 +78,29 @@ export function ScreenDesignPage() {
   const previewWidth = `${widthPercent}%`
 
   return (
-    <div className="h-full min-h-[480px] bg-stone-100 dark:bg-rwe-neutral-900 animate-fade-in flex flex-col overflow-hidden">
+    <div className="h-full min-h-[480px] bg-muted animate-fade-in flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="border-b border-stone-200 dark:border-rwe-neutral-800 bg-rwe-sand-25 dark:bg-rwe-neutral-950 shrink-0 z-50">
+      <header className="border-b border-border bg-card shrink-0 z-50">
         <div className="px-4 py-2 flex items-center gap-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate(paths.section(sectionId ?? ''))}
-            className="text-stone-600 dark:text-rwe-neutral-400 hover:text-stone-900 dark:hover:text-rwe-neutral-100 -ml-2"
+            className="text-muted-foreground hover:text-foreground -ml-2"
           >
             <ArrowLeft className="w-4 h-4 mr-2" strokeWidth={1.5} />
             Back
           </Button>
-          <div className="h-4 w-px bg-stone-200 dark:bg-rwe-neutral-700" />
+          <div className="h-4 w-px bg-muted" />
           <div className="flex items-center gap-2 min-w-0">
-            <Layout className="w-4 h-4 text-stone-400 shrink-0" strokeWidth={1.5} />
+            <Layout className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
             {section && (
-              <span className="text-sm text-stone-500 dark:text-rwe-neutral-400 truncate">
+              <span className="text-sm text-muted-foreground truncate">
                 {section.title}
               </span>
             )}
-            <span className="text-stone-300 dark:text-rwe-neutral-600">/</span>
-            <span className="text-sm font-medium text-stone-700 dark:text-rwe-neutral-300 truncate">
+            <span className="text-primary-foreground">/</span>
+            <span className="text-sm font-medium text-foreground truncate">
               {screenDesignName}
             </span>
           </div>
@@ -114,12 +108,12 @@ export function ScreenDesignPage() {
           {/* Width indicator and device presets */}
           <div className="ml-auto flex items-center gap-4">
             {/* Device size presets */}
-            <div className="flex items-center gap-1 border-r border-stone-200 dark:border-rwe-neutral-700 pr-4">
+            <div className="flex items-center gap-1 border-r border-border pr-4">
               <button
                 onClick={() => setWidthPercent(30)}
                 className={`p-1.5 rounded transition-colors ${widthPercent <= 40
-                    ? 'bg-stone-200 dark:bg-rwe-neutral-700 text-stone-900 dark:text-rwe-neutral-100'
-                    : 'text-stone-400 dark:text-rwe-neutral-500 hover:text-stone-600 dark:hover:text-rwe-neutral-300 hover:bg-stone-100 dark:hover:bg-rwe-neutral-800'
+                    ? 'bg-muted text-foreground'
+                    : 'text-muted-foreground hover:text-muted-foreground hover:bg-accent'
                   }`}
                 title="Mobile (30%)"
               >
@@ -128,8 +122,8 @@ export function ScreenDesignPage() {
               <button
                 onClick={() => setWidthPercent(60)}
                 className={`p-1.5 rounded transition-colors ${widthPercent > 40 && widthPercent <= 60
-                    ? 'bg-stone-200 dark:bg-rwe-neutral-700 text-stone-900 dark:text-rwe-neutral-100'
-                    : 'text-stone-400 dark:text-rwe-neutral-500 hover:text-stone-600 dark:hover:text-rwe-neutral-300 hover:bg-stone-100 dark:hover:bg-rwe-neutral-800'
+                    ? 'bg-muted text-foreground'
+                    : 'text-muted-foreground hover:text-muted-foreground hover:bg-accent'
                   }`}
                 title="Tablet (60%)"
               >
@@ -138,8 +132,8 @@ export function ScreenDesignPage() {
               <button
                 onClick={() => setWidthPercent(100)}
                 className={`p-1.5 rounded transition-colors ${widthPercent > 60
-                    ? 'bg-stone-200 dark:bg-rwe-neutral-700 text-stone-900 dark:text-rwe-neutral-100'
-                    : 'text-stone-400 dark:text-rwe-neutral-500 hover:text-stone-600 dark:hover:text-rwe-neutral-300 hover:bg-stone-100 dark:hover:bg-rwe-neutral-800'
+                    ? 'bg-muted text-foreground'
+                    : 'text-muted-foreground hover:text-muted-foreground hover:bg-accent'
                   }`}
                 title="Desktop (100%)"
               >
@@ -156,14 +150,14 @@ export function ScreenDesignPage() {
                 onShowResolved={comments.setShowResolved}
               />
             )}
-            <span className="text-xs text-stone-500 dark:text-rwe-neutral-400 font-mono w-10 text-right">
+            <span className="text-xs text-muted-foreground font-mono w-10 text-right">
               {Math.round(widthPercent)}%
             </span>
             <a
               href={paths.screenFullscreen(sectionId ?? '', screenDesignName ?? '')}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-rwe-neutral-400 hover:text-stone-700 dark:hover:text-rwe-neutral-200 transition-colors"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               <Maximize2 className="w-3.5 h-3.5" strokeWidth={1.5} />
               Fullscreen
@@ -187,14 +181,14 @@ export function ScreenDesignPage() {
             className="w-4 flex items-center justify-center cursor-ew-resize group shrink-0"
             onMouseDown={handleMouseDown}
           >
-            <div className="w-1 h-16 rounded-full bg-stone-300 dark:bg-rwe-neutral-600 group-hover:bg-stone-400 dark:group-hover:bg-rwe-neutral-500 transition-colors flex items-center justify-center">
-              <GripVertical className="w-3 h-3 text-stone-500 dark:text-rwe-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
+            <div className="w-1 h-16 rounded-full bg-muted group-hover:bg-muted-foreground transition-colors flex items-center justify-center">
+              <GripVertical className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
             </div>
           </div>
 
           {/* Preview container using iframe for true isolation */}
           <div
-            className="bg-rwe-sand-25 dark:bg-rwe-neutral-950 rounded-lg shadow-xl border border-stone-200 dark:border-rwe-neutral-700 overflow-hidden"
+            className="bg-card rounded-lg shadow-xl border border-border overflow-hidden"
             style={{ width: previewWidth, minWidth: MIN_WIDTH, maxWidth: '100%' }}
           >
             <iframe
@@ -210,8 +204,8 @@ export function ScreenDesignPage() {
             className="w-4 flex items-center justify-center cursor-ew-resize group shrink-0"
             onMouseDown={handleMouseDown}
           >
-            <div className="w-1 h-16 rounded-full bg-stone-300 dark:bg-rwe-neutral-600 group-hover:bg-stone-400 dark:group-hover:bg-rwe-neutral-500 transition-colors flex items-center justify-center">
-              <GripVertical className="w-3 h-3 text-stone-500 dark:text-rwe-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
+            <div className="w-1 h-16 rounded-full bg-muted group-hover:bg-muted-foreground transition-colors flex items-center justify-center">
+              <GripVertical className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
             </div>
           </div>
         </div>
@@ -230,224 +224,5 @@ export function ScreenDesignPage() {
         )}
       </div>
     </div>
-  )
-}
-
-type LazyComponent<P = object> = React.LazyExoticComponent<React.ComponentType<P>>
-type ShellProps = { children?: React.ReactNode }
-
-// Lazy components are created once per screen design / section and cached at
-// module level, so their identity is stable across renders.
-const screenDesignCache = new Map<string, LazyComponent | null>()
-const appShellCache = new Map<string, LazyComponent<ShellProps> | null>()
-
-function getLazyScreenDesign(sectionId: string, screenDesignName: string): LazyComponent | null {
-  const key = `${sectionId}/${screenDesignName}`
-  if (!screenDesignCache.has(key)) screenDesignCache.set(key, createLazyScreenDesign(sectionId, screenDesignName))
-  return screenDesignCache.get(key) ?? null
-}
-
-function createLazyScreenDesign(sectionId: string, screenDesignName: string): LazyComponent | null {
-  const loader = loadScreenDesignComponent(sectionId, screenDesignName)
-  if (!loader) return null
-  // Wrap the loader to handle potential export issues
-  return React.lazy(async () => {
-    try {
-      const module = await loader()
-      if (module && typeof module.default === 'function') {
-        return module
-      }
-      console.error('Screen design does not have a valid default export:', screenDesignName)
-      return { default: () => <div>Invalid screen design: {screenDesignName}</div> }
-    } catch (e) {
-      console.error('Failed to load screen design:', screenDesignName, e)
-      return { default: () => <div>Failed to load: {screenDesignName}</div> }
-    }
-  })
-}
-
-function getLazyAppShell(sectionId: string | undefined): LazyComponent<ShellProps> | null {
-  const key = sectionId ?? ''
-  if (!appShellCache.has(key)) appShellCache.set(key, createLazyAppShell(sectionId))
-  return appShellCache.get(key) ?? null
-}
-
-function createLazyAppShell(sectionId: string | undefined): LazyComponent<ShellProps> | null {
-  // Check if this section should use the shell (based on spec.md config)
-  if (sectionId && !sectionUsesShell(sectionId)) {
-    console.log('[ScreenDesignFullscreen] Section configured to not use shell')
-    return null
-  }
-
-  // Check if shell components exist
-  const shellExists = hasShellComponents()
-  console.log('[ScreenDesignFullscreen] Shell exists:', shellExists)
-  if (!shellExists) return null
-
-  const loader = loadAppShell()
-  console.log('[ScreenDesignFullscreen] AppShell loader:', loader)
-  if (!loader) {
-    console.warn('[ScreenDesignFullscreen] hasShellComponents() returned true but loadAppShell() returned null')
-    return null
-  }
-
-  // Wrap the loader to provide default props to the shell
-  return React.lazy(async () => {
-    try {
-      const module = await loader() as Record<string, unknown>
-      const ShellComponent = (module?.default || module?.AppShell) as React.ComponentType<Record<string, unknown>>
-
-      if (typeof ShellComponent !== 'function') {
-        console.warn('[ScreenDesignFullscreen] AppShell does not have a valid export')
-        return { default: ({ children }: { children?: React.ReactNode }) => <>{children}</> }
-      }
-
-      // Create a wrapper that provides default props to the shell
-      const ShellWrapper = ({ children }: { children?: React.ReactNode }) => {
-        // Try to get navigation items from shell spec
-        const shellInfo = loadShellInfo()
-        const specNavItems = shellInfo?.spec?.navigationItems || []
-
-        // Icon mapping for known section labels
-        const iconMap: Record<string, typeof Circle> = {
-          dashboard: LayoutDashboard,
-          'rotation planning': CalendarDays,
-          profiles: Users,
-          'knowledge base': BookOpen,
-        }
-
-        // Parse navigation items from spec (format: "**Label** → Description")
-        const navigationItems = specNavItems.length > 0
-          ? specNavItems.map((item, index) => {
-            // Extract label from **Label** format
-            const labelMatch = item.match(/\*\*([^*]+)\*\*/)
-            const label = labelMatch ? labelMatch[1] : item.split('→')[0]?.trim() || `Item ${index + 1}`
-            return {
-              label,
-              href: `/${label.toLowerCase().replace(/\s+/g, '-')}`,
-              icon: iconMap[label.toLowerCase()] || Circle,
-              isActive: index === 0,
-            }
-          })
-          : [
-            { label: 'Dashboard', href: '/', icon: LayoutDashboard, isActive: true },
-            { label: 'Items', href: '/items', icon: Circle },
-            { label: 'Settings', href: '/settings', icon: Circle },
-          ]
-
-        const defaultUser = {
-          name: 'Demo User',
-        }
-
-        // Pass props dynamically - the shell component decides what it needs
-        return (
-          <ShellComponent
-            navigationItems={navigationItems}
-            user={defaultUser}
-            onNavigate={() => { }}
-            onLogout={() => { }}
-          >
-            {children}
-          </ShellComponent>
-        )
-      }
-
-      return { default: ShellWrapper }
-    } catch (e) {
-      console.error('[ScreenDesignFullscreen] Failed to load AppShell:', e)
-      return { default: ({ children }: { children?: React.ReactNode }) => <>{children}</> }
-    }
-  })
-}
-
-/**
- * Fullscreen version of a screen design (for screenshots)
- * Syncs theme with parent window via localStorage
- * Wraps screen design in AppShell if shell components exist
- */
-export function ScreenDesignFullscreen() {
-  const { sectionId, screenDesignName } = useParams<{ sectionId: string; screenDesignName: string }>()
-
-  // Load screen design component
-  const ScreenDesignComponent = sectionId && screenDesignName ? getLazyScreenDesign(sectionId, screenDesignName) : null
-
-  // Load AppShell component if it exists AND this section uses the shell
-  const AppShellComponent = getLazyAppShell(sectionId)
-
-  // Live Edit: the picker, when the preview is embedded in a step page
-  useLivePicker()
-  // The product's fonts, which the prototype does not load otherwise
-  useProductFonts()
-
-  // Sync theme with parent window
-  useEffect(() => {
-    const applyTheme = () => {
-      const theme = localStorage.getItem('theme') || 'system'
-      const root = document.documentElement
-
-      if (theme === 'system') {
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        root.classList.toggle('dark', systemDark)
-      } else {
-        root.classList.toggle('dark', theme === 'dark')
-      }
-    }
-
-    // Apply on mount
-    applyTheme()
-
-    // Listen for storage changes (from parent window)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'theme') {
-        applyTheme()
-      }
-    }
-    window.addEventListener('storage', handleStorageChange)
-
-    // Also poll for changes since storage event doesn't fire in same window
-    const interval = setInterval(applyTheme, 100)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      clearInterval(interval)
-    }
-  }, [])
-
-  if (!ScreenDesignComponent) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-background">
-        <p className="text-stone-600 dark:text-rwe-neutral-400">Screen design not found.</p>
-      </div>
-    )
-  }
-
-  // If shell exists, wrap screen design in AppShell
-  if (AppShellComponent) {
-    return (
-      <Suspense
-        fallback={
-          <div className="h-screen flex items-center justify-center bg-background">
-            <div className="text-stone-500 dark:text-rwe-neutral-400">Loading...</div>
-          </div>
-        }
-      >
-        <RenderComponent component={AppShellComponent}>
-          <RenderComponent component={ScreenDesignComponent} />
-        </RenderComponent>
-      </Suspense>
-    )
-  }
-
-  // No shell, render screen design directly
-  return (
-    <Suspense
-      fallback={
-        <div className="h-screen flex items-center justify-center bg-background">
-          <div className="text-stone-500 dark:text-rwe-neutral-400">Loading...</div>
-        </div>
-      }
-    >
-      <RenderComponent component={ScreenDesignComponent} />
-    </Suspense>
   )
 }

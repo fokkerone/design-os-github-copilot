@@ -1,14 +1,14 @@
 /**
- * Live Edit: which class renders a design token in the prototype. The prototype does not load
- * the product's tokens.css (token separation), so a token class only shows the token when
- * Tailwind's default theme has the same value under the same name (`p-4`, `text-sm`,
+ * Live Edit: which class renders a design token in the prototype. A token class only shows the
+ * token when the prototype's theme (Tailwind's defaults plus the theme slot of preview.css, see
+ * scripts/tailwind-theme.mjs) has the same value under the same name (`p-4`, `text-sm`,
  * `bg-teal-600`). Every other token is written as its exact value, colors in OKLCH
  * (`bg-[oklch(65.03%_0.11008_192.46)]`, `rounded-[0.25rem]`), with the token named in a
  * comment; the export maps it back to the semantic utility.
  */
 import twTheme from 'virtual:tailwind-theme'
 
-/** Tailwind's default theme variables, without the leading `--` (`color-teal-600`, `radius-md`, …) */
+/** The prototype's theme variables, without the leading `--` (`color-teal-600`, `radius-md`, …) */
 export const tailwindTheme: ReadonlyMap<string, string> = (() => {
   const vars = new Map<string, string>()
   for (const [, name, value] of twTheme.matchAll(/--([\w.-]+):\s*([^;]+);/g)) {

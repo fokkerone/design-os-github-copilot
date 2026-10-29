@@ -36,9 +36,9 @@ export function SectionContextCard({ sectionId, hasSpec }: SectionContextCardPro
     // Personas and flows are optional: a hint, not an error
     if (!hasSpec) return null
     return (
-      <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm border-dashed">
+      <Card className="border-border shadow-sm border-dashed">
         <CardContent className="py-5 space-y-3">
-          <p className="text-sm text-stone-600 dark:text-rwe-neutral-400">
+          <p className="text-sm text-muted-foreground">
             This section is not linked to a persona or a user flow yet. Both are optional. They tell the screen designs who
             the section is for and how the user moves through it.
           </p>
@@ -50,15 +50,15 @@ export function SectionContextCard({ sectionId, hasSpec }: SectionContextCardPro
   }
 
   return (
-    <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
+    <Card className="border-border shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">Personas and user flows</CardTitle>
+        <CardTitle className="text-lg font-semibold text-foreground">Personas and user flows</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400 mb-2">Designed for</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Designed for</p>
           {personas.length === 0 ? (
-            <p className="text-sm text-stone-500 dark:text-rwe-neutral-400">No persona linked.</p>
+            <p className="text-sm text-muted-foreground">No persona linked.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {personas.map((persona) => (
@@ -74,20 +74,20 @@ export function SectionContextCard({ sectionId, hasSpec }: SectionContextCardPro
             .filter((step) => (step.target?.sectionId ?? step.sectionId) === sectionId)
 
           return (
-            <div key={flow.id} className="rounded-md border border-stone-200 dark:border-rwe-neutral-700">
-              <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-stone-200 dark:border-rwe-neutral-700">
+            <div key={flow.id} className="rounded-md border border-border">
+              <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-border">
                 <FlowChip flow={flow} />
                 <CoverageBar coverage={model.coverage(flow.id)} compact />
               </div>
               {steps.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-stone-500 dark:text-rwe-neutral-400">No step of this flow is in this section.</p>
+                <p className="px-4 py-3 text-sm text-muted-foreground">No step of this flow is in this section.</p>
               ) : (
-                <ol className="divide-y divide-stone-100 dark:divide-rwe-neutral-800">
+                <ol className="divide-y divide-border">
                   {steps.map((step) => (
                     <li key={step.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2.5">
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="font-mono text-xs text-stone-400 dark:text-rwe-neutral-500 w-6 shrink-0">{step.id}</span>
-                        <span className="text-sm text-stone-700 dark:text-rwe-neutral-300">{step.title}</span>
+                        <span className="font-mono text-xs text-muted-foreground w-6 shrink-0">{step.id}</span>
+                        <span className="text-sm text-foreground">{step.title}</span>
                         <StepScreen step={step} />
                       </div>
                       <StepStatusBadge step={step} />
@@ -100,7 +100,7 @@ export function SectionContextCard({ sectionId, hasSpec }: SectionContextCardPro
         })}
 
         {unused.length > 0 && flows.length > 0 && (
-          <p className="text-xs text-stone-500 dark:text-rwe-neutral-400">
+          <p className="text-xs text-muted-foreground">
             Not part of any flow step: <span className="font-mono">{unused.map((screen) => screen.name).join(', ')}</span>
           </p>
         )}

@@ -27,7 +27,7 @@ Please create these first, then run `/design-os:clickdummy` again."
 
 Also check for optional design tokens (`product/design-system/design-system.json`). If missing, show a brief note but continue — the screen designs should already have their own styling.
 
-> **Token separation:** The clickdummy is product code. It must not import Design OS UI (`@/components/*`) or use Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, ...); data loaders from `@/lib/product-loader` and `@/lib/section-loader` are fine. See "Token separation" in agents.md.
+> **Token separation:** The clickdummy is product code. It must not import Design OS UI (`@/components/*`) and uses token classes like the screens; data loaders from `@/lib/product-loader` and `@/lib/section-loader` are fine. See "Token separation" in agents.md.
 
 ## Step 1b: Load the Tech Stack
 

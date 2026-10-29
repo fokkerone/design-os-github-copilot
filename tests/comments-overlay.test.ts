@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createCommentsOverlay, elementLabel } from '@/lib/live-edit/comments-overlay'
+import { createCommentsOverlay, elementLabel } from '@/preview/bridge/comments-overlay'
 import type { DesignComment } from '@/lib/comments/format'
 import type { FromPreview } from '@/lib/live-edit/protocol'
 

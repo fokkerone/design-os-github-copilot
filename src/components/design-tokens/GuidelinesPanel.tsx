@@ -9,10 +9,10 @@ function RuleList({ items, kind }: { items: string[]; kind: 'do' | 'dont' | 'neu
   return (
     <ul className="space-y-1.5">
       {items.map((item, i) => (
-        <li key={i} className="flex gap-2 text-sm text-stone-700 dark:text-rwe-neutral-300">
-          {kind === 'do' && <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-blue-600" strokeWidth={2} />}
-          {kind === 'dont' && <X className="mt-0.5 h-4 w-4 shrink-0 text-red-500" strokeWidth={2} />}
-          {kind === 'neutral' && <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-stone-400" />}
+        <li key={i} className="flex gap-2 text-sm text-foreground">
+          {kind === 'do' && <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={2} />}
+          {kind === 'dont' && <X className="mt-0.5 h-4 w-4 shrink-0 text-destructive" strokeWidth={2} />}
+          {kind === 'neutral' && <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted-foreground" />}
           <span>{item}</span>
         </li>
       ))}
@@ -27,15 +27,15 @@ export function GuidelinesPanel({ tokens, guide }: { tokens: DesignTokens; guide
     <div className="space-y-8">
       {(g.mission || g.writingTone || g.brand.length > 0) && (
         <TokenGroup title="Overview">
-          {g.mission && <p className="text-stone-700 dark:text-rwe-neutral-300 leading-relaxed">{g.mission}</p>}
+          {g.mission && <p className="text-foreground leading-relaxed">{g.mission}</p>}
           <div className="flex flex-wrap gap-2">
             {g.brand.map((b) => (
-              <span key={b} className="rounded bg-stone-100 px-2 py-1 text-xs text-stone-600 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-300">
+              <span key={b} className="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
                 {b}
               </span>
             ))}
             {g.writingTone && (
-              <span className="rounded bg-stone-100 px-2 py-1 text-xs text-stone-600 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-300">
+              <span className="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
                 Tone: {g.writingTone}
               </span>
             )}
@@ -82,7 +82,7 @@ export function GuidelinesPanel({ tokens, guide }: { tokens: DesignTokens; guide
         <TokenGroup title="Components">
           <div className="flex flex-wrap gap-2">
             {g.components.families.map((f) => (
-              <span key={f} className="rounded-full border border-stone-200 px-2.5 py-1 text-xs text-stone-700 dark:border-rwe-neutral-700 dark:text-rwe-neutral-300">
+              <span key={f} className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground">
                 {f}
               </span>
             ))}
@@ -91,8 +91,8 @@ export function GuidelinesPanel({ tokens, guide }: { tokens: DesignTokens; guide
             <dl className="grid grid-cols-[6rem_1fr] gap-x-4 gap-y-1.5 text-sm">
               {g.components.variantAxes.map((a) => (
                 <div key={a.axis} className="contents">
-                  <dt className="text-stone-500 dark:text-rwe-neutral-400">{a.axis}</dt>
-                  <dd className="text-stone-800 dark:text-rwe-neutral-200">{a.values.join(' · ')}</dd>
+                  <dt className="text-muted-foreground">{a.axis}</dt>
+                  <dd className="text-foreground">{a.values.join(' · ')}</dd>
                 </div>
               ))}
             </dl>
@@ -107,18 +107,18 @@ export function GuidelinesPanel({ tokens, guide }: { tokens: DesignTokens; guide
       ))}
 
       {guide && (
-        <Collapsible open={open} onOpenChange={setOpen} className="rounded-md border border-stone-200 dark:border-rwe-neutral-700">
+        <Collapsible open={open} onOpenChange={setOpen} className="rounded-md border border-border">
           <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-3 text-left">
             <span>
-              <span className="block text-sm font-medium text-stone-900 dark:text-rwe-neutral-100">DESIGN.md</span>
-              <span className="block font-mono text-[11px] text-stone-500 dark:text-rwe-neutral-400">
+              <span className="block text-sm font-medium text-foreground">DESIGN.md</span>
+              <span className="block font-mono text-[11px] text-muted-foreground">
                 product/design-system/DESIGN.md · generated, read-only
               </span>
             </span>
-            <ChevronDown className={`h-4 w-4 text-stone-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="border-t border-stone-200 dark:border-rwe-neutral-700 px-4 py-4">
+            <div className="border-t border-border px-4 py-4">
               {open && <WikiMarkdown markdown={guide.replace(/^---\n[\s\S]*?\n---\n/, '')} />}
             </div>
           </CollapsibleContent>

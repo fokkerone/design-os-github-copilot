@@ -2,7 +2,7 @@
 title: Comments and impeccable
 summary: Drop numbered comments on a screen design or the shell, pick an impeccable command (Improve, Check, Maintain) for each, and send one at a time to the agent. Comments live in wiki/comments/ and are resolved there.
 tags: [how-to, comments]
-sources: [.claude/commands/design-os/comment.md, scripts/comments-store.mjs, scripts/impeccable-context.mjs, src/lib/comments/, src/lib/live-edit/comments-overlay.ts]
+sources: [.claude/commands/design-os/comment.md, scripts/comments-store.mjs, scripts/impeccable-context.mjs, src/lib/comments/, src/preview/bridge/comments-overlay.ts]
 created: 2026-10-24
 updated: 2026-10-24
 ---

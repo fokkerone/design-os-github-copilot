@@ -1,6 +1,6 @@
 # Trennung von Design OS UI und Prototyp
 
-Stand: 2026-10-27, Branch `feat/liveedit`
+Stand: 2026-10-27, Branch `feat/liveedit`. Nachtrag 2026-10-29 (Branch `feat/split-tailwind`): Schritte 3 bis 5 umgesetzt, siehe Abschnitt 2a und `docs/architecture/plan-split-tailwind.md`.
 
 ## 1. Ziel
 
@@ -15,7 +15,7 @@ Design OS **mehrere Prototypen** und **Templates** laufen. Das geht nur, wenn be
 | **K4 Daten über eine Prototyp-Root** | Design OS liest Planungsdateien und Komponenten über **eine** konfigurierbare Wurzel, nicht über feste Pfade. |
 | **K5 Keine geteilten Komponenten** | Die Design-OS-UI (`src/components/ui`) und die Produkt-UI (`src/ui`) teilen keinen Code und kein Theme. |
 
-## 2. Ist-Zustand auf einen Blick
+## 2. Ist-Zustand auf einen Blick (vor dem Split)
 
 ```mermaid
 flowchart TB
@@ -43,7 +43,42 @@ flowchart TB
 Kurz gesagt: Der Prototyp ist **organisatorisch** getrennt (eigene Ordner, Import-Guards, Token-Guards). **Technisch** läuft er
 aber im selben Build, im selben CSS und im selben React-Baum wie Design OS. Der iframe isoliert nur das Layout, nicht den Code.
 
-## 3. Ist-Zustand je Ebene
+## 2a. Stand nach dem Split (zwei Tailwind-Setups)
+
+```mermaid
+flowchart TB
+  subgraph Server["Ein Vite-Server (Port 3000), zwei Dokumente"]
+    direction TB
+    subgraph App["index.html → src/main.tsx"]
+      AppCSS["src/styles/design-os.css<br/>@source ../components ../lib"]
+      Pages["src/components · src/lib<br/>Loader: nur Dateinamen (?designos-file)"]
+    end
+    subgraph Frame["preview.html → src/preview/main.tsx (iframe)"]
+      PrevCSS["src/preview/preview.css<br/>tailwindcss + designos:prototype-theme"]
+      Registry["src/preview/registry.ts"]
+      Bridge["src/preview/bridge/<br/>Picker, Kommentare, Theme, Fonts"]
+      Proto["src/sections · src/shell<br/>src/ui · src/clickdummy"]
+    end
+  end
+  Slot{"Theme-Slot"}
+  Tokens["product/design-system/tokens/tokens.css"]
+  Volta["templates/volta/theme.css"]
+  PrevCSS --> Slot
+  Slot -->|"wenn vorhanden"| Tokens
+  Slot -->|"sonst"| Volta
+  Registry --> Proto
+  Pages -->|"postMessage (protocol.ts)"| Bridge
+```
+
+- Der iframe lädt `preview.html#/screen/<section>/<screen>`, `#/shell` oder `#/clickdummy`. Die alten `/…/fullscreen`-Routen leiten dorthin um.
+- Die Design-OS-Loader listen Prototyp-Dateien nur noch (`import.meta.glob(…, { query: '?designos-file' })`, ein Stub aus `scripts/prototype-files.mjs`). Kein Prototyp-Code landet im App-Bundle; `npm run test:build` prüft das über das Build-Manifest.
+- Der Theme-Slot (`scripts/prototype-theme.mjs`) nimmt die importierten Produkt-Tokens, sonst das Template aus `product/design-system/template.json` (Default `volta`). Der Live-Edit-Inspector liest dasselbe Theme (`virtual:tailwind-theme`).
+- `npm run preview:check` listet Klassen des Prototyps, die im Prototyp-Theme kein CSS erzeugen.
+- Die Konvention „Token-Klassen + `token:`-Kommentar“ bleibt bis Phase C des Plans; semantische Utilities lösen im Prototyp jetzt aber auf das Prototyp-Theme auf.
+
+**Phase B (Design OS auf das shadcn-Preset):** Die Design OS UI nutzt das Preset `beqC8BzE` (rhea, zinc, Inter). `src/app-theme.css` ist entfernt, Volta lebt nur noch in `templates/volta/theme.css`. Die Palettenklassen in `src/components` hat der Codemod `scripts/codemods/volta-to-shadcn.mjs` auf semantische Tokens umgestellt; `tests/design-os-theme.test.ts` wacht darüber. Damit haben die beiden Setups jetzt auch zwei verschiedene Looks.
+
+## 3. Ist-Zustand je Ebene (vor dem Split)
 
 ### 3.1 Komponenten
 
@@ -133,18 +168,18 @@ Storybook zeigt, dass die Loader schon heute austauschbar sind: `.storybook/fixt
 
 | # | Leck | Kriterium | Schwere | Guard |
 |---|---|---|---|---|
-| L1 | Preview-iframe lädt die Design-OS-SPA inkl. `index.css` | K1, K2 | hoch | nein |
-| L2 | Ein Tailwind-Build für App und Prototyp in der laufenden App | K1 | hoch | teilweise (`design-os.css` ist jetzt sauber, `index.css` bündelt weiterhin) |
+| L1 | ~~Preview-iframe lädt die Design-OS-SPA inkl. `index.css`~~ | K1, K2 | hoch | **geschlossen**: `preview.html` (e2e `navigation.spec.ts`) |
+| L2 | ~~Ein Tailwind-Build für App und Prototyp~~ | K1 | hoch | **geschlossen**: `index.css` entfällt, `separation.test.mjs` + `test:build` |
 | L3 | Feste `/product`- und `/src/sections`-Pfade in zehn Loadern | K4 | hoch | nein |
 | L4 | Eine `package.json` für App und Prototyp-Stack | K3 | hoch | nein |
-| L5 | Volta-Paletten im Prototyp nutzbar | K1, K5 | mittel | nein |
-| L6 | `dark`-Variante und Theme-Sync aus Design OS | K1 | mittel | nein |
-| L7 | Live-Edit-Picker und Fullscreen-Komponenten im Prototyp-Bundle | K3 | mittel | nein |
-| L8 | `FlowWalkBar` aus `src/components` im Clickdummy | K3, K5 | mittel | Guard verbietet den Import, die Architektur verlangt ihn |
+| L5 | ~~Volta-Paletten aus Design OS im Prototyp~~ | K1, K5 | mittel | **geschlossen**: Volta kommt nur noch als Template `templates/volta/` |
+| L6 | ~~`dark`-Variante und Theme-Sync aus Design OS~~ | K1 | mittel | **geschlossen**: Variante aus dem Theme, Sync über `dos:theme` |
+| L7 | ~~Live-Edit-Picker und Fullscreen-Komponenten im Prototyp-Bundle~~ | K3 | mittel | **geschlossen**: `src/preview/bridge/`, Import-Allowlist in `separation.test.mjs` |
+| L8 | `FlowWalkBar` aus `src/components` im Clickdummy | K3, K5 | mittel | offen: der Clickdummy nutzt ihn derzeit nicht; braucht er ihn, wandert er in die Bridge |
 | L9 | Alias `@/lib/*` aus Prototyp-Code erreichbar | K3 | niedrig | nein |
-| L10 | Produkt-Tokens werden in der Vorschau nur angenähert | K1 | niedrig | – (Folge von L1/L2) |
+| L10 | ~~Produkt-Tokens werden in der Vorschau nur angenähert~~ | K1 | niedrig | **geschlossen**: die Vorschau lädt `tokens.css` |
 | ✓ | Produktcode importiert keine Design-OS-UI und kein globales CSS | K3, K5 | – | ja |
-| ✓ | Design OS lädt `tokens.css` nie, Tokens nur als Daten | K1 | – | ja |
+| ✓ | Design OS lädt `tokens.css` nie, Tokens nur als Daten (nur die Vorschau lädt sie) | K1 | – | ja |
 | ✓ | Storybook der Design OS UI lädt keinen Prototyp | K3 | – | ja (`tests/storybook.test.ts`) |
 
 ## 5. Zielarchitektur
@@ -189,16 +224,16 @@ Jeder Schritt bekommt einen Guard-Test, bevor der nächste beginnt.
 |---|---|---|---|
 | 1 | CSS-Split: `src/styles/design-os.css` scannt nur App-Quellen, `index.css` hängt den Prototyp an | `separation.test.mjs`: Design-OS-CSS hat nur App-`@source`s | **erledigt** |
 | 2 | Storybook nur für die Design OS UI, Loader auf Fixtures umgebogen | `tests/storybook.test.ts` | **erledigt** |
-| 3 | Eigener Preview-Entry (`preview.html` + `preview.css` mit `tokens.css`); Fullscreen-Routen entfallen | Prototyp-Bundle enthält kein `design-os.css`, kein `@/components` | offen |
-| 4 | `src/preview-bridge/` für Live-Edit-Picker, Flow-Walk und Theme-Sync | Bridge importiert nichts aus `@/components`, `@/lib/*-loader` | offen |
-| 5 | `index.css` ohne Prototyp-`@source`s (folgt aus 3) | `index.css` == App-Quellen | offen |
+| 3 | Eigener Preview-Entry (`preview.html` + `preview.css` mit Theme-Slot); Fullscreen-Routen werden Redirects | `tests/build-separation`, Import-Allowlist | **erledigt** |
+| 4 | `src/preview/bridge/` für Live-Edit-Picker, Kommentare, Theme-Sync und Fonts | Bridge importiert nichts aus `@/components` | **erledigt** (Flow-Walk offen, L8) |
+| 5 | `index.css` entfällt, `main.tsx` lädt `design-os.css` | `separation.test.mjs` | **erledigt** |
 | 6 | Loader auf `virtual:designos-prototype` umstellen, Caches pro Root | kein `import.meta.glob('/product` in `src/lib` | offen |
 | 7 | Ordner `prototypes/<id>/`, Migration des bestehenden Produkts nach `prototypes/default/` | alle Pfade über die Registry | offen |
 | 8 | Export pro Prototyp (`prototypes/<id>/product-plan/`) | Export-Snapshot-Test | offen |
 | 9 | Eigene `package.json` pro Prototyp (pnpm-Workspace), Tech-Stack-Installationen dorthin | App-`package.json` enthält keine Stack-Pakete | offen |
 | 10 | Templates: `templates/<name>/` + Befehl „Neuer Prototyp“ | Template ist ein gültiger Prototyp (Smoke-Test) | offen |
 
-Die Schritte 3 bis 5 lösen L1, L2, L5, L6, L7, L8 und L10 und bringen schon für **einen** Prototyp echte Tokens in die Vorschau.
+Die Schritte 3 bis 5 lösen L1, L2, L5, L6, L7 und L10 und bringen schon für **einen** Prototyp echte Tokens in die Vorschau.
 Die Schritte 6 bis 10 sind die Voraussetzung für mehrere Prototypen und Templates.
 
 ## 7. Offene Fragen und Risiken

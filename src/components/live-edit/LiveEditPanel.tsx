@@ -9,7 +9,7 @@ type Tab = 'layers' | 'inspect'
 const TAB_KEY = 'designos:live-edit:tab'
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
-const muted = 'text-stone-500 dark:text-rwe-neutral-400'
+const muted = 'text-muted-foreground'
 
 function storedTab(): Tab {
   try {
@@ -44,8 +44,8 @@ export function LiveEditPanel({ live, onClose }: { live: NonNullable<ReturnType<
   const shown: Tab = selection ? tab : 'layers'
 
   const tabs = (
-    <div className="flex items-center gap-1 border-b border-stone-200 px-2.5 py-1.5 dark:border-rwe-neutral-800">
-      <div role="tablist" aria-label="Live Edit" className="flex flex-1 gap-0.5 rounded-md bg-rwe-sand-100 p-0.5 dark:bg-rwe-neutral-900">
+    <div className="flex items-center gap-1 border-b border-border px-2.5 py-1.5">
+      <div role="tablist" aria-label="Live Edit" className="flex flex-1 gap-0.5 rounded-md bg-muted p-0.5">
         {(['layers', 'inspect'] as const).map((t) => (
           <button
             key={t}
@@ -56,8 +56,8 @@ export function LiveEditPanel({ live, onClose }: { live: NonNullable<ReturnType<
             onClick={() => setTab(t)}
             className={`h-6 flex-1 rounded text-[11px] font-medium disabled:opacity-40 ${focusRing} ${
               shown === t
-                ? 'bg-rwe-sand-25 text-rwe-neutral-900 shadow-sm dark:bg-rwe-neutral-950 dark:text-rwe-neutral-50'
-                : `${muted} hover:text-rwe-neutral-900 dark:hover:text-rwe-neutral-100`
+                ? 'bg-card text-foreground shadow-sm'
+                : `${muted} hover:text-foreground`
             }`}
           >
             {t === 'layers' ? 'Layers' : 'Inspect'}
@@ -69,7 +69,7 @@ export function LiveEditPanel({ live, onClose }: { live: NonNullable<ReturnType<
           type="button"
           aria-label="Close Live Edit"
           onClick={onClose}
-          className={`flex size-6 items-center justify-center rounded-md ${muted} hover:bg-stone-100 dark:hover:bg-rwe-neutral-800 ${focusRing}`}
+          className={`flex size-6 items-center justify-center rounded-md ${muted} hover:bg-accent ${focusRing}`}
         >
           <X className="size-3.5" strokeWidth={1.5} />
         </button>

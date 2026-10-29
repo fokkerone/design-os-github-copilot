@@ -1,9 +1,17 @@
 /*
-  App chrome theme: the Volta palette used by the Design OS shell (sidebar, chat, step panel).
-  Source: RWE Volta from the reference app. Product tokens never come from here:
-  they live in product/design-system/ and are applied only in the exported codebase.
-  Palettes whose names clash with Tailwind built-ins carry an rwe- prefix.
+  Volta template: the prototype theme for products without their own token import.
+  The Volta palettes (brand-blue, energy-*, rwe-*), the shadcn variables on top of them and the
+  dark variant of the prototype. Loaded only by the prototype preview (src/preview/preview.css,
+  through the designos:prototype-theme slot), never by the Design OS UI.
+
+  Tailwind's default palettes (stone, teal, ...) stay available, so screens written with palette
+  steps keep rendering. A product token import (product/design-system/tokens/tokens.css)
+  replaces this file in the slot.
 */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Volta palettes */
 @theme {
   /* brand-blue (DESIGN.md) */
   --color-brand-blue-25: #f3f5f8;
@@ -209,4 +217,133 @@
   --color-rwe-neutral-900: #141414;
   --color-rwe-neutral-950: #0a0a0a;
   --color-rwe-neutral-black: #000000;
+}
+
+/* Fonts: Inter for text, IBM Plex Mono for code (fonts listed in template.json) */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+/* Semantic colors and radius as Tailwind utilities (bg-primary, rounded-lg, ...) */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/*
+  Light and dark theme of the prototype (shadcn variables) on the Volta palettes above.
+  The panel is rwe-sand-50 / rwe-neutral-900, cards sit one step apart, accents are brand-blue (light)
+  and energy-green (dark), like the app chrome.
+*/
+:root {
+  --radius: 0.5rem;
+  --background: var(--color-rwe-sand-50);
+  --foreground: var(--color-rwe-neutral-900);
+  --card: var(--color-rwe-sand-25);
+  --card-foreground: var(--color-rwe-neutral-900);
+  --popover: var(--color-rwe-sand-25);
+  --popover-foreground: var(--color-rwe-neutral-900);
+  --primary: var(--color-brand-blue-500);
+  --primary-foreground: var(--color-rwe-sand-25);
+  --secondary: var(--color-rwe-sand-200);
+  --secondary-foreground: var(--color-rwe-neutral-900);
+  --muted: var(--color-rwe-sand-200);
+  --muted-foreground: var(--color-rwe-neutral-500);
+  --accent: var(--color-rwe-sand-200);
+  --accent-foreground: var(--color-rwe-neutral-900);
+  --destructive: var(--color-rwe-red-700);
+  --border: var(--color-rwe-sand-500);
+  --input: var(--color-rwe-sand-500);
+  --ring: var(--color-rwe-focus);
+  --chart-1: var(--color-brand-blue-500);
+  --chart-2: var(--color-energy-blue-500);
+  --chart-3: var(--color-energy-green-600);
+  --chart-4: var(--color-rwe-yellow-600);
+  --chart-5: var(--color-rwe-orange-600);
+  --sidebar: var(--color-rwe-sand-200);
+  --sidebar-foreground: var(--color-rwe-neutral-900);
+  --sidebar-primary: var(--color-brand-blue-500);
+  --sidebar-primary-foreground: var(--color-rwe-sand-25);
+  --sidebar-accent: var(--color-rwe-sand-500);
+  --sidebar-accent-foreground: var(--color-rwe-neutral-900);
+  --sidebar-border: var(--color-rwe-sand-500);
+  --sidebar-ring: var(--color-rwe-focus);
+}
+
+.dark {
+  --background: var(--color-rwe-neutral-900);
+  --foreground: var(--color-rwe-neutral-50);
+  --card: var(--color-rwe-neutral-950);
+  --card-foreground: var(--color-rwe-neutral-50);
+  --popover: var(--color-rwe-neutral-900);
+  --popover-foreground: var(--color-rwe-neutral-50);
+  --primary: var(--color-energy-green-500);
+  --primary-foreground: var(--color-brand-blue-900);
+  --secondary: var(--color-rwe-neutral-800);
+  --secondary-foreground: var(--color-rwe-neutral-50);
+  --muted: var(--color-rwe-neutral-800);
+  --muted-foreground: var(--color-rwe-neutral-400);
+  --accent: var(--color-rwe-neutral-800);
+  --accent-foreground: var(--color-rwe-neutral-50);
+  --destructive: var(--color-rwe-red-300);
+  --border: var(--color-rwe-neutral-800);
+  --input: var(--color-rwe-neutral-800);
+  --ring: var(--color-rwe-focus);
+  --chart-1: var(--color-energy-green-500);
+  --chart-2: var(--color-energy-blue-400);
+  --chart-3: var(--color-rwe-yellow-300);
+  --chart-4: var(--color-rwe-orange-300);
+  --chart-5: var(--color-rwe-red-300);
+  --sidebar: var(--color-rwe-neutral-950);
+  --sidebar-foreground: var(--color-rwe-neutral-50);
+  --sidebar-primary: var(--color-energy-green-500);
+  --sidebar-primary-foreground: var(--color-brand-blue-900);
+  --sidebar-accent: var(--color-rwe-neutral-800);
+  --sidebar-accent-foreground: var(--color-rwe-neutral-50);
+  --sidebar-border: var(--color-rwe-neutral-800);
+  --sidebar-ring: var(--color-rwe-focus);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
 }

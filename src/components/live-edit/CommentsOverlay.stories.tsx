@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useEffect, useRef, useState } from 'react'
 import { action } from 'storybook/actions'
 import type { DesignComment } from '@/lib/comments/format'
-import { createCommentsOverlay, type CommentsOverlay } from '@/lib/live-edit/comments-overlay'
+import { createCommentsOverlay, type CommentsOverlay } from '@/preview/bridge/comments-overlay'
 import type { FromPreview } from '@/lib/live-edit/protocol'
 
 /**
- * The comment layer that runs inside the preview iframe (src/lib/live-edit/comments-overlay.ts):
+ * The comment layer that runs inside the preview iframe (src/preview/bridge/comments-overlay.ts):
  * numbered pins on the elements, a composer with an impeccable command, edit, send and delete.
  * It is plain DOM, so this story drives it on a neutral sample surface. The elements carry
  * `data-dos-src` like the dev build marks them; no prototype code is loaded.
@@ -59,13 +59,13 @@ const log = {
 
 function Surface() {
   return (
-    <div data-dos-comp="Surface" className="mx-auto mt-16 max-w-md space-y-4 rounded-lg border border-stone-200 bg-rwe-sand-25 p-6 dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950">
+    <div data-dos-comp="Surface" className="mx-auto mt-16 max-w-md space-y-4 rounded-lg border border-border bg-card p-6">
       <h2 data-dos-src={SRC.title} className="text-xl font-semibold">Sample surface</h2>
       <label className="block space-y-1 text-sm">
         <span>Value</span>
-        <input data-dos-src={SRC.field} defaultValue="18342" className="w-full rounded-md border border-stone-300 px-3 py-2 dark:border-rwe-neutral-700 dark:bg-rwe-neutral-900" />
+        <input data-dos-src={SRC.field} defaultValue="18342" className="w-full rounded-md border border-border px-3 py-2 dark:bg-background" />
       </label>
-      <button data-dos-src={SRC.button} type="button" className="rounded-md bg-brand-blue-500 px-4 py-2 text-sm font-medium text-white dark:bg-energy-green-500 dark:text-brand-blue-900">
+      <button data-dos-src={SRC.button} type="button" className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
         Submit
       </button>
     </div>

@@ -1,21 +1,17 @@
-import { Suspense, useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { PanelLeft, Maximize2, GripVertical, Smartphone, Tablet, Monitor } from 'lucide-react'
-import { RenderComponent } from '@/components/RenderComponent'
-import { loadShellPreview } from '@/lib/shell-loader'
 import { AppLayout } from '@/components/AppLayout'
 import { EmptyState } from '@/components/EmptyState'
 import { ShellCard } from '@/components/ShellCard'
 import { loadProductData } from '@/lib/product-loader'
+import { hasShellPreview } from '@/lib/shell-loader'
 import { paths } from '@/lib/paths'
 import { PickButton } from '@/components/live-edit/Inspector'
 import { LiveEditPanel } from '@/components/live-edit/LiveEditPanel'
-import { useLivePicker } from '@/components/live-edit/useLivePicker'
-import { useProductFonts } from '@/lib/product-fonts'
 import { useLivePreview } from '@/components/live-edit/useLivePreview'
 import { useLiveComments, useOneMode } from '@/components/live-edit/useLiveComments'
 import { CommentButton } from '@/components/live-edit/CommentButton'
 import type { LiveTarget } from '@/lib/live-edit/selection'
-import React from 'react'
 
 /** For useOneMode outside a chat, where neither mode exists */
 const noMode = () => {}
@@ -25,12 +21,12 @@ const SHELL_TARGET: LiveTarget = { kind: 'shell' }
 
 /** Prototype › Shell: the shell preview, or how to design it while there is none */
 export function ShellDesignPage() {
-  if (getLazyShellPreview()) return <ShellPreviewPage />
+  if (hasShellPreview()) return <ShellPreviewPage />
   const shell = loadProductData().shell
   return (
     <AppLayout>
-      <h1 className="mb-2 text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100">Application Shell</h1>
-      <p className="mb-6 text-stone-600 dark:text-rwe-neutral-400">The persistent navigation and layout that wraps all sections.</p>
+      <h1 className="mb-2 text-2xl font-semibold text-foreground">Application Shell</h1>
+      <p className="mb-6 text-muted-foreground">The persistent navigation and layout that wraps all sections.</p>
       <div className="space-y-6">
         {shell?.spec && <ShellCard shell={shell} />}
         <EmptyState type="shell" />
@@ -91,13 +87,13 @@ function ShellPreviewPage() {
   const previewWidth = `${widthPercent}%`
 
   return (
-    <div className="h-full min-h-[480px] bg-stone-100 dark:bg-rwe-neutral-900 animate-fade-in flex flex-col overflow-hidden">
+    <div className="h-full min-h-[480px] bg-muted animate-fade-in flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="border-b border-stone-200 dark:border-rwe-neutral-800 bg-rwe-sand-25 dark:bg-rwe-neutral-950 shrink-0 z-50">
+      <header className="border-b border-border bg-card shrink-0 z-50">
         <div className="px-4 py-2 flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <PanelLeft className="w-4 h-4 text-stone-400" strokeWidth={1.5} />
-            <span className="text-sm font-medium text-stone-700 dark:text-rwe-neutral-300">
+            <PanelLeft className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+            <span className="text-sm font-medium text-foreground">
               Shell Design
             </span>
           </div>
@@ -105,13 +101,13 @@ function ShellPreviewPage() {
           {/* Width indicator and device presets */}
           <div className="ml-auto flex items-center gap-4">
             {/* Device size presets */}
-            <div className="flex items-center gap-1 border-r border-stone-200 dark:border-rwe-neutral-700 pr-4">
+            <div className="flex items-center gap-1 border-r border-border pr-4">
               <button
                 onClick={() => setWidthPercent(30)}
                 className={`p-1.5 rounded transition-colors ${
                   widthPercent <= 40
-                    ? 'bg-stone-200 dark:bg-rwe-neutral-700 text-stone-900 dark:text-rwe-neutral-100'
-                    : 'text-stone-400 dark:text-rwe-neutral-500 hover:text-stone-600 dark:hover:text-rwe-neutral-300 hover:bg-stone-100 dark:hover:bg-rwe-neutral-800'
+                    ? 'bg-muted text-foreground'
+                    : 'text-muted-foreground hover:text-muted-foreground hover:bg-accent'
                 }`}
                 title="Mobile (30%)"
               >
@@ -121,8 +117,8 @@ function ShellPreviewPage() {
                 onClick={() => setWidthPercent(60)}
                 className={`p-1.5 rounded transition-colors ${
                   widthPercent > 40 && widthPercent <= 60
-                    ? 'bg-stone-200 dark:bg-rwe-neutral-700 text-stone-900 dark:text-rwe-neutral-100'
-                    : 'text-stone-400 dark:text-rwe-neutral-500 hover:text-stone-600 dark:hover:text-rwe-neutral-300 hover:bg-stone-100 dark:hover:bg-rwe-neutral-800'
+                    ? 'bg-muted text-foreground'
+                    : 'text-muted-foreground hover:text-muted-foreground hover:bg-accent'
                 }`}
                 title="Tablet (60%)"
               >
@@ -132,8 +128,8 @@ function ShellPreviewPage() {
                 onClick={() => setWidthPercent(100)}
                 className={`p-1.5 rounded transition-colors ${
                   widthPercent > 60
-                    ? 'bg-stone-200 dark:bg-rwe-neutral-700 text-stone-900 dark:text-rwe-neutral-100'
-                    : 'text-stone-400 dark:text-rwe-neutral-500 hover:text-stone-600 dark:hover:text-rwe-neutral-300 hover:bg-stone-100 dark:hover:bg-rwe-neutral-800'
+                    ? 'bg-muted text-foreground'
+                    : 'text-muted-foreground hover:text-muted-foreground hover:bg-accent'
                 }`}
                 title="Desktop (100%)"
               >
@@ -150,14 +146,14 @@ function ShellPreviewPage() {
                 onShowResolved={comments.setShowResolved}
               />
             )}
-            <span className="text-xs text-stone-500 dark:text-rwe-neutral-400 font-mono w-10 text-right">
+            <span className="text-xs text-muted-foreground font-mono w-10 text-right">
               {Math.round(widthPercent)}%
             </span>
             <a
               href={paths.shellFullscreen}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-rwe-neutral-400 hover:text-stone-700 dark:hover:text-rwe-neutral-200 transition-colors"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               <Maximize2 className="w-3.5 h-3.5" strokeWidth={1.5} />
               Fullscreen
@@ -178,14 +174,14 @@ function ShellPreviewPage() {
             className="w-4 flex items-center justify-center cursor-ew-resize group shrink-0"
             onMouseDown={handleMouseDown}
           >
-            <div className="w-1 h-16 rounded-full bg-stone-300 dark:bg-rwe-neutral-600 group-hover:bg-stone-400 dark:group-hover:bg-rwe-neutral-500 transition-colors flex items-center justify-center">
-              <GripVertical className="w-3 h-3 text-stone-500 dark:text-rwe-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
+            <div className="w-1 h-16 rounded-full bg-muted group-hover:bg-muted-foreground transition-colors flex items-center justify-center">
+              <GripVertical className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
             </div>
           </div>
 
           {/* Preview container using iframe for true isolation */}
           <div
-            className="bg-rwe-sand-25 dark:bg-rwe-neutral-950 rounded-lg shadow-xl border border-stone-200 dark:border-rwe-neutral-700 overflow-hidden"
+            className="bg-card rounded-lg shadow-xl border border-border overflow-hidden"
             style={{ width: previewWidth, minWidth: MIN_WIDTH, maxWidth: '100%' }}
           >
             <iframe
@@ -201,8 +197,8 @@ function ShellPreviewPage() {
             className="w-4 flex items-center justify-center cursor-ew-resize group shrink-0"
             onMouseDown={handleMouseDown}
           >
-            <div className="w-1 h-16 rounded-full bg-stone-300 dark:bg-rwe-neutral-600 group-hover:bg-stone-400 dark:group-hover:bg-rwe-neutral-500 transition-colors flex items-center justify-center">
-              <GripVertical className="w-3 h-3 text-stone-500 dark:text-rwe-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
+            <div className="w-1 h-16 rounded-full bg-muted group-hover:bg-muted-foreground transition-colors flex items-center justify-center">
+              <GripVertical className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
             </div>
           </div>
         </div>
@@ -221,83 +217,5 @@ function ShellPreviewPage() {
         )}
       </div>
     </div>
-  )
-}
-
-// The lazy preview is created once at module level, so its identity is stable across renders
-let shellPreviewComponent: React.LazyExoticComponent<React.ComponentType> | null | undefined
-
-function getLazyShellPreview() {
-  if (shellPreviewComponent === undefined) {
-    const loader = loadShellPreview()
-    shellPreviewComponent = loader ? React.lazy(loader) : null
-  }
-  return shellPreviewComponent
-}
-
-/**
- * Fullscreen version of the shell preview (for screenshots)
- * Syncs theme with parent window via localStorage
- */
-export function ShellDesignFullscreen() {
-  const ShellPreviewComponent = getLazyShellPreview()
-
-  // Live Edit: the picker, when the preview is embedded in a step page
-  useLivePicker()
-  // The product's fonts, which the prototype does not load otherwise
-  useProductFonts()
-
-  // Sync theme with parent window
-  useEffect(() => {
-    const applyTheme = () => {
-      const theme = localStorage.getItem('theme') || 'system'
-      const root = document.documentElement
-
-      if (theme === 'system') {
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        root.classList.toggle('dark', systemDark)
-      } else {
-        root.classList.toggle('dark', theme === 'dark')
-      }
-    }
-
-    // Apply on mount
-    applyTheme()
-
-    // Listen for storage changes (from parent window)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'theme') {
-        applyTheme()
-      }
-    }
-    window.addEventListener('storage', handleStorageChange)
-
-    // Also poll for changes since storage event doesn't fire in same window
-    const interval = setInterval(applyTheme, 100)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      clearInterval(interval)
-    }
-  }, [])
-
-  if (!ShellPreviewComponent) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-background">
-        <p className="text-stone-600 dark:text-rwe-neutral-400">Shell preview not found.</p>
-      </div>
-    )
-  }
-
-  return (
-    <Suspense
-      fallback={
-        <div className="h-screen flex items-center justify-center bg-background">
-          <div className="text-stone-500 dark:text-rwe-neutral-400">Loading...</div>
-        </div>
-      }
-    >
-      <RenderComponent component={ShellPreviewComponent} />
-    </Suspense>
   )
 }

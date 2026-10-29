@@ -108,16 +108,16 @@ export function EmptyState({ type, sectionName }: EmptyStateProps) {
   const starter = typeof starterConfig === 'function' ? starterConfig(sectionName) : starterConfig
 
   return (
-    <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm border-dashed">
+    <Card className="border-border shadow-sm border-dashed">
       <CardContent className="py-8">
         <div className="flex flex-col items-center text-center max-w-sm mx-auto">
-          <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-rwe-neutral-800 flex items-center justify-center mb-3">
-            <Icon className="w-5 h-5 text-stone-400 dark:text-rwe-neutral-500" strokeWidth={1.5} />
+          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-3">
+            <Icon className="w-5 h-5 text-muted-foreground" strokeWidth={1.5} />
           </div>
-          <h3 className="text-base font-medium text-stone-600 dark:text-rwe-neutral-400 mb-1">
+          <h3 className="text-base font-medium text-muted-foreground mb-1">
             {title}
           </h3>
-          <p className="text-sm text-stone-500 dark:text-rwe-neutral-400 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             {description}
           </p>
           <AgentPrompt step={step} prompt={starter} compact />

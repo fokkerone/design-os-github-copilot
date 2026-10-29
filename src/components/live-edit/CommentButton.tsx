@@ -1,9 +1,9 @@
 import { CheckCheck, MessageSquarePlus } from 'lucide-react'
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
-const muted = 'text-stone-500 dark:text-rwe-neutral-400'
-const idle = `${muted} hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-200`
-const on = 'bg-brand-blue-500 text-white dark:bg-energy-green-500 dark:text-brand-blue-900'
+const muted = 'text-muted-foreground'
+const idle = `${muted} hover:bg-accent hover:text-foreground`
+const on = 'bg-primary text-primary-foreground'
 
 /** Comment mode in the preview toolbar: numbered comments with an impeccable command (C) */
 export function CommentButton({
@@ -35,7 +35,7 @@ export function CommentButton({
           <span
             aria-label={`${open} open`}
             className={`flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold ${
-              active ? 'bg-rwe-neutral-950/20' : 'bg-brand-blue-500 text-white dark:bg-energy-green-500 dark:text-brand-blue-900'
+              active ? 'bg-primary/20' : 'bg-primary text-primary-foreground'
             }`}
           >
             {open}

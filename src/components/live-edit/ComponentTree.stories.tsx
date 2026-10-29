@@ -18,7 +18,7 @@ const meta = {
   title: 'Design OS/Live Edit/ComponentTree',
   component: ComponentTree,
   args: { nodes, selectedId: null, onHover: fn(), onSelect: fn() },
-  decorators: [(Story) => <div className="h-[420px] w-[248px] rounded-lg border border-stone-200 dark:border-rwe-neutral-800"><Story /></div>],
+  decorators: [(Story) => <div className="h-[420px] w-[248px] rounded-lg border border-border"><Story /></div>],
 } satisfies Meta<typeof ComponentTree>
 
 export default meta

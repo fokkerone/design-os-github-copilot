@@ -5,7 +5,7 @@
  * and the DOM elements written there (`data-dos-src`). Routers, providers, library internals and
  * the Design OS wrappers are left out, their children move up.
  */
-import type { TreeNode } from './protocol'
+import type { TreeNode } from '@/lib/live-edit/protocol'
 
 export const CALL_ATTR = 'data-dos-call'
 const NAME_ATTR = 'data-dos-name'

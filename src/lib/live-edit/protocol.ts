@@ -5,7 +5,7 @@
 
 import type { CommentAnchor, DesignComment } from '@/lib/comments/format'
 
-/** One node of the component tree (src/lib/live-edit/component-tree.ts) */
+/** One node of the component tree (src/preview/bridge/component-tree.ts) */
 export interface TreeNode {
   /** Valid until the next tree the preview sends */
   id: string
@@ -87,6 +87,8 @@ export type ToPreview =
   | { type: 'dos:comments'; items: DesignComment[]; showResolved: boolean }
   /** The page could not save a comment: the open composer shows why */
   | { type: 'dos:comment-error'; error: string }
+  /** The page's light or dark mode; the preview follows it (preview.html has its own theme) */
+  | { type: 'dos:theme'; dark: boolean }
 
 /** Iframe → page */
 export type FromPreview =
@@ -102,7 +104,7 @@ export type FromPreview =
   | { type: 'dos:comment-send'; number: number; element: PickedElement | null; call: string | null }
   | { type: 'dos:comment-delete'; number: number }
 
-const TYPES = new Set(['dos:pick', 'dos:preview', 'dos:reset', 'dos:select', 'dos:deselect', 'dos:guides', 'dos:hover', 'dos:select-node', 'dos:commit', 'dos:describe', 'dos:comment-mode', 'dos:comments', 'dos:comment-error', 'dos:comment-create', 'dos:comment-update', 'dos:comment-send', 'dos:comment-delete', 'dos:tree', 'dos:ready', 'dos:picked', 'dos:cancel', 'dos:updated'])
+const TYPES = new Set(['dos:pick', 'dos:preview', 'dos:reset', 'dos:select', 'dos:deselect', 'dos:guides', 'dos:hover', 'dos:select-node', 'dos:commit', 'dos:describe', 'dos:comment-mode', 'dos:comments', 'dos:comment-error', 'dos:theme', 'dos:comment-create', 'dos:comment-update', 'dos:comment-send', 'dos:comment-delete', 'dos:tree', 'dos:ready', 'dos:picked', 'dos:cancel', 'dos:updated'])
 
 /** The Live Edit message in an event, or null for anything else (other origins, other messages) */
 export function readMessage<T extends ToPreview | FromPreview>(event: MessageEvent, origin = window.location.origin): T | null {

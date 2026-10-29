@@ -25,10 +25,12 @@ const exportZipFiles = import.meta.glob("/product-plan.zip", {
   eager: true,
 }) as Record<string, string>;
 
-// Check for clickdummy component at build time
+// Whether the clickdummy exists, by name only: the preview (preview.html) runs it
 const clickdummyFiles = import.meta.glob("/src/clickdummy/ClickdummyApp.tsx", {
+  query: "?designos-file",
+  import: "default",
   eager: true,
-}) as Record<string, unknown>;
+}) as Record<string, true>;
 
 /**
  * Parse product-overview.md content into ProductOverview structure

@@ -93,11 +93,11 @@ export function AppShell({
   return (
     // The shell sets its own `dark` or `light` scope so it does not depend on the page theme.
     <div className={theme} style={{ colorScheme: theme }}>
-      <div className="relative isolate flex h-screen w-full overflow-hidden bg-rwe-sand-200 font-['Inter',sans-serif] text-rwe-neutral-900 antialiased dark:bg-rwe-neutral-950 dark:text-rwe-neutral-100">
+      <div className="relative isolate flex h-screen w-full overflow-hidden bg-muted font-['Inter',sans-serif] text-foreground antialiased">
         {/* Doodle tile behind the frame (sidebar, gutters). The SVG is a mask, so it is tinted per theme; the content panel covers it. */}
         <div
           aria-hidden
-          className='pointer-events-none absolute inset-0 -z-10 bg-rwe-neutral-900/6 dark:bg-rwe-neutral-50/5'
+          className='pointer-events-none absolute inset-0 -z-10 bg-primary/6'
           style={{
             maskImage: `url(${doodle})`,
             WebkitMaskImage: `url(${doodle})`,
@@ -129,12 +129,12 @@ export function AppShell({
               className='absolute inset-0 bg-rwe-black-a-25'
               onClick={() => setDrawerOpen(false)}
             />
-            <aside className='absolute inset-y-0 left-0 w-[280px] bg-rwe-sand-200 shadow-xl dark:bg-rwe-neutral-950'>
+            <aside className='absolute inset-y-0 left-0 w-[280px] bg-muted shadow-xl'>
               <button
                 type='button'
                 aria-label='Close navigation'
                 onClick={() => setDrawerOpen(false)}
-                className='absolute right-2 top-16 z-10 flex size-8 items-center justify-center rounded-md text-stone-500 hover:bg-rwe-sand-500 dark:text-rwe-neutral-400 dark:hover:bg-rwe-neutral-800'
+                className='absolute right-2 top-16 z-10 flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent'
               >
                 <X className='size-4' />
               </button>
@@ -145,7 +145,7 @@ export function AppShell({
 
         <div className='flex min-w-0 flex-1 flex-col'>
           {/* Mobile top bar */}
-          <div className='flex h-12 shrink-0 items-center gap-2 border-b border-stone-200 px-2 md:hidden dark:border-rwe-neutral-800'>
+          <div className='flex h-12 shrink-0 items-center gap-2 border-b border-border px-2 md:hidden'>
             <IconButton
               label='Open navigation'
               onClick={() => setDrawerOpen(true)}
@@ -157,9 +157,9 @@ export function AppShell({
 
           {/* Content panel. The sidebar toggle sits at the left edge of the 48px header. */}
           <main
-            className={`relative min-h-0 flex-1 overflow-y-auto bg-rwe-sand-50 md:mr-1.5 md:mt-1.5 md:[&>*>header:first-child]:pl-12 ${
+            className={`relative min-h-0 flex-1 overflow-y-auto bg-background md:mr-1.5 md:mt-1.5 md:[&>*>header:first-child]:pl-12 ${
               collapsed ? "md:ml-1.5" : ""
-            } md:rounded-lg md:border md:border-stone-200 dark:bg-rwe-neutral-900 md:dark:border-rwe-neutral-800`}
+            } md:rounded-lg md:border md:border-border`}
           >
             <span className='absolute left-2 top-2 z-10 hidden md:block'>
               <IconButton
@@ -193,7 +193,7 @@ function IconButton({
       type='button'
       aria-label={label}
       onClick={onClick}
-      className='flex size-8 items-center justify-center rounded-md text-stone-500 hover:bg-rwe-sand-500 hover:text-rwe-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus dark:text-rwe-neutral-300 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-50'
+      className='flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
     >
       {children}
     </button>

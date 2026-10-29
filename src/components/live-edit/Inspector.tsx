@@ -37,11 +37,11 @@ import { panelClass } from './panel'
 import { propEdit, propFields, type PropField } from '@/lib/live-edit/component-props'
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
-const muted = 'text-stone-500 dark:text-rwe-neutral-400'
-const surface = 'bg-rwe-sand-100 dark:bg-rwe-neutral-900'
-const fieldClass = `w-full rounded-md ${surface} px-2 py-1 text-[12px] text-rwe-neutral-900 dark:text-rwe-neutral-100 ${focusRing}`
-const iconButton = `flex size-6 items-center justify-center rounded-md ${muted} hover:bg-stone-100 hover:text-rwe-neutral-900 disabled:opacity-40 disabled:hover:bg-transparent dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-100 ${focusRing}`
-const primaryButton = `flex items-center gap-1.5 rounded-md bg-brand-blue-500 px-2 py-1 text-[11px] font-medium text-white hover:bg-brand-blue-600 dark:bg-energy-green-500 dark:text-brand-blue-900 dark:hover:bg-energy-green-400 ${focusRing}`
+const muted = 'text-muted-foreground'
+const surface = 'bg-muted'
+const fieldClass = `w-full rounded-md ${surface} px-2 py-1 text-[12px] text-foreground ${focusRing}`
+const iconButton = `flex size-6 items-center justify-center rounded-md ${muted} hover:bg-accent hover:text-foreground disabled:opacity-40 disabled:hover:bg-transparent ${focusRing}`
+const primaryButton = `flex items-center gap-1.5 rounded-md bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground hover:bg-primary/90 ${focusRing}`
 // Transparent colors show a checkerboard behind the swatch
 const checker = 'repeating-conic-gradient(#d6d3d1 0% 25%, #ffffff 0% 50%) 50% / 8px 8px'
 
@@ -165,19 +165,19 @@ export function Inspector({
   return (
     <aside aria-label="Inspector" className={panelClass}>
       {tabs}
-      <header className="flex items-center gap-2 border-b border-stone-200 px-2.5 py-1.5 dark:border-rwe-neutral-800">
+      <header className="flex items-center gap-2 border-b border-border px-2.5 py-1.5">
         {isComponent ? (
-          <Component className="size-3.5 shrink-0 text-brand-blue-500 dark:text-energy-green-500" strokeWidth={1.5} />
+          <Component className="size-3.5 shrink-0 text-primary" strokeWidth={1.5} />
         ) : (
-          <MousePointerClick className="size-3.5 shrink-0 text-brand-blue-500 dark:text-energy-green-500" strokeWidth={1.5} />
+          <MousePointerClick className="size-3.5 shrink-0 text-primary" strokeWidth={1.5} />
         )}
         <div className="min-w-0 flex-1">
           {isComponent ? (
-            <p className="truncate text-[12px] font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100" title={element.componentPath.join(' › ')}>
+            <p className="truncate text-[12px] font-medium text-foreground" title={element.componentPath.join(' › ')}>
               {`<${element.component}>`} {element.componentPath.length > 1 && <span className={muted}>in {element.componentPath.at(-2)}</span>}
             </p>
           ) : (
-            <p className="truncate text-[12px] font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">
+            <p className="truncate text-[12px] font-medium text-foreground">
               {element.componentPath.join(' › ') || 'Element'} <span className={muted}>· {element.tag}</span>
             </p>
           )}
@@ -190,7 +190,7 @@ export function Inspector({
         </button>
       </header>
 
-      <div className="flex-1 divide-y divide-stone-200 overflow-y-auto dark:divide-rwe-neutral-800">
+      <div className="flex-1 divide-y divide-border overflow-y-auto">
         {isComponent && <ComponentDetails element={element} edits={edits} setEdit={setEdit} />}
         {!isComponent && element.textOnly && (
           <Section title="Content">
@@ -214,9 +214,9 @@ export function Inspector({
       </div>
 
       {(written || writeError) && (
-        <div role="status" className="space-y-1 border-t border-stone-200 px-2.5 py-1.5 text-[11px] dark:border-rwe-neutral-800">
+        <div role="status" className="space-y-1 border-t border-border px-2.5 py-1.5 text-[11px]">
           {writeError ? (
-            <p className="text-red-600 dark:text-red-400">Could not write: {writeError}</p>
+            <p className="text-destructive">Could not write: {writeError}</p>
           ) : (
             written && (
               <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ export function Inspector({
                       onRecord(written.edits)
                       setWritten({ ...written, recorded: true })
                     }}
-                    className={`shrink-0 rounded px-1.5 py-0.5 font-medium text-brand-blue-500 hover:bg-stone-100 dark:text-energy-green-500 dark:hover:bg-rwe-neutral-800 ${focusRing}`}
+                    className={`shrink-0 rounded px-1.5 py-0.5 font-medium text-primary hover:bg-accent ${focusRing}`}
                   >
                     Record in wiki
                   </button>
@@ -240,7 +240,7 @@ export function Inspector({
           )}
         </div>
       )}
-      <footer className="flex items-center gap-1 border-t border-stone-200 px-2.5 py-1.5 dark:border-rwe-neutral-800">
+      <footer className="flex items-center gap-1 border-t border-border px-2.5 py-1.5">
         <button type="button" aria-label="Undo" disabled={index === 0} onClick={() => step(index - 1)} className={iconButton}>
           <Undo2 className="size-3.5" strokeWidth={1.5} />
         </button>
@@ -319,7 +319,7 @@ function ComponentDetails({
             const edited = edits.some((e) => e.property === `prop:${field.name}`)
             const label = (
               <span
-                className={`w-16 shrink-0 truncate text-[11px] ${edited ? 'font-medium text-brand-blue-500 dark:text-energy-green-500' : muted}`}
+                className={`w-16 shrink-0 truncate text-[11px] ${edited ? 'font-medium text-primary' : muted}`}
                 title={field.from ? `${field.name} (from ${field.from})` : field.name}
               >
                 {field.name}
@@ -330,7 +330,7 @@ function ComponentDetails({
               return (
                 <div key={field.name} className="flex items-center gap-2">
                   {label}
-                  <span className={`truncate font-mono text-[11px] ${field.shown || value !== undefined ? 'text-rwe-neutral-900 dark:text-rwe-neutral-100' : muted}`} title={text}>
+                  <span className={`truncate font-mono text-[11px] ${field.shown || value !== undefined ? 'text-foreground' : muted}`} title={text}>
                     {text}
                   </span>
                 </div>
@@ -368,7 +368,7 @@ function ComponentDetails({
                     aria-label={field.name}
                     checked={(value ?? field.default) === true}
                     onChange={(e) => change(field, e.target.checked)}
-                    className="size-3.5 accent-brand-blue-500 dark:accent-energy-green-500"
+                    className="size-3.5 accent-primary"
                   />
                 </label>
               )
@@ -438,7 +438,7 @@ function GroupSection({
                 type="checkbox"
                 checked={guides}
                 onChange={(e) => onGuidesChange(e.target.checked)}
-                className="size-3 accent-brand-blue-500 dark:accent-energy-green-500"
+                className="size-3 accent-primary"
               />
               Show paddings and margins
             </label>
@@ -468,8 +468,8 @@ function GroupSection({
               aria-pressed={splitCorners}
               title="Individual corners"
               onClick={() => setSplitCorners(!splitCorners)}
-              className={`flex size-[26px] shrink-0 items-center justify-center rounded-md border border-stone-200 dark:border-rwe-neutral-800 ${
-                splitCorners ? 'bg-stone-100 text-rwe-neutral-900 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-100' : muted
+              className={`flex size-[26px] shrink-0 items-center justify-center rounded-md border border-border ${
+                splitCorners ? 'bg-muted text-foreground' : muted
               } ${focusRing}`}
             >
               <Scan className="size-3.5" strokeWidth={1.5} />
@@ -501,7 +501,7 @@ function Field({ state, choose, aside }: { state: PropertyState; choose: Control
     <div className="min-w-0">
       <span className={`mb-1 flex items-center justify-between text-[11px] ${muted}`}>
         {property.label}
-        {edited && <span className="font-mono text-[10px] text-brand-blue-500 dark:text-energy-green-500">edited</span>}
+        {edited && <span className="font-mono text-[10px] text-primary">edited</span>}
       </span>
       <div className="flex items-center gap-1.5">
         <div className="min-w-0 flex-1">{control}</div>
@@ -561,10 +561,10 @@ function ScrubField({ state, choose }: { state: PropertyState; choose: Controls[
           if (options[next].className !== current) stepTo(next)
         }}
         onPointerUp={() => (drag.current = null)}
-        className="flex h-5 w-3.5 shrink-0 cursor-ew-resize items-center justify-center rounded bg-stone-300/70 dark:bg-rwe-neutral-700"
+        className="flex h-5 w-3.5 shrink-0 cursor-ew-resize items-center justify-center rounded bg-muted/70"
       >
-        <span className="h-2.5 w-px bg-stone-500 dark:bg-rwe-neutral-400" />
-        <span className="ml-0.5 h-2.5 w-px bg-stone-500 dark:bg-rwe-neutral-400" />
+        <span className="h-2.5 w-px bg-muted-foreground" />
+        <span className="ml-0.5 h-2.5 w-px bg-muted-foreground" />
       </span>
       <input
         aria-label={property.name ?? property.label}
@@ -581,7 +581,7 @@ function ScrubField({ state, choose }: { state: PropertyState; choose: Controls[
             stepTo(position() + (e.key === 'ArrowUp' ? 1 : -1))
           }
         }}
-        className="min-w-0 flex-1 bg-transparent font-mono text-[12px] text-rwe-neutral-900 focus:outline-none dark:text-rwe-neutral-100"
+        className="min-w-0 flex-1 bg-transparent font-mono text-[12px] text-foreground focus:outline-none"
       />
       {hint && <span className={`shrink-0 font-mono text-[10px] ${hint === 'not a token' ? 'text-amber-600 dark:text-amber-400' : muted}`}>{hint}</span>}
     </div>
@@ -662,8 +662,8 @@ function Segmented({ state, choose }: { state: PropertyState; choose: Controls['
           onClick={() => choose(state, o)}
           className={`flex h-6 flex-1 items-center justify-center rounded ${focusRing} ${
             active(o)
-              ? 'bg-rwe-sand-25 text-rwe-neutral-900 shadow-sm dark:bg-rwe-neutral-950 dark:text-rwe-neutral-50'
-              : `${muted} hover:text-rwe-neutral-900 dark:hover:text-rwe-neutral-100`
+              ? 'bg-card text-foreground shadow-sm'
+              : `${muted} hover:text-foreground`
           }`}
         >
           {SEGMENT_ICONS[o.className] ?? o.label}
@@ -675,7 +675,7 @@ function Segmented({ state, choose }: { state: PropertyState; choose: Controls['
 
 function Swatch({ color, size = 'size-6' }: { color: string; size?: string }) {
   return (
-    <span aria-hidden className={`${size} inline-block shrink-0 overflow-hidden rounded-full border border-stone-300 dark:border-rwe-neutral-700`} style={{ background: checker }}>
+    <span aria-hidden className={`${size} inline-block shrink-0 overflow-hidden rounded-full border border-border`} style={{ background: checker }}>
       <span className="block size-full" style={{ background: color }} />
     </span>
   )
@@ -727,7 +727,7 @@ function ColorField({ state, choose }: { state: PropertyState; choose: Controls[
 }
 
 function ColorOption({ option, selected, onPick, wide }: { option: InspectorOption; selected: boolean; onPick: () => void; wide?: boolean }) {
-  const ring = selected ? 'ring-2 ring-brand-blue-500 dark:ring-energy-green-500' : ''
+  const ring = selected ? 'ring-2 ring-ring' : ''
   if (wide) {
     return (
       <button
@@ -735,7 +735,7 @@ function ColorOption({ option, selected, onPick, wide }: { option: InspectorOpti
         aria-label={option.label}
         aria-pressed={selected}
         onClick={onPick}
-        className={`flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left text-[11px] text-rwe-neutral-900 hover:bg-stone-100 dark:text-rwe-neutral-100 dark:hover:bg-rwe-neutral-800 ${ring} ${focusRing}`}
+        className={`flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left text-[11px] text-foreground hover:bg-accent ${ring} ${focusRing}`}
       >
         <Swatch color={option.swatch ?? ''} size="size-4" />
         {option.darkSwatch && <Swatch color={option.darkSwatch} size="size-4" />}
@@ -766,7 +766,7 @@ function Section({ title, action, children }: { title: string; action?: React.Re
 function Pairs({ title, children }: { title?: string; children: React.ReactNode }) {
   return (
     <div>
-      {title && <p className="mb-1 text-[11px] text-rwe-neutral-900 dark:text-rwe-neutral-100">{title}</p>}
+      {title && <p className="mb-1 text-[11px] text-foreground">{title}</p>}
       <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">{children}</div>
     </div>
   )
@@ -782,8 +782,8 @@ export function PickButton({ active, onToggle }: { active: boolean; onToggle: ()
       title="Select an element (V)"
       className={`flex items-center gap-1.5 rounded px-2 py-1 text-xs transition-colors ${focusRing} ${
         active
-          ? 'bg-brand-blue-500 text-white dark:bg-energy-green-500 dark:text-brand-blue-900'
-          : `${muted} hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-200`
+          ? 'bg-primary text-primary-foreground'
+          : `${muted} hover:bg-accent hover:text-foreground`
       }`}
     >
       <MousePointerClick className="size-3.5" strokeWidth={1.5} />

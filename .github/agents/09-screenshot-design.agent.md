@@ -52,7 +52,7 @@ After starting the server, wait a few seconds for it to be ready before navigati
 
 Use the browser automation tool to navigate to the screen design and capture a screenshot.
 
-The screen design URL pattern is: `http://localhost:3000/prototype/sections/[section-id]/screen-designs/[screen-design-name]/fullscreen` (use the `/fullscreen` URL: it renders only the screen design, without the app shell, chat and step panel)
+The screen design URL pattern is: `http://localhost:3000/preview.html#/screen/[section-id]/[screen-design-name]` (the prototype preview: it renders only the screen design, in the prototype's own stylesheet and theme, without the Design OS app shell, chat and step panel; the old `/fullscreen` URL redirects there)
 
 1. First, navigate to the screen design URL
 2. Wait for the page to fully load

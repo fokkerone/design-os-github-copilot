@@ -21,7 +21,7 @@ const meta = {
   title: 'Design OS/App Shell/MainNav',
   component: MainNav,
   args: { items: buildNavigation('/prototype/sections', facts), onNavigate: fn() },
-  decorators: [(Story) => <div className="w-[238px] bg-rwe-sand-200 py-2 dark:bg-rwe-neutral-950"><Story /></div>],
+  decorators: [(Story) => <div className="w-[238px] bg-muted py-2"><Story /></div>],
 } satisfies Meta<typeof MainNav>
 
 export default meta

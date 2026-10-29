@@ -5,12 +5,12 @@ function ShadowCard({ shadow }: { shadow: ShadowToken }) {
   return (
     <div className="space-y-2 min-w-0">
       <div className="grid grid-cols-2 gap-2">
-        <div className="flex h-20 items-center justify-center rounded-md bg-stone-100 p-3">
-          <div className="h-full w-full rounded-md bg-rwe-sand-25" style={{ boxShadow: shadow.light?.css }} />
+        <div className="flex h-20 items-center justify-center rounded-md bg-muted p-3">
+          <div className="h-full w-full rounded-md bg-card" style={{ boxShadow: shadow.light?.css }} />
         </div>
-        <div className="flex h-20 items-center justify-center rounded-md bg-stone-900 p-3">
+        <div className="flex h-20 items-center justify-center rounded-md bg-primary p-3">
           <div
-            className="h-full w-full rounded-md bg-stone-800"
+            className="h-full w-full rounded-md bg-primary"
             style={{ boxShadow: (shadow.dark ?? shadow.light)?.css }}
             title={shadow.dark ? 'Dark value' : 'No dark value — light value applies'}
           />
@@ -18,7 +18,7 @@ function ShadowCard({ shadow }: { shadow: ShadowToken }) {
       </div>
       <div className="flex items-center gap-1.5">
         <CodePill>shadow-{shadow.name}</CodePill>
-        {!shadow.dark && <span className="text-[10px] text-stone-400">light only</span>}
+        {!shadow.dark && <span className="text-[10px] text-muted-foreground">light only</span>}
       </div>
       {shadow.light && <CopyValue value={shadow.light.css} />}
     </div>
@@ -33,7 +33,7 @@ export function Shadows({ shadows }: { shadows: ShadowToken[] }) {
       <div className="space-y-6">
         {roles.map((role) => (
           <div key={role} className="space-y-2">
-            {roles.length > 1 && <p className="text-xs font-medium capitalize text-stone-600 dark:text-rwe-neutral-300">{role}</p>}
+            {roles.length > 1 && <p className="text-xs font-medium capitalize text-muted-foreground">{role}</p>}
             <div className="grid grid-cols-1 @2xl:grid-cols-3 @5xl:grid-cols-4 gap-4">
               {shadows
                 .filter((s) => s.role === role)
@@ -54,9 +54,9 @@ export function BlurEffects({ effects }: { effects: DesignTokens['effects'] }) {
     <TokenGroup title="Blur effects" count={effects.length} hint="Figma effect styles from DESIGN.md — use Tailwind blur-* / backdrop-blur-*.">
       <div className="flex flex-wrap gap-2">
         {effects.map((e) => (
-          <div key={e.name} className="rounded-md bg-stone-50 dark:bg-rwe-neutral-800/50 px-3 py-2">
-            <p className="text-xs font-medium text-stone-700 dark:text-rwe-neutral-300">{e.label}</p>
-            <p className="font-mono text-[11px] text-stone-500 dark:text-rwe-neutral-400">
+          <div key={e.name} className="rounded-md bg-muted px-3 py-2">
+            <p className="text-xs font-medium text-foreground">{e.label}</p>
+            <p className="font-mono text-[11px] text-muted-foreground">
               {e.kind} · {e.px}px
             </p>
           </div>
@@ -73,8 +73,8 @@ export function OpacityScale({ opacity }: { opacity: DesignTokens['opacity'] }) 
       <div className="flex flex-wrap gap-1">
         {opacity.map((o) => (
           <div key={o.name} className="w-9 space-y-1 text-center">
-            <div className="h-6 rounded-sm bg-stone-900 dark:bg-rwe-neutral-100" style={{ opacity: o.value / 100 }} />
-            <span className="font-mono text-[10px] text-stone-400">{o.name}</span>
+            <div className="h-6 rounded-sm bg-primary" style={{ opacity: o.value / 100 }} />
+            <span className="font-mono text-[10px] text-muted-foreground">{o.name}</span>
           </div>
         ))}
       </div>

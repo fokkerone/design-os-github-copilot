@@ -1,20 +1,27 @@
 /**
- * The product's font families in the fullscreen previews. The prototype does not load the
- * product's tokens.css, so a family the type scale names (Space Mono, Merriweather) would fall
- * back to the system font. The previews load them from Google Fonts, read from the token model
- * as data. Families the system already has (ui-sans-serif, Georgia, …) are not requested.
+ * Google Fonts for the product's type scale. Themes and token models name font families but load
+ * no font files, so a family like Space Mono would fall back to the system font. Shared by the
+ * prototype preview (src/preview/bridge/fonts.ts) and the Design System page, which renders in
+ * the product's look. Families the system already has (ui-sans-serif, Georgia, …) are not requested.
  */
 import { useEffect } from 'react'
-import { loadDesignTokens } from '@/lib/design-tokens-loader'
+import type { DesignTokens } from '@/types/design-tokens'
 
 const GENERIC = /^(ui-|system-ui|sans-serif|serif|monospace|cursive|fantasy|-apple-system|BlinkMacSystemFont|Segoe UI|Roboto|Helvetica|Arial|Georgia|Cambria|Times|Menlo|Monaco|Consolas|SFMono)/i
 const LINK_ATTR = 'data-dos-font'
 
+export const isGenericFont = (family: string) => GENERIC.test(family)
+
 /** The Google Fonts families of the type scale, e.g. ["Inter", "Space Mono", "Merriweather"] */
-export function productFontFamilies(): string[] {
-  const tokens = loadDesignTokens()
+export function tokenFontFamilies(tokens: DesignTokens | null): string[] {
   const families = (tokens?.typography.fontFamilies ?? []).map((f) => f.family.replace(/['"]/g, '').trim())
-  return [...new Set(families.filter((f) => f && !GENERIC.test(f)))]
+  return [...new Set(families.filter((f) => f && !isGenericFont(f)))]
+}
+
+/** [family, weights] of the type scale */
+export function tokenFonts(tokens: DesignTokens | null): [string, number[]][] {
+  const weights = (tokens?.typography.fontWeights ?? []).map((w) => w.value)
+  return tokenFontFamilies(tokens).map((family) => [family, weights])
 }
 
 /** The stylesheet URL for one family, with the weights of the type scale */
@@ -24,10 +31,11 @@ export function fontUrl(family: string, weights: number[]): string {
   return `https://fonts.googleapis.com/css2?family=${name}${axis}&display=swap`
 }
 
-export function useProductFonts() {
+/** Adds a stylesheet link per family to <head> while the component is mounted */
+export function useFontLinks(fonts: [string, number[]][]) {
+  const key = JSON.stringify(fonts)
   useEffect(() => {
-    const weights = (loadDesignTokens()?.typography.fontWeights ?? []).map((w) => w.value)
-    const links = productFontFamilies().flatMap((family) => {
+    const links = (JSON.parse(key) as [string, number[]][]).flatMap(([family, weights]) => {
       if (document.head.querySelector(`link[${LINK_ATTR}="${family}"]`)) return []
       const link = document.createElement('link')
       link.rel = 'stylesheet'
@@ -42,5 +50,5 @@ export function useProductFonts() {
       return [link]
     })
     return () => links.forEach((l) => l.remove())
-  }, [])
+  }, [key])
 }

@@ -17,7 +17,7 @@ export function ChatPanel() {
           className="mx-4 mt-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-[13px] text-amber-900 sm:mx-6 dark:border-amber-700/60 dark:bg-amber-900/20 dark:text-amber-100"
         >
           OpenCode is not running. The dev server starts it (OpenCode 2.x on the PATH); restart{' '}
-          <code className="rounded-sm bg-black/5 px-1 py-0.5 dark:bg-rwe-sand-25/10">{OPENCODE_START_COMMAND}</code> and check its log.
+          <code className="rounded-sm bg-black/5 px-1 py-0.5 dark:bg-primary/10">{OPENCODE_START_COMMAND}</code> and check its log.
         </div>
       )}
       <ChatPane
@@ -28,7 +28,7 @@ export function ChatPanel() {
               aria-label="New chat"
               title="New chat"
               onClick={() => chat.newChat?.()}
-              className="flex size-7 items-center justify-center rounded-sm text-stone-500 transition-colors hover:bg-rwe-sand-500 hover:text-rwe-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus dark:text-rwe-neutral-400 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-50"
+              className="flex size-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus"
             >
               <SquarePen className="size-4" strokeWidth={1.75} />
             </button>

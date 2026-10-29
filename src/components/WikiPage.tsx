@@ -8,8 +8,8 @@ import { getWikiDomains, getWikiLog, getWikiPage, hasWikiContent, type WikiPage 
 import { useWikiRevision } from '@/lib/use-wiki-revision'
 
 const LOG_KIND_STYLES: Record<string, string> = {
-  ingest: 'bg-brand-blue-100 text-brand-blue-800 dark:bg-energy-green-900/40 dark:text-energy-green-300',
-  meta: 'bg-stone-100 text-stone-600 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-400',
+  ingest: 'bg-primary/10 text-primary',
+  meta: 'bg-muted text-muted-foreground',
   lint: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
 }
 
@@ -30,26 +30,26 @@ function PageRow({ page }: { page: WikiPageData }) {
     <li>
       <Link
         to={`/wiki/${page.path}`}
-        className="group block rounded-md -mx-3 px-3 py-3 hover:bg-stone-100 dark:hover:bg-rwe-neutral-800/60 focus-visible:outline-2 focus-visible:outline-brand-blue-500"
+        className="group block rounded-md -mx-3 px-3 py-3 hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring"
       >
         <div className="flex items-baseline justify-between gap-3">
-          <span className="font-medium text-stone-900 dark:text-rwe-neutral-100 underline decoration-transparent decoration-2 underline-offset-2 group-hover:decoration-brand-blue-500">
+          <span className="font-medium text-foreground underline decoration-transparent decoration-2 underline-offset-2 group-hover:decoration-primary">
             {page.title}
           </span>
-          <span className="shrink-0 text-xs tabular-nums text-stone-400 dark:text-rwe-neutral-500">{page.updated}</span>
+          <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{page.updated}</span>
         </div>
         {page.summary && (
-          <p className="mt-1 text-sm text-stone-600 dark:text-rwe-neutral-400 leading-relaxed">{page.summary}</p>
+          <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{page.summary}</p>
         )}
         {(status || page.tags.length > 0) && (
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {status && (
-              <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-brand-blue-100 text-brand-blue-800 dark:bg-energy-green-900/40 dark:text-energy-green-300">
+              <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-primary/10 text-primary">
                 {status}
               </span>
             )}
             {page.tags.map((tag) => (
-              <span key={tag} className="text-xs text-stone-500 dark:text-rwe-neutral-400">
+              <span key={tag} className="text-xs text-muted-foreground">
                 #{tag}
               </span>
             ))}
@@ -89,24 +89,24 @@ export function WikiPage() {
     <WikiLayout currentPath="" toc={toc}>
       <div className="space-y-10">
         <div>
-          <h1 className="text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-2">Project brain</h1>
-          <p className="text-stone-600 dark:text-rwe-neutral-400 leading-relaxed">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">Project brain</h1>
+          <p className="text-muted-foreground leading-relaxed">
             Decisions, user flows and research, compiled from your planning files. To edit pages or browse the
             graph, open the <code className="font-mono text-sm">wiki/</code> folder in Obsidian.
           </p>
         </div>
 
         {!hasWikiContent() ? (
-          <div className="rounded-lg border border-dashed border-stone-300 dark:border-rwe-neutral-700 px-6 py-10 text-center">
-            <BookOpen className="w-6 h-6 mx-auto text-stone-400" strokeWidth={1.5} />
-            <p className="mt-3 font-medium text-stone-900 dark:text-rwe-neutral-100">The wiki has no pages yet</p>
-            <p className="mt-1 text-sm text-stone-600 dark:text-rwe-neutral-400">
+          <div className="rounded-lg border border-dashed border-border px-6 py-10 text-center">
+            <BookOpen className="w-6 h-6 mx-auto text-muted-foreground" strokeWidth={1.5} />
+            <p className="mt-3 font-medium text-foreground">The wiki has no pages yet</p>
+            <p className="mt-1 text-sm text-muted-foreground">
               Compile your planning files with <code className="font-mono">/design-os:wiki-ingest --product</code>, or
               design a flow with <code className="font-mono">/design-os:userflow</code>.
             </p>
             <Link
               to="/wiki/how-to/Home"
-              className="mt-4 inline-block text-sm text-stone-900 dark:text-rwe-neutral-100 underline decoration-brand-blue-500 decoration-2 underline-offset-2"
+              className="mt-4 inline-block text-sm text-foreground underline decoration-primary decoration-2 underline-offset-2"
             >
               Read the How To guides
             </Link>
@@ -114,7 +114,7 @@ export function WikiPage() {
         ) : (
           <>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" strokeWidth={1.5} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
               <Input
                 id="wiki-search"
                 type="search"
@@ -127,7 +127,7 @@ export function WikiPage() {
             </div>
 
             {filtered.length === 0 ? (
-              <p className="text-sm text-stone-600 dark:text-rwe-neutral-400">
+              <p className="text-sm text-muted-foreground">
                 No pages match “{query}”. Try a tag such as <span className="font-medium">flows</span> or a section name.
               </p>
             ) : (
@@ -135,13 +135,13 @@ export function WikiPage() {
                 const domainHome = getWikiPage(`${domain}/Home`)
                 return (
                   <section key={domain} aria-labelledby={`domain-${domain}`}>
-                    <div className="flex items-baseline justify-between gap-3 border-b border-stone-200 dark:border-rwe-neutral-800 pb-2">
-                      <h2 id={`domain-${domain}`} className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100 capitalize">
+                    <div className="flex items-baseline justify-between gap-3 border-b border-border pb-2">
+                      <h2 id={`domain-${domain}`} className="text-lg font-semibold text-foreground capitalize">
                         {domain.replace(/-/g, ' ')}
-                        <span className="ml-2 text-sm font-normal text-stone-400 dark:text-rwe-neutral-500">{pages.length}</span>
+                        <span className="ml-2 text-sm font-normal text-muted-foreground">{pages.length}</span>
                       </h2>
                       {domainHome && (
-                        <Link to={`/wiki/${domainHome.path}`} className="text-sm text-stone-500 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:text-rwe-neutral-100">
+                        <Link to={`/wiki/${domainHome.path}`} className="text-sm text-muted-foreground hover:text-foreground">
                           Domain index
                         </Link>
                       )}
@@ -160,17 +160,17 @@ export function WikiPage() {
 
         {log.length > 0 && (
           <section aria-labelledby="wiki-activity">
-            <h2 id="wiki-activity" className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100 border-b border-stone-200 dark:border-rwe-neutral-800 pb-2">
+            <h2 id="wiki-activity" className="text-lg font-semibold text-foreground border-b border-border pb-2">
               Recent activity
             </h2>
             <ol className="mt-3 space-y-2">
               {log.map((entry, index) => (
                 <li key={index} className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-baseline gap-3 text-sm">
-                  <span className="tabular-nums text-stone-400 dark:text-rwe-neutral-500">{entry.date}</span>
+                  <span className="tabular-nums text-muted-foreground">{entry.date}</span>
                   <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${LOG_KIND_STYLES[entry.kind] || LOG_KIND_STYLES.meta}`}>
                     {entry.kind}
                   </span>
-                  <span className="text-stone-700 dark:text-rwe-neutral-300 break-words">{entry.text}</span>
+                  <span className="text-foreground break-words">{entry.text}</span>
                 </li>
               ))}
             </ol>
@@ -180,7 +180,7 @@ export function WikiPage() {
         {vaultPages.length > 0 && (
           <nav aria-label="Vault pages" className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
             {vaultPages.map((page) => (
-              <Link key={page.path} to={`/wiki/${page.path}`} className="text-stone-500 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:text-rwe-neutral-100">
+              <Link key={page.path} to={`/wiki/${page.path}`} className="text-muted-foreground hover:text-foreground">
                 {page.title}
               </Link>
             ))}

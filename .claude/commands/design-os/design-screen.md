@@ -177,7 +177,7 @@ Follow rule 3 of "Applying the stack" in the `designos-techstack` skill:
   - Port only what the screen needs. Compose from what `src/ui/` already has before porting another primitive.
 - **Packages:** use only packages listed in the stack. Ask before installing one (including what a ported primitive imports), and use the stack's `package-manager`.
 - **Icons** come from the stack's `icons` area (default `lucide-react`). Import them at the top of the file like any dependency.
-- The rules against `@/components/*` and semantic utilities apply to `src/ui/` as well: `npm run test:tokens` covers it as a product directory.
+- The rule against `@/components/*` applies to `src/ui/` as well: `npm run test:tokens` covers it as a product directory.
 - **Every primitive the screen uses lives in `src/ui/`**, so Design System › Components lists it (the `designos-techstack` skill, rule 3, "Every component a design uses"). A reusable piece of UI the screen needs, even a hand-written one, goes to `src/ui/<name>.tsx` as a named PascalCase export with typed props and `cva()` variants. `cva()` and primitive libraries (Radix, Base UI ...) appear only in `src/ui/`. After creating or changing a component run `npm run -s ui:check` and fix every finding.
 
 ### Design Requirements
@@ -195,7 +195,7 @@ Follow rule 3 of "Applying the stack" in the `designos-techstack` skill:
 - Use only token values listed there: palette, semantic colors, the radius and shadow scale, the type scale. Write each as a token class ("Token classes" in agents.md): the Tailwind class when the token has Tailwind's default value (`zinc-500`, `p-4`), else its exact value as an arbitrary class, colors in OKLCH (`bg-[oklch(65.03%_0.11008_192.46)]`, `rounded-[0.25rem]`). No arbitrary values that are no token (`bg-[#…]`, `p-[13px]`).
 - Semantic roles from section 3.1: the palette step with the same value where one exists, else the role's exact OKLCH value; always note the semantic token in a comment (e.g. `{/* token: primary */}`) so the export can switch to `bg-primary` with `tokens.css`.
 - Light and dark values come from the Light/Dark columns; use `dark:` variants accordingly.
-- Never use Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, `border-border`, `bg-card`, ...) and never import from `@/components/` — in the preview they resolve to the Design OS theme, not the product. `npm run test:tokens` fails on both (see "Token separation" in agents.md).
+- Write token classes with token comments, not semantic utilities (`bg-primary`, `text-muted-foreground`, ...): the export maps them back to the semantic utilities (the preview renders the real tokens either way). Never import from `@/components/`; `npm run test:tokens` fails on it (see "Token separation" in agents.md). After writing, run `npm run preview:check`: it lists classes that render nothing in the prototype theme.
 
 **If `product/design-system/design-system.json` exists:**
 - Use the primary color for buttons, links, and key accents

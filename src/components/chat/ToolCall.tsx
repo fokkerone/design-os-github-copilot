@@ -15,10 +15,10 @@ export interface ToolCallView {
 
 type Approval = NonNullable<ToolCallView['approval']>
 
-const muted = 'text-stone-500 dark:text-rwe-neutral-400'
+const muted = 'text-muted-foreground'
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
-const primary = `h-8 rounded-sm bg-brand-blue-500 px-3 text-[13px] font-medium text-white transition-colors hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:bg-stone-200 disabled:text-stone-400 dark:bg-energy-green-500 dark:text-brand-blue-900 dark:hover:bg-energy-green-400 dark:disabled:bg-rwe-neutral-800 dark:disabled:text-rwe-neutral-500 ${focusRing}`
-const ghost = `h-8 rounded-sm px-3 text-[13px] text-stone-600 transition-colors hover:bg-rwe-sand-500 hover:text-rwe-neutral-900 dark:text-rwe-neutral-300 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-50 ${focusRing}`
+const primary = `h-8 rounded-sm bg-primary px-3 text-[13px] font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground ${focusRing}`
+const ghost = `h-8 rounded-sm px-3 text-[13px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground ${focusRing}`
 
 const TOOL_ICONS: Record<string, typeof Wrench> = { bash: Terminal, read: FileText, write: FileText, edit: FileText, glob: FileText, grep: FileText }
 
@@ -48,19 +48,19 @@ export function ToolCall({ toolName, args, status, isError, approval, respondToA
       className={`my-1.5 rounded-md border text-[13px] ${
         open
           ? 'border-amber-300 bg-amber-50 dark:border-amber-700/60 dark:bg-amber-900/20'
-          : 'border-stone-200 bg-rwe-sand-25 dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950/60'
+          : 'border-border bg-card'
       }`}
     >
       <div className="flex items-center gap-2 px-2.5 py-1.5">
         {state === 'running' ? (
-          <Loader2 className="size-3.5 shrink-0 animate-spin text-brand-blue-500 dark:text-energy-green-500" aria-hidden />
+          <Loader2 className="size-3.5 shrink-0 animate-spin text-primary" aria-hidden />
         ) : state === 'error' ? (
-          <AlertCircle className="size-3.5 shrink-0 text-rwe-red-700 dark:text-rwe-red-200" aria-hidden />
+          <AlertCircle className="size-3.5 shrink-0 text-destructive" aria-hidden />
         ) : (
           <Icon className={`size-3.5 shrink-0 ${muted}`} aria-hidden />
         )}
         <span className="font-medium">{toolName}</span>
-        {summary && <span className={`min-w-0 truncate font-['JetBrains_Mono',ui-monospace,monospace] text-[12px] ${muted}`}>{summary}</span>}
+        {summary && <span className={`min-w-0 truncate font-mono text-[12px] ${muted}`}>{summary}</span>}
         {state === 'done' && approval?.approved !== undefined && (
           <span className={`ml-auto text-[12px] ${muted}`}>{approval.approved ? 'Allowed' : 'Denied'}</span>
         )}
@@ -119,7 +119,7 @@ function Questions({ approval, onRespond }: { approval: Approval; onRespond: (r:
 
   return (
     <form
-      className="my-2 min-w-0 space-y-4 rounded-md border border-brand-blue-200 bg-rwe-sand-25 p-3 dark:border-energy-green-700/50 dark:bg-rwe-neutral-950/60"
+      className="my-2 min-w-0 space-y-4 rounded-md border border-primary/30 bg-card p-3"
       onSubmit={(e) => {
         e.preventDefault()
         if (complete) submit()
@@ -139,8 +139,8 @@ function Questions({ approval, onRespond }: { approval: Approval; onRespond: (r:
                   key={o.id}
                   className={`flex cursor-pointer items-start gap-2 rounded-md border px-2.5 py-1.5 text-[13px] transition-colors ${
                     checked
-                      ? 'border-brand-blue-500 bg-brand-blue-50 dark:border-energy-green-500 dark:bg-energy-green-500/10'
-                      : 'border-stone-200 hover:bg-rwe-sand-500 dark:border-rwe-neutral-800 dark:hover:bg-rwe-neutral-800'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:bg-accent'
                   }`}
                 >
                   <input
@@ -170,7 +170,7 @@ function Questions({ approval, onRespond }: { approval: Approval; onRespond: (r:
                 rows={2}
                 value={a.text}
                 onChange={(e) => set(q.id, { text: e.target.value, ...(multiple ? {} : { optionIds: [] }) })}
-                className={`block w-full resize-none rounded-md border border-stone-200 bg-transparent px-2.5 py-1.5 text-[13px] placeholder:text-stone-500 dark:border-rwe-neutral-800 dark:placeholder:text-rwe-neutral-500 ${focusRing}`}
+                className={`block w-full resize-none rounded-md border border-border bg-transparent px-2.5 py-1.5 text-[13px] placeholder:text-muted-foreground ${focusRing}`}
               />
             )}
           </fieldset>
@@ -193,7 +193,7 @@ function Questions({ approval, onRespond }: { approval: Approval; onRespond: (r:
 function Answered({ approval }: { approval: Approval }) {
   const questions = approval.questions ?? []
   return (
-    <div className="my-2 space-y-2 rounded-md border border-stone-200 bg-rwe-sand-25 px-3 py-2 text-[13px] dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950/60">
+    <div className="my-2 space-y-2 rounded-md border border-border bg-card px-3 py-2 text-[13px]">
       {questions.map((q) => {
         const a = approval.answers?.[q.id]
         const given = [...(a?.optionIds ?? []), ...(a?.text ? [a.text] : [])]
@@ -205,7 +205,7 @@ function Answered({ approval }: { approval: Approval }) {
                 <span className={`font-normal ${muted}`}>{approval.approved === false ? 'Skipped' : approval.resolution ?? 'No answer'}</span>
               ) : (
                 <>
-                  <Check className="size-3.5 text-energy-green-600 dark:text-energy-green-500" aria-hidden />
+                  <Check className="size-3.5 text-primary" aria-hidden />
                   <span>{given.join(', ')}</span>
                 </>
               )}

@@ -5,6 +5,8 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 // @ts-expect-error plain ESM script
 import tailwindTheme from '../scripts/tailwind-theme.mjs'
+// @ts-expect-error plain ESM script
+import prototypeFiles from '../scripts/prototype-files.mjs'
 import { fixtureGlobs } from './fixture-globs'
 
 /**
@@ -29,10 +31,11 @@ function fixtureComponentProps(): Plugin {
  * Vite config of Storybook. Storybook shows the Design OS UI only, so it leaves out what the app
  * needs for the product: no OpenCode server, no Live Edit source markers, prop writer, React
  * DevTools hook or comment store, and the loaders read sample fixtures instead of product/
- * (see fixture-globs.ts). Tailwind's default theme stays: Live Edit reads it as data.
+ * (see fixture-globs.ts; prototype files are listed by name only, as in the app). Live Edit reads
+ * Tailwind's default theme as data, not the prototype theme (that would read product/).
  */
 export default defineConfig({
-  plugins: [fixtureGlobs(), react(), tailwindcss(), tailwindTheme(), fixtureComponentProps()],
+  plugins: [fixtureGlobs(), prototypeFiles(), react(), tailwindcss(), tailwindTheme({ prototype: false }), fixtureComponentProps()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../src'),

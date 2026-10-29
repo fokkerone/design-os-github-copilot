@@ -1,14 +1,18 @@
 import { useEffect } from 'react'
-import { createPicker } from '@/lib/live-edit/picker'
-import { createCommentsOverlay } from '@/lib/live-edit/comments-overlay'
+import { createPicker } from './picker'
+import { createCommentsOverlay } from './comments-overlay'
+import { applyDark, followStoredTheme } from './theme'
 import { readMessage, type FromPreview, type ToPreview } from '@/lib/live-edit/protocol'
 
 /**
- * Live Edit, preview side: the fullscreen preview runs the picker and the comments overlay when it is embedded in a
- * step page, and reports HMR updates so the page drops its inspector preview once the agent's
- * edit has arrived. Opened on its own (new tab, screenshots) it does nothing.
+ * The preview's side of Design OS: light or dark mode, and, when the preview is embedded in a
+ * step page, the Live Edit picker and the comments overlay. It reports HMR updates so the page
+ * drops its inspector preview once the agent's edit has arrived. It speaks to the page only
+ * through postMessage (src/lib/live-edit/protocol.ts).
  */
-export function useLivePicker() {
+export function useBridge() {
+  useEffect(() => followStoredTheme(), [])
+
   useEffect(() => {
     const parent = window.parent
     if (parent === window) return
@@ -33,6 +37,7 @@ export function useLivePicker() {
       else if (message.type === 'dos:comment-mode') comments.setActive(message.active)
       else if (message.type === 'dos:comments') comments.setComments(message.items, message.showResolved)
       else if (message.type === 'dos:comment-error') comments.showError(message.error)
+      else if (message.type === 'dos:theme') applyDark(message.dark)
     }
     window.addEventListener('message', onMessage)
     post({ type: 'dos:ready' })

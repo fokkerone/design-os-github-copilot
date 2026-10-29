@@ -21,10 +21,10 @@ interface WikiLayoutProps {
 const VAULT_PATHS = ['Home', 'log', '_meta/taxonomy', '_lint-report', '_insights']
 
 const linkBase =
-  'block rounded-md px-2 py-1 text-sm leading-snug focus-visible:outline-2 focus-visible:outline-brand-blue-500'
+  'block rounded-md px-2 py-1 text-sm leading-snug focus-visible:outline-2 focus-visible:outline-ring'
 const linkIdle =
-  'text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:bg-rwe-neutral-800/60 dark:hover:text-rwe-neutral-100'
-const linkActive = 'bg-stone-100 font-medium text-stone-900 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-100'
+  'text-muted-foreground hover:bg-accent hover:text-foreground'
+const linkActive = 'bg-muted font-medium text-foreground'
 
 function NavLink({ to, active, children }: { to: string; active: boolean; children: ReactNode }) {
   return (
@@ -62,10 +62,10 @@ function WikiNav({ currentPath }: { currentPath: string }) {
         return (
           // Keyed by the current state so the group of the page you are on is open after navigating
           <details key={`${domain}-${isCurrent}`} open={isCurrent} className="group">
-            <summary className="flex cursor-pointer list-none items-center gap-1 rounded-md px-1 py-1 text-xs font-medium uppercase tracking-wide text-stone-500 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:text-rwe-neutral-100 [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center gap-1 rounded-md px-1 py-1 text-xs font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
               <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" strokeWidth={2} aria-hidden="true" />
               {domain.replace(/-/g, ' ')}
-              <span className="ml-auto font-normal tabular-nums text-stone-400 dark:text-rwe-neutral-500">{pages.length}</span>
+              <span className="ml-auto font-normal tabular-nums text-muted-foreground">{pages.length}</span>
             </summary>
             <ul className="mt-1 space-y-0.5">
               {domainHome && (
@@ -127,7 +127,7 @@ function WikiToc({ items, onNavigate }: { items: WikiHeading[]; onNavigate?: () 
 
   return (
     <nav aria-label="On this page">
-      <ul className="space-y-0.5 border-l border-stone-200 dark:border-rwe-neutral-800">
+      <ul className="space-y-0.5 border-l border-border">
         {items.map((item) => {
           const isActive = item.id === active
           return (
@@ -140,12 +140,12 @@ function WikiToc({ items, onNavigate }: { items: WikiHeading[]; onNavigate?: () 
                   onNavigate?.()
                 }}
                 aria-current={isActive ? 'location' : undefined}
-                className={`-ml-px block border-l-2 py-1 pr-2 text-[13px] leading-snug focus-visible:outline-2 focus-visible:outline-brand-blue-500 ${
+                className={`-ml-px block border-l-2 py-1 pr-2 text-[13px] leading-snug focus-visible:outline-2 focus-visible:outline-ring ${
                   item.depth > 2 ? 'pl-6' : 'pl-3'
                 } ${
                   isActive
-                    ? 'border-brand-blue-500 font-medium text-stone-900 dark:text-rwe-neutral-100'
-                    : 'border-transparent text-stone-500 hover:text-stone-900 dark:text-rwe-neutral-400 dark:hover:text-rwe-neutral-100'
+                    ? 'border-primary font-medium text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {item.text}
@@ -159,7 +159,7 @@ function WikiToc({ items, onNavigate }: { items: WikiHeading[]; onNavigate?: () 
 }
 
 const detailsSummary =
-  'cursor-pointer list-none rounded-md border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 dark:border-rwe-neutral-800 dark:text-rwe-neutral-300 [&::-webkit-details-marker]:hidden'
+  'cursor-pointer list-none rounded-md border border-border px-3 py-2 text-sm font-medium text-foreground [&::-webkit-details-marker]:hidden'
 
 /**
  * Wiki pages: navigation on the left, content in the middle, table of contents on the right.
@@ -219,7 +219,7 @@ export function WikiLayout({ children, currentPath, toc = [], backTo, backLabel,
         {toc.length > 0 && (
           <aside className="hidden @7xl:block">
             <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-rwe-neutral-400">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 On this page
               </p>
               <WikiToc key={tocKey} items={toc} />

@@ -120,7 +120,7 @@ flowchart LR
   UI --> EX
 ```
 
-- **UI primitives come from `src/ui/`.** Screens, shell and clickdummy import button, dialog and the rest only from there, never from `@/components/*` (that is the Design OS UI, with the Design OS theme). `npm run test:tokens` treats `src/ui/` as a product directory and fails on Design OS semantic utilities such as `bg-primary`.
+- **UI primitives come from `src/ui/`.** Screens, shell and clickdummy import button, dialog and the rest only from there, never from `@/components/*` (that is the Design OS UI). `npm run test:tokens` treats `src/ui/` as a product directory and fails on such imports.
 - **Ported, never added.** With shadcn/ui, a missing primitive is ported with `npx shadcn@latest view @shadcn/<name>` into `src/ui/<name>.tsx`: imports become relative, semantic utilities become token classes from `DESIGN.md` (the palette step when the role has its value, else the exact OKLCH value) with a `token:` comment, and the base and style are respected. `npx shadcn@latest add` is never run, because it would overwrite Design OS UI.
 - **Undecided means no dependency.** An area without a decision is built with React, TypeScript and Tailwind. A dependency that is neither in the stack nor in its Packages table is not added; a listed package is installed only after the step asks you.
 - **Conflicts are shown, not resolved.** If a request needs something the stack does not have, the step names the area and points you to `/design-os:techstack update`. It never edits the file and never picks a side silently.

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ScreenDesignFullscreen, ScreenDesignPage } from './ScreenDesignPage'
+import { ScreenDesignPage } from './ScreenDesignPage'
 
 /**
  * The screen design page frames the preview. Storybook shows the Design OS UI only: the preview
- * iframe stays empty and the fullscreen route renders a placeholder instead of the prototype.
+ * iframe (preview.html, the prototype's own document) stays empty.
  */
 const meta = {
   title: 'Design OS/Pages/ScreenDesignPage',
@@ -24,13 +24,3 @@ type Story = StoryObj<typeof meta>
 export const Frame: Story = {}
 
 export const WithChat: Story = { parameters: { chat: 'online' } }
-
-export const Fullscreen: Story = {
-  render: () => <ScreenDesignFullscreen />,
-  parameters: {
-    router: {
-      path: '/prototype/sections/:sectionId/screen-designs/:screenDesignName/fullscreen',
-      url: '/prototype/sections/meter-readings/screen-designs/ReadingForm/fullscreen',
-    },
-  },
-}

@@ -90,6 +90,7 @@ When the request is exactly `Apply the inspector edits to the source as listed.`
 - No new dependency. A request the tech stack cannot serve is reported with `/design-os:techstack update`.
 - A change that needs a new reusable piece of UI, or new variants, goes to `src/ui/` (named PascalCase export, `cva()` variants), not into the screen, so Design System › Components lists it. Run `npm run -s ui:check` after it and fix every finding.
 - Vite HMR updates the preview next to the chat as soon as the file is saved; the inspector preview disappears then and the real result shows.
+- Run `npm run preview:check`: it lists classes that render nothing in the prototype theme. Replace them with a token of the theme.
 
 Tell the user in one or two sentences what changed (file:line) and ask with the question tool whether it fits or needs adjustments. Repeat Step 3 for adjustments.
 

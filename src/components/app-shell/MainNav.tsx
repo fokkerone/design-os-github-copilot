@@ -49,14 +49,14 @@ function CollapsibleGroup({ item, onNavigate }: { item: NavItem; onNavigate?: (h
         type="button"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="group flex h-[30px] w-full items-center gap-2 rounded-md px-2 text-left text-[13px] font-medium text-rwe-neutral-700 transition-colors duration-150 hover:bg-rwe-sand-500 hover:text-rwe-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus dark:text-rwe-neutral-200 dark:hover:bg-rwe-neutral-900 dark:hover:text-rwe-neutral-50"
+        className="group flex h-[30px] w-full items-center gap-2 rounded-md px-2 text-left text-[13px] font-medium text-foreground transition-colors duration-150 hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus"
       >
-        <Icon className="size-4 shrink-0 text-stone-500 group-hover:text-rwe-neutral-800 dark:text-rwe-neutral-300 dark:group-hover:text-rwe-neutral-100" strokeWidth={1.75} aria-hidden />
+        <Icon className="size-4 shrink-0 text-muted-foreground group-hover:text-foreground" strokeWidth={1.75} aria-hidden />
         <span className="truncate">{item.label}</span>
         <svg
           viewBox="0 0 8 8"
           aria-hidden
-          className={`size-2 shrink-0 fill-current text-stone-500 transition-transform duration-150 dark:text-rwe-neutral-400 ${open ? 'rotate-90' : ''}`}
+          className={`size-2 shrink-0 fill-current text-muted-foreground transition-transform duration-150 ${open ? 'rotate-90' : ''}`}
         >
           <path d="M2 1l4 3-4 3z" />
         </svg>
@@ -83,25 +83,25 @@ function NavRow({ item, onNavigate, nested }: { item: NavItem; onNavigate?: (hre
       onClick={() => onNavigate?.(item.href)}
       className={`group flex h-[30px] w-full items-center gap-2 rounded-md px-2 text-left text-[13px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus ${
         item.isActive
-          ? 'bg-rwe-sand-500 text-rwe-neutral-900 dark:bg-rwe-neutral-700/70 dark:text-rwe-neutral-50'
-          : 'text-rwe-neutral-700 hover:bg-rwe-sand-500 hover:text-rwe-neutral-900 dark:text-rwe-neutral-200 dark:hover:bg-rwe-neutral-900 dark:hover:text-rwe-neutral-50'
+          ? 'bg-muted text-foreground'
+          : 'text-foreground hover:bg-accent hover:text-foreground'
       }`}
     >
       <Icon
         className={`size-4 shrink-0 ${
           item.isActive
-            ? 'text-rwe-neutral-900 dark:text-rwe-neutral-50'
-            : 'text-stone-500 group-hover:text-rwe-neutral-800 dark:text-rwe-neutral-300 dark:group-hover:text-rwe-neutral-100'
+            ? 'text-foreground'
+            : 'text-muted-foreground group-hover:text-foreground'
         }`}
         strokeWidth={1.75}
         aria-hidden
       />
       <span className="truncate">{item.label}</span>
       {nested && item.status === 'completed' && (
-        <Check className="ml-auto size-3.5 shrink-0 text-energy-green-600 dark:text-energy-green-500" strokeWidth={2} aria-hidden />
+        <Check className="ml-auto size-3.5 shrink-0 text-primary" strokeWidth={2} aria-hidden />
       )}
       {item.badge ? (
-        <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-blue-500 px-1 text-[11px] font-semibold text-white dark:bg-energy-green-500 dark:text-brand-blue-900">
+        <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[11px] font-semibold text-primary-foreground">
           {item.badge}
         </span>
       ) : null}

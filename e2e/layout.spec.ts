@@ -1,4 +1,33 @@
+import { readFileSync } from 'node:fs'
 import { test, expect } from './fixtures'
+
+/** A variable of the Design OS theme as the browser computes it (oklch lightness 16.8% → 0.168) */
+function themeVar(selector: string, name: string): string {
+  const css = readFileSync(new URL('../src/styles/design-os.css', import.meta.url), 'utf8')
+  const block = css.slice(css.indexOf(`\n${selector} {`))
+  const value = block.match(new RegExp(`${name}:\\s*([^;]+);`))![1].trim()
+  // the browser writes oklch(16.8% 0.0020 …) as oklch(0.168 0.002 …)
+  return value
+    .replace(/oklch\(([\d.]+)%/, (_, l) => `oklch(${Number(l) / 100}`)
+    .replace(/\d+\.\d+/g, (n) => String(Number(n)))
+}
+
+/** The numbers of a color, e.g. [0.187, 0.002, 286.2]: the browser rounds them its own way */
+function channels(color: string): number[] {
+  return (color.match(/-?\d*\.?\d+/g) ?? []).map(Number)
+}
+
+function sameColor(actual: string, expected: string): boolean {
+  const a = channels(actual)
+  const e = channels(expected)
+  return a.length === e.length && a.every((n, i) => Math.abs(n - e[i]) < 0.01)
+}
+
+/** The Design OS --radius in px (rounded-lg = --radius in the rhea preset) */
+function themeRadius(): string {
+  const rem = themeVar(':root,\n.light', '--radius').match(/([\d.]+)rem/)![1]
+  return `${Number(rem) * 16}px`
+}
 
 test.describe('layout', () => {
   test('opens on the Vision step in sidebar, chat and step panel', async ({ page, opencode }) => {
@@ -26,7 +55,7 @@ test.describe('layout', () => {
       const c = getComputedStyle(el)
       return { radius: c.borderTopLeftRadius, border: c.borderTopWidth, mt: c.marginTop }
     })
-    expect(style).toEqual({ radius: '8px', border: '1px', mt: '6px' })
+    expect(style).toEqual({ radius: themeRadius(), border: '1px', mt: '6px' })
   })
 
   test('chat on the left, step on the right', async ({ page, opencode }) => {
@@ -74,13 +103,13 @@ test.describe('layout', () => {
     await expect(page.getByRole('button', { name: 'Show step panel' })).toBeVisible()
   })
 
-  test('uses Inter and the Volta dark background', async ({ page, opencode }) => {
+  test('uses Inter and the zinc dark background of the shadcn preset', async ({ page, opencode }) => {
     void opencode
     await page.goto('/prototype/vision')
     const font = await page.locator('main').evaluate((el) => getComputedStyle(el).fontFamily)
     expect(font).toContain('Inter')
     const bg = await page.locator('main').evaluate((el) => getComputedStyle(el).backgroundColor)
-    expect(bg).toBe('rgb(20, 20, 20)') // rwe-neutral-900
+    expect(sameColor(bg, themeVar('.dark', '--background')), `${bg} is the .dark --background`).toBe(true)
   })
 
   test('sidebar collapses with [ and the button', async ({ page, opencode }) => {
@@ -114,10 +143,18 @@ test.describe('layout', () => {
     await page.goto('/prototype/vision')
     await page.getByRole('button', { name: /switch to light/i }).click()
     const bg = () => page.locator('main').evaluate((el) => getComputedStyle(el).backgroundColor)
-    await expect.poll(bg).toBe('rgb(252, 252, 248)') // rwe-sand-50
+    const light = themeVar(':root,\n.light', '--background')
+    await expect.poll(async () => sameColor(await bg(), light)).toBe(true)
     await page.reload()
-    await expect.poll(bg).toBe('rgb(252, 252, 248)')
+    await expect.poll(async () => sameColor(await bg(), light)).toBe(true)
     expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light')
+    // the preview has its own theme and follows the mode
+    await page.goto('/preview.html#/shell')
+    const dark = () => page.evaluate(() => document.documentElement.classList.contains('dark'))
+    await expect.poll(dark).toBe(false)
+    await page.evaluate(() => localStorage.setItem('theme', 'dark'))
+    await page.reload()
+    await expect.poll(dark).toBe(true)
   })
 
   test('mobile: navigation is a drawer', async ({ page, opencode }) => {

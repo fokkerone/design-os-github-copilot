@@ -40,7 +40,7 @@ If design tokens are missing, show a warning but continue:
 
 ## Step 1b: Check for Brand Identity in Design System
 
-If `product/design-system/DESIGN.md` exists (generated from imported design tokens), it is the source of truth for colors, typography, radius and shadows — follow it and use only the token values listed there. Use token classes ("Token classes" in agents.md: `teal-600` when the token has Tailwind's value, else the exact value such as `bg-[oklch(65.03%_0.11008_192.46)]`, with `// token: primary`), never Design OS semantic utilities like `bg-primary` or imports from `@/components/` (see "Token separation" in agents.md).
+If `product/design-system/DESIGN.md` exists (generated from imported design tokens), it is the source of truth for colors, typography, radius and shadows — follow it and use only the token values listed there. Use token classes ("Token classes" in agents.md: `teal-600` when the token has Tailwind's value, else the exact value such as `bg-[oklch(65.03%_0.11008_192.46)]`, with `// token: primary`), not semantic utilities like `bg-primary`, and never imports from `@/components/` (see "Token separation" in agents.md). After writing, run `npm run preview:check`.
 
 Check if `product/design-system/design-system.json` exists and contains personality, voice, or uiStyle fields.
 

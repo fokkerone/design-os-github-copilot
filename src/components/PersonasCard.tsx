@@ -15,15 +15,15 @@ export function PersonasCard() {
   }
 
   return (
-    <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
+    <Card className="border-border shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">
+        <CardTitle className="text-lg font-semibold text-foreground">
           Personas
-          <span className="ml-2 text-sm font-normal text-stone-500 dark:text-rwe-neutral-400">({model.personas.length})</span>
+          <span className="ml-2 text-sm font-normal text-muted-foreground">({model.personas.length})</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <ul className="divide-y divide-stone-200 dark:divide-rwe-neutral-700">
+        <ul className="divide-y divide-border">
           {model.personas.map((persona) => {
             const flowCount = model.flowsForPersona(persona.id).length
             const sectionCount = model.sectionsForPersona(persona.id).length
@@ -33,23 +33,23 @@ export function PersonasCard() {
               <li key={persona.id}>
                 <Link
                   to={`/personas/${persona.id}`}
-                  className="flex items-start justify-between gap-4 px-6 py-4 hover:bg-stone-50 dark:hover:bg-rwe-neutral-800/50 transition-colors"
+                  className="flex items-start justify-between gap-4 px-6 py-4 hover:bg-accent transition-colors"
                 >
                   <div className="flex items-start gap-4 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-stone-200 dark:bg-rwe-neutral-700 flex items-center justify-center shrink-0">
-                      <UserRound className="w-4 h-4 text-stone-600 dark:text-rwe-neutral-300" strokeWidth={1.5} />
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                      <UserRound className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="font-medium text-stone-900 dark:text-rwe-neutral-100">
+                      <h3 className="font-medium text-foreground">
                         {persona.name}
                         {persona.archetype && persona.archetype !== persona.name && (
-                          <span className="font-normal text-stone-500 dark:text-rwe-neutral-400"> — {persona.archetype}</span>
+                          <span className="font-normal text-muted-foreground"> — {persona.archetype}</span>
                         )}
                       </h3>
                       {persona.jobStory && (
-                        <p className="text-sm text-stone-600 dark:text-rwe-neutral-400 mt-0.5 line-clamp-2">{persona.jobStory}</p>
+                        <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{persona.jobStory}</p>
                       )}
-                      <p className="text-xs text-stone-500 dark:text-rwe-neutral-400 mt-2">
+                      <p className="text-xs text-muted-foreground mt-2">
                         {[
                           persona.priority,
                           persona.kind === 'proto' ? 'proto: assumptions, not research' : persona.kind,
@@ -60,7 +60,7 @@ export function PersonasCard() {
                           .filter(Boolean)
                           .join(' · ')}
                         {conflicts > 0 && (
-                          <span className="text-red-700 dark:text-red-400">
+                          <span className="text-destructive">
                             {' '}
                             · {conflicts} conflict{conflicts === 1 ? '' : 's'}
                           </span>
@@ -68,7 +68,7 @@ export function PersonasCard() {
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-stone-400 dark:text-rwe-neutral-500 shrink-0 mt-1" strokeWidth={1.5} />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 mt-1" strokeWidth={1.5} />
                 </Link>
               </li>
             )

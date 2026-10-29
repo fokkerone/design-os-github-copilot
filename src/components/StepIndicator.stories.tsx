@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { StepIndicator } from './StepIndicator'
 
-const Box = ({ label }: { label: string }) => <div className="rounded-lg border border-stone-200 p-4 text-sm dark:border-rwe-neutral-800">{label}</div>
+const Box = ({ label }: { label: string }) => <div className="rounded-lg border border-border p-4 text-sm">{label}</div>
 
 const meta = {
   title: 'Design OS/Building Blocks/StepIndicator',

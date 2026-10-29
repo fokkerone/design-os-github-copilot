@@ -18,7 +18,7 @@ import { ChatMarkdown } from './ChatMarkdown'
 import { ToolCall } from './ToolCall'
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
-const muted = 'text-stone-500 dark:text-rwe-neutral-400'
+const muted = 'text-muted-foreground'
 
 /**
  * The agent chat: thread and composer, styled like the reference app.
@@ -26,12 +26,12 @@ const muted = 'text-stone-500 dark:text-rwe-neutral-400'
  */
 export function ChatPane({ composerExtras }: { composerExtras?: React.ReactNode }) {
   return (
-    <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col text-rwe-neutral-900 dark:text-rwe-neutral-100">
+    <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col text-foreground">
       <ThreadPrimitive.Viewport className="relative min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-[720px] space-y-5 px-4 py-6 sm:px-6">
           <AuiIf condition={(s) => s.thread.isEmpty}>
             <div className="py-16 text-center">
-              <div className="mx-auto mb-3 flex size-9 items-center justify-center rounded-full bg-rwe-sand-500 dark:bg-rwe-neutral-800">
+              <div className="mx-auto mb-3 flex size-9 items-center justify-center rounded-full bg-muted">
                 <Bot className={`size-4 ${muted}`} />
               </div>
               <p className="text-[15px] font-medium">Ask the agent</p>
@@ -57,7 +57,7 @@ export function ChatPane({ composerExtras }: { composerExtras?: React.ReactNode 
 function UserMessage() {
   return (
     <MessagePrimitive.Root className="flex justify-end">
-      <div className="max-w-[85%] whitespace-pre-wrap rounded-lg bg-rwe-sand-500 px-3.5 py-2 text-[14px] leading-relaxed dark:bg-rwe-neutral-800">
+      <div className="max-w-[85%] whitespace-pre-wrap rounded-lg bg-muted px-3.5 py-2 text-[14px] leading-relaxed">
         <MessagePrimitive.Parts>
           {({ part }) => (part.type === 'text' ? <UserText /> : null)}
         </MessagePrimitive.Parts>
@@ -76,13 +76,13 @@ function UserText() {
       <>
         <details className="mb-1.5 text-[12px]">
           <summary className={`flex cursor-pointer list-none items-center gap-1.5 ${muted}`}>
-            <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-brand-blue-500 text-[10px] font-semibold text-white" aria-hidden>
+            <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground" aria-hidden>
               {comment.number}
             </span>
-            <span className="font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">{comment.element}</span>
+            <span className="font-medium text-foreground">{comment.element}</span>
             {comment.command && <span className="font-mono">/impeccable {comment.command}</span>}
           </summary>
-          <pre className="mt-1.5 max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-rwe-sand-25 p-2 font-mono text-[11px] dark:bg-rwe-neutral-950/60">{comment.context}</pre>
+          <pre className="mt-1.5 max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-card p-2 font-mono text-[11px]">{comment.context}</pre>
         </details>
         {comment.text}
       </>
@@ -94,11 +94,11 @@ function UserText() {
       <details className="mb-1.5 text-[12px]">
         <summary className={`flex cursor-pointer list-none items-center gap-1.5 ${muted}`}>
           <MousePointerClick className="size-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
-          <span className="font-medium text-rwe-neutral-900 dark:text-rwe-neutral-100">{live.label}</span>
+          <span className="font-medium text-foreground">{live.label}</span>
           <span className="truncate font-mono">{live.source}</span>
           {live.edits > 0 && <span>· {live.edits} edit{live.edits === 1 ? '' : 's'}</span>}
         </summary>
-        <pre className="mt-1.5 max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-rwe-sand-25 p-2 font-mono text-[11px] dark:bg-rwe-neutral-950/60">{live.context}</pre>
+        <pre className="mt-1.5 max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-card p-2 font-mono text-[11px]">{live.context}</pre>
       </details>
       {live.request}
     </>
@@ -113,10 +113,10 @@ function AssistantMessage() {
     <MessagePrimitive.Root className="flex gap-3">
       <span
         data-working={working ? 'true' : undefined}
-        className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rwe-sand-500 dark:bg-rwe-neutral-800"
+        className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted"
         aria-hidden
       >
-        <Bot className={`size-3.5 ${working ? 'animate-pulse text-brand-blue-500 dark:text-energy-green-500' : muted}`} />
+        <Bot className={`size-3.5 ${working ? 'animate-pulse text-primary' : muted}`} />
       </span>
       <div className="min-w-0 flex-1">
         <MessagePrimitive.Parts>
@@ -130,7 +130,7 @@ function AssistantMessage() {
         <MessagePrimitive.Error>
           <ErrorPrimitive.Root
             role="alert"
-            className="mt-2 rounded-md border border-rwe-red-200 bg-rwe-red-50 px-3 py-2 text-[13px] text-rwe-red-700 dark:border-rwe-red-800 dark:bg-rwe-red-900/20 dark:text-rwe-red-200"
+            className="mt-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-[13px] text-destructive"
           >
             <ErrorPrimitive.Message />
           </ErrorPrimitive.Root>
@@ -143,7 +143,7 @@ function AssistantMessage() {
 function ActivityNote({ activity }: { activity: 'working' | 'waiting' | 'idle' }) {
   return (
     <p role="status" aria-label={ACTIVITY_LABEL[activity]} className={`mt-1 flex items-center gap-1.5 text-[12px] ${muted}`}>
-      <span className="size-1.5 animate-pulse rounded-full bg-brand-blue-500 dark:bg-energy-green-500" aria-hidden />
+      <span className="size-1.5 animate-pulse rounded-full bg-primary" aria-hidden />
       {ACTIVITY_LABEL[activity]}…
     </p>
   )
@@ -170,10 +170,10 @@ function Composer({ extras }: { extras?: React.ReactNode }) {
           live?.markSent()
         } else if (expanded !== text) aui.composer().setText(expanded)
       }}
-      className="rounded-lg border border-stone-200 bg-rwe-sand-25 px-3.5 pb-2.5 pt-3 transition-colors focus-within:border-stone-300 dark:border-rwe-neutral-800 dark:bg-rwe-neutral-950/60 dark:focus-within:border-rwe-neutral-700">
+      className="rounded-lg border border-border bg-card px-3.5 pb-2.5 pt-3 transition-colors focus-within:border-border">
       {picked && (
         <div className="mb-2 flex items-center gap-1.5">
-          <span className="inline-flex min-w-0 items-center gap-1.5 rounded-full bg-brand-blue-500 py-0.5 pl-2 pr-1 text-[12px] text-white dark:bg-energy-green-500 dark:text-brand-blue-900">
+          <span className="inline-flex min-w-0 items-center gap-1.5 rounded-full bg-primary py-0.5 pl-2 pr-1 text-[12px] text-primary-foreground">
             <MousePointerClick className="size-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
             <span className="font-medium">{selectionLabel(picked)}</span>
             {picked.edits.length > 0 && <span className="opacity-80">· {picked.edits.length}</span>}
@@ -195,7 +195,7 @@ function Composer({ extras }: { extras?: React.ReactNode }) {
         aria-label="Message the agent"
         placeholder={picked ? 'Describe the change…' : 'Reply to the agent…'}
         rows={1}
-        className="block max-h-40 min-h-6 w-full resize-none bg-transparent text-[14px] text-rwe-neutral-900 placeholder:text-stone-500 focus:outline-none dark:text-rwe-neutral-50 dark:placeholder:text-rwe-neutral-500"
+        className="block max-h-40 min-h-6 w-full resize-none bg-transparent text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none"
       />
       <div className="mt-2 flex items-center gap-1">
         {extras}
@@ -203,7 +203,7 @@ function Composer({ extras }: { extras?: React.ReactNode }) {
         <AuiIf condition={(s) => !s.thread.isRunning}>
           <ComposerPrimitive.Send
             aria-label="Send"
-            className={`flex size-7 items-center justify-center rounded-full bg-brand-blue-500 text-white transition-colors hover:bg-brand-blue-600 disabled:bg-rwe-sand-500 disabled:text-stone-400 dark:bg-energy-green-500 dark:text-brand-blue-900 dark:hover:bg-energy-green-400 dark:disabled:bg-rwe-neutral-800 dark:disabled:text-rwe-neutral-500 ${focusRing}`}
+            className={`flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground ${focusRing}`}
           >
             <ArrowUp className="size-4" strokeWidth={2.25} />
           </ComposerPrimitive.Send>
@@ -211,7 +211,7 @@ function Composer({ extras }: { extras?: React.ReactNode }) {
         <AuiIf condition={(s) => s.thread.isRunning}>
           <ComposerPrimitive.Cancel
             aria-label="Stop"
-            className={`flex size-7 items-center justify-center rounded-full bg-rwe-neutral-800 text-white transition-colors hover:bg-rwe-neutral-700 dark:bg-rwe-neutral-100 dark:text-rwe-neutral-900 ${focusRing}`}
+            className={`flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 ${focusRing}`}
           >
             <Square className="size-3 fill-current" />
           </ComposerPrimitive.Cancel>

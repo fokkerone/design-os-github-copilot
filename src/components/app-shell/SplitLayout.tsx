@@ -40,7 +40,7 @@ function useIsWide() {
 
 const SPLIT_LAYOUT_KEY = 'designos:split'
 
-const border = 'border-stone-200 dark:border-rwe-neutral-800'
+const border = 'border-border'
 
 /**
  * Chat on the left, the page of the current step on the right (layout of the reference app).
@@ -75,9 +75,9 @@ export function SplitLayout({ title, chat, children, panelMode, onPanelModeChang
   }, [covered])
 
   return (
-    <div className="flex h-full min-h-[560px] flex-col text-rwe-neutral-900 dark:text-rwe-neutral-100">
+    <div className="flex h-full min-h-[560px] flex-col text-foreground">
       <header className={`flex h-12 shrink-0 items-center gap-3 border-b px-3 sm:px-4 ${border}`}>
-        <h1 className="min-w-0 truncate px-2 text-[14px] text-rwe-neutral-900 dark:text-rwe-neutral-50">{title}</h1>
+        <h1 className="min-w-0 truncate px-2 text-[14px] text-foreground">{title}</h1>
         {hasChat && (
           <div className="ml-auto flex items-center gap-1">
             <HeaderButton
@@ -86,7 +86,7 @@ export function SplitLayout({ title, chat, children, panelMode, onPanelModeChang
               busy={chatActivity !== 'idle'}
             >
               <MessageSquare
-                className={`size-4 ${chatActivity !== 'idle' ? 'animate-pulse text-brand-blue-500 dark:text-energy-green-500' : ''}`}
+                className={`size-4 ${chatActivity !== 'idle' ? 'animate-pulse text-primary' : ''}`}
                 strokeWidth={1.75}
               />
             </HeaderButton>
@@ -133,7 +133,7 @@ export function SplitLayout({ title, chat, children, panelMode, onPanelModeChang
               )}
               <aside
                 aria-label="Step"
-                className={`flex flex-col bg-rwe-sand-50 dark:bg-rwe-neutral-900 ${
+                className={`flex flex-col bg-background ${
                   hasChat ? 'fixed inset-y-0 right-0 z-40 w-full max-w-[560px] shadow-xl' : 'min-w-0 flex-1'
                 }`}
               >
@@ -216,7 +216,7 @@ function ResizableSplit({
       <ResizableHandle
         withHandle
         aria-label="Resize chat and step"
-        className="bg-stone-200 data-[separator=active]:bg-brand-blue-500 dark:bg-rwe-neutral-800 dark:data-[separator=active]:bg-energy-green-500"
+        className="bg-muted data-[separator=active]:bg-primary"
       />
       <ResizablePanel
         id="step"
@@ -230,7 +230,7 @@ function ResizableSplit({
         <aside
           aria-label="Step"
           data-collapsed={mode === 'hidden'}
-          className="flex h-full flex-col bg-rwe-sand-50 data-[collapsed=true]:invisible dark:bg-rwe-neutral-900"
+          className="flex h-full flex-col bg-background data-[collapsed=true]:invisible"
         >
           <div className="@container min-h-0 flex-1 overflow-y-auto">{mode !== 'hidden' && children}</div>
         </aside>
@@ -247,7 +247,7 @@ function HeaderButton({ label, onClick, pressed, busy, children }: { label: stri
       aria-pressed={pressed}
       data-busy={busy ? 'true' : undefined}
       onClick={onClick}
-      className="flex size-8 items-center justify-center rounded-md text-stone-500 hover:bg-rwe-sand-500 hover:text-rwe-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus dark:text-rwe-neutral-300 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-50"
+      className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus"
     >
       {children}
     </button>

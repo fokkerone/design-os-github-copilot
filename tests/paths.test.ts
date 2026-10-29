@@ -13,9 +13,7 @@ const samples: [string, string][] = [
   ['sections', paths.sections],
   ['section', paths.section('citizen-chat')],
   ['screen', paths.screen('citizen-chat', 'Start')],
-  ['screenFullscreen', paths.screenFullscreen('citizen-chat', 'Start')],
   ['preview', paths.preview],
-  ['previewFullscreen', paths.previewFullscreen],
   ['export', paths.export],
   ['personas', paths.personas],
   ['persona', paths.persona('anna')],
@@ -23,7 +21,6 @@ const samples: [string, string][] = [
   ['flow', paths.flow('signup')],
   ['designSystem', paths.designSystem],
   ['shell', paths.shell],
-  ['shellFullscreen', paths.shellFullscreen],
   ['components', paths.components],
   ['techstack', paths.techstack],
   ['wiki', paths.wiki],
@@ -44,9 +41,19 @@ describe('paths', () => {
     expect(paths.screen('a b', 'C/D')).toBe('/prototype/sections/a%20b/screen-designs/C%2FD')
   })
 
-  it('serves the clickdummy preview fullscreen, as AGENTS.md describes', () => {
-    expect(paths.previewFullscreen).toBe('/prototype/preview/fullscreen')
+  it('opens previews in the prototype preview, a document of its own', () => {
+    expect(paths.screenFullscreen('a b', 'Start')).toBe('/preview.html#/screen/a%20b/Start')
+    expect(paths.shellFullscreen).toBe('/preview.html#/shell')
+    expect(paths.previewFullscreen).toBe('/preview.html#/clickdummy')
   })
+
+  it.each(['/prototype/sections/a/screen-designs/B/fullscreen', '/prototype/shell/fullscreen', '/prototype/preview/fullscreen'])(
+    'keeps the old fullscreen route %s as a redirect to the preview',
+    (path) => {
+      const matches = matchRoutes(appRoutes, path)
+      expect(matches!.at(-1)!.route.loader).toBeTypeOf('function')
+    },
+  )
 })
 
 describe('no legacy paths in the app source', () => {

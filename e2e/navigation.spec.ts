@@ -69,13 +69,27 @@ test.describe('navigation', () => {
     await expect(page).toHaveURL(/prototype\/vision$/)
   })
 
-  test('fullscreen previews render without the shell', async ({ page, opencode }) => {
+  test('fullscreen previews open the prototype preview, without the shell', async ({ page, opencode }) => {
     void opencode
     await page.goto('/prototype/shell/fullscreen')
+    await expect(page).toHaveURL(/\/preview\.html#\/shell$/)
     await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)
     await page.goto('/prototype/preview/fullscreen')
+    await expect(page).toHaveURL(/\/preview\.html#\/clickdummy$/)
     await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)
     if (!hasSampleProject) await expect(page.getByText(/not been assembled/i)).toBeVisible()
+  })
+
+  test('the preview is its own document with its own stylesheet', async ({ page, opencode }) => {
+    void opencode
+    await page.goto('/prototype/vision')
+    const appScope = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--designos-scope').trim())
+    await expect.poll(appScope).toBe('app')
+    await page.goto('/preview.html#/clickdummy')
+    await expect.poll(appScope).toBe('prototype')
+    // only preview.css: no Design OS stylesheet in the prototype document
+    const sheets = await page.evaluate(() => [...document.querySelectorAll('style[data-vite-dev-id]')].map((s) => s.getAttribute('data-vite-dev-id') ?? ''))
+    expect(sheets.map((id) => id.replace(/^.*\/src\//, 'src/'))).toEqual(['src/preview/preview.css'])
   })
 
   test('empty project shows the start card and starts the step in the chat', async ({ page, opencode }) => {

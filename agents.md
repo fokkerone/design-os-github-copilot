@@ -41,7 +41,7 @@ When working in Design OS, be aware of two distinct contexts:
 The React application that displays and manages planning files. When modifying the Design OS UI itself:
 
 - Files live in `src/` (components, pages, utilities)
-- Uses the Design OS look: the app chrome (sidebar, chat, step panel) uses the Volta palette from `src/app-theme.css` and Inter, the page content in the step panel follows it
+- Uses the Design OS look: the shadcn preset `beqC8BzE` (style rhea, zinc, Inter) in `src/styles/design-os.css`, semantic tokens only (`bg-background`, `text-muted-foreground`, ...)
 - Provides the interface for viewing specs, screen designs, exports, etc.
 
 ### 2. Product Design (Screen Designs & Exports)
@@ -150,7 +150,7 @@ Change a screen design or the shell from the preview, like v0: **Select element*
 
 ### Comments and impeccable (any time after a screen design or the shell exists)
 
-**Comment** (`C`) in the preview toolbar works like v0's annotations: a click drops a numbered pin on the element, the user writes the comment and picks an [impeccable](https://impeccable.style) command (**Improve**: polish, layout, typeset, colorize, bolder, quieter, distill, clarify, adapt, animate, delight, onboard · **Check**: critique, audit · **Maintain**: harden, optimize, extract; `src/lib/comments/commands.ts`). Comments are stored in the wiki, one page per section (`wiki/comments/<section-id>.md`, `shell.md`; format `src/lib/comments/format.ts`, written by the dev endpoint `scripts/comments-store.mjs`), status `open` → `sent` → `resolved`; a number is never reused. A pin opens its comment (edit, **Send to chat**, delete); one comment goes to the chat per message, as a fenced `design-comment` block. The agent follows `.claude/commands/design-os/comment.md`: runs the impeccable command on the element under the Design OS rules (tokens, `src/ui/`, `ui:check`; Check commands change no file), then marks the comment resolved and records the change in `wiki/design-changes/`. Saving or resolving a comment is a hot update, never a page reload: the wiki files load through the self-accepting `src/lib/wiki-files.ts` (components re-render with `useWikiRevision`), and Tailwind does not scan `wiki/` (`@source not` in `src/index.css`).
+**Comment** (`C`) in the preview toolbar works like v0's annotations: a click drops a numbered pin on the element, the user writes the comment and picks an [impeccable](https://impeccable.style) command (**Improve**: polish, layout, typeset, colorize, bolder, quieter, distill, clarify, adapt, animate, delight, onboard · **Check**: critique, audit · **Maintain**: harden, optimize, extract; `src/lib/comments/commands.ts`). Comments are stored in the wiki, one page per section (`wiki/comments/<section-id>.md`, `shell.md`; format `src/lib/comments/format.ts`, written by the dev endpoint `scripts/comments-store.mjs`), status `open` → `sent` → `resolved`; a number is never reused. A pin opens its comment (edit, **Send to chat**, delete); one comment goes to the chat per message, as a fenced `design-comment` block. The agent follows `.claude/commands/design-os/comment.md`: runs the impeccable command on the element under the Design OS rules (tokens, `src/ui/`, `ui:check`; Check commands change no file), then marks the comment resolved and records the change in `wiki/design-changes/`. Saving or resolving a comment is a hot update, never a page reload: the wiki files load through the self-accepting `src/lib/wiki-files.ts` (components re-render with `useWikiRevision`), and neither Tailwind build scans `wiki/` (both stylesheets use `source(none)` with explicit `@source`s).
 
 impeccable is installed per project for Claude Code, Copilot and OpenCode (`.claude/skills/impeccable`, `.github/skills/impeccable`, `.opencode/skills/impeccable`, engine binaries included). It reads the Design OS context through `.agents/context/`: `npm run impeccable:context` (also run by `npm run dev`) links `DESIGN.md` to `product/design-system/DESIGN.md` and `PRODUCT.md` to `product/PRODUCT.md`, and keeps a Design OS block at the top of each impeccable `SKILL.md` (re-applied after `npx impeccable update`). Never run `/impeccable init`, `document`, `shape`, `craft`, `live`, `generate` or `hooks` in Design OS: the planning steps own those files.
 
@@ -186,11 +186,27 @@ The chat is [assistant-ui](https://www.assistant-ui.com/) on its external store 
 
 ---
 
+## Two Tailwind setups: Design OS UI and prototype preview
+
+The Design OS UI and the prototype are two separate documents with two separate Tailwind builds, so a prototype can look completely different from Design OS (and, later, come from a template):
+
+| | Design OS UI | Prototype preview |
+|---|---|---|
+| Document | `index.html` → `src/main.tsx` | `preview.html` → `src/preview/main.tsx` |
+| Stylesheet | `src/styles/design-os.css` (scans `src/components`, `src/lib`) | `src/preview/preview.css` (scans `src/sections`, `src/shell`, `src/ui`, `src/clickdummy`, `src/preview`) |
+| Theme | its own (shadcn variables in `design-os.css`) | the slot `designos:prototype-theme` (`scripts/prototype-theme.mjs`): `product/design-system/tokens/tokens.css` when the product imported tokens, else `templates/<id>/theme.css` named in `product/design-system/template.json` (default `volta`, see `templates/README.md`) |
+
+- **Previews** open `preview.html#/screen/<section-id>/<ScreenName>`, `#/shell` and `#/clickdummy` (`src/preview/route.ts`, `paths.*Fullscreen`). The old `/…/fullscreen` routes redirect there. The step pages show the preview in an iframe.
+- **The Design OS UI never runs prototype code.** Its loaders list screen designs, shell components and the clickdummy by name only (`import.meta.glob(…, { query: '?designos-file' })`, stubs from `scripts/prototype-files.mjs`); `src/preview/registry.ts` is the only place that imports them.
+- **The preview bridge** (`src/preview/bridge/`: Live Edit picker, comments overlay, fonts, light/dark mode) talks to the step page only through postMessage (`src/lib/live-edit/protocol.ts`). The preview follows the page's mode (`dos:theme`, `localStorage['theme']`) but never its theme.
+- **Class coverage:** `npm run preview:check` lists classes of the prototype that render nothing in its theme (a strict token import resets Tailwind's defaults). Run it after writing a screen design or the shell.
+- **Guards:** `scripts/design-tokens/tests/separation.test.mjs` (stylesheets, the preview's import graph, no prototype imports in the app) and `npm run test:build` (`scripts/tests/build-separation.test.mjs`: the built entries share no module of the other side and each has its own CSS).
+
 ## Storybook (Design OS UI only)
 
 `npm run storybook` (port 6006) and `npm run build-storybook` show the **Design OS UI**, never the product or the prototype. Every component in `src/components/` has a `<Name>.stories.tsx` next to it (title `Design OS/<group>/<Name>`), enforced by `tests/storybook.test.ts`.
 
-- `.storybook/vite.config.ts` is Storybook's own Vite config: no OpenCode server, no Live Edit source markers, no comments store, no component-props scanner. `.storybook/preview.css` loads `src/styles/design-os.css` (the app stylesheet without the prototype sources), never `src/index.css`.
+- `.storybook/vite.config.ts` is Storybook's own Vite config: no OpenCode server, no Live Edit source markers, no comments store, no component-props scanner. `.storybook/preview.css` loads `src/styles/design-os.css` (the Design OS stylesheet), never `src/preview/preview.css` or a prototype theme.
 - The loaders run unchanged: `.storybook/fixture-globs.ts` points their `import.meta.glob` patterns for `/product`, `/product-plan`, `/wiki`, `src/sections`, `src/shell` and `src/clickdummy` at `.storybook/fixtures/` (a fictitious sample project; prototype files are placeholder stubs). `virtual:component-props` comes from `.storybook/fixtures/component-props.json`.
 - Story parameters: `router: { path, url }`, `chat: 'online' | 'offline' | 'working' | 'waiting'` (fake chat context, no OpenCode), `fixtures: 'filled' | 'empty'`. Chat components use `StaticThread` from `.storybook/helpers.tsx`.
 - The comment UI has its own stories: `live-edit/CommentButton` and `live-edit/CommentsOverlay` (the preview overlay on a sample surface, with pins, composer, send and delete as actions).
@@ -405,23 +421,23 @@ Plus **Sections** — The individual features, each with spec, data, screen desi
 
 Design OS separates concerns between its own UI and the product being designed:
 
-- **Design OS UI**: The app chrome uses the Volta palette (`src/app-theme.css`) and Inter; page content inside the step panel follows the same look
-- **Product Screen Designs**: Use the design tokens defined for the product (when available)
+- **Design OS UI**: The shadcn preset `beqC8BzE` (rhea, zinc, Inter) in `src/styles/design-os.css`, for the app chrome and the page content alike
+- **Product Screen Designs**: Use the design tokens defined for the product (when available); the preview renders them with the real `tokens.css` (or a template theme), see "Two Tailwind setups"
 - **Shell**: Uses product design tokens to preview the full app experience
 
 ### Token separation (enforced by `npm run test:tokens`)
 
 Design OS tokens and product tokens never mix:
 
-| | Design OS app (`src/components`, `src/lib`, `src/index.css`) | Product (`src/sections`, `src/shell`, `src/ui`, `src/clickdummy`, `product-plan/`) |
+| | Design OS app (`src/components`, `src/lib`, `src/styles/design-os.css`) | Product (`src/sections`, `src/shell`, `src/ui`, `src/clickdummy`, `product-plan/`) |
 |---|---|---|
-| Theme | Own theme in `src/index.css` (shadcn `--primary`, `--muted`, ...) plus the Volta app-chrome palette in `src/app-theme.css` | Product tokens from `product/design-system/DESIGN.md` |
-| Product tokens | Read as **data** only via `src/lib/design-tokens-loader.ts` and rendered with inline values on the Design page | Applied as CSS (`tokens.css`) **only in the exported codebase** |
-| Forbidden | Loading `product/design-system/tokens/tokens.css`; reading product token files outside the loader | Importing `@/components/*` (Design OS UI incl. shadcn ui) or the token loaders (product UI primitives come from `src/ui/`, never from `@/components/*`); global CSS imports; Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, `border-border`, `bg-card`, ...) — inside Design OS they resolve to the Design OS theme |
+| Theme | Own theme in `src/styles/design-os.css`: the shadcn preset (zinc `--primary`, `--muted`, ...) | Product tokens from `product/design-system/DESIGN.md`, rendered in the preview by `src/preview/preview.css` with the real `tokens.css` (or a template theme) |
+| Product tokens | Read as **data** only via `src/lib/design-tokens-loader.ts`. The Design System page stays in the Design OS look; only the displayed tokens (swatches, font samples, radius, shadows) render the product values inline, and the product fonts are loaded for the samples | Applied as CSS only in the prototype preview (theme slot) and in the exported codebase |
+| Forbidden | Loading `product/design-system/tokens/tokens.css`; reading product token files outside the loader; importing prototype code (list it by name, `?designos-file`) | Importing `@/components/*` (Design OS UI incl. shadcn ui) or the token loaders (product UI primitives come from `src/ui/`, never from `@/components/*`); global CSS imports |
 
 `src/ui/` is the product's own UI layer (button, dialog, ...), ported from the library in the tech stack with token classes instead of semantic utilities. Screen designs, the shell and the clickdummy import primitives only from there.
 
-**Token classes.** The prototype does not load `tokens.css`, so a class only shows a token when Tailwind's default theme has the same value under the same name. Use the Tailwind class then (`p-4`, `text-sm`). Palette steps named like Tailwind's always use the Tailwind class (`bg-teal-600`), even where the token export rounds them differently (Figma palettes are often Tailwind v3 hex; the prototype runs v4). Otherwise write the token's **exact value** as an arbitrary class, colors in **OKLCH** as listed in DESIGN.md, never hex: `bg-[oklch(65.03%_0.11008_192.46)] dark:bg-[oklch(80.08%_0.13033_181.21)]`, `rounded-[0.25rem]`, `text-[0.625rem]`. Name the token in a comment (`{/* token: primary */}`, `// token: radius-md`); the export maps both kinds to the semantic utilities (`bg-primary`, `rounded-md`) with `tokens.css`. Arbitrary values that are no token (`p-[13px]`, `bg-[#ff6600]`) stay exceptions the user confirms. The Live Edit inspector offers exactly these classes (`src/lib/live-edit/token-class.ts`).
+**Token classes.** Until the prototype convention moves to semantic utilities (`docs/architecture/plan-split-tailwind.md`, phase C), screens keep writing token classes: the export maps them back with the token comments. A class only shows a token when the prototype theme (Tailwind's defaults plus the theme slot) has the same value under the same name. Use the Tailwind class then (`p-4`, `text-sm`). Palette steps named like Tailwind's always use the Tailwind class (`bg-teal-600`), even where the token export rounds them differently (Figma palettes are often Tailwind v3 hex; the prototype runs v4). Otherwise write the token's **exact value** as an arbitrary class, colors in **OKLCH** as listed in DESIGN.md, never hex: `bg-[oklch(65.03%_0.11008_192.46)] dark:bg-[oklch(80.08%_0.13033_181.21)]`, `rounded-[0.25rem]`, `text-[0.625rem]`. Name the token in a comment (`{/* token: primary */}`, `// token: radius-md`); the export maps both kinds to the semantic utilities (`bg-primary`, `rounded-md`) with `tokens.css`. Arbitrary values that are no token (`p-[13px]`, `bg-[#ff6600]`) stay exceptions the user confirms. The Live Edit inspector offers exactly these classes (`src/lib/live-edit/token-class.ts`).
 
 ---
 
@@ -449,8 +465,9 @@ The handoff focuses on UI designs, product requirements, and user flows. Backend
 
 The Design OS application has two layers:
 
-- **App chrome** (left navigation, chat, step panel): Linear-style layout copied from the reference app (`software-factory`). Volta palette from `src/app-theme.css` (`rwe-*`, `brand-blue`, `energy-green`), Inter, dark by default, sidebar 238px with 30px rows, content inset panel with `rounded-lg` and a 1px border. The shell sets its own `dark` or `light` scope.
-- **Page content** inside the step panel uses the same Volta look (guarded by `tests/volta-content.test.ts`): dark mode on `rwe-neutral`, accents `brand-blue` (light) and `energy-green` (dark), the shadcn variables in `src/index.css` map to the Volta palette. Light mode may keep `stone` for borders and muted text, as the reference app does.
+- **Theme**: the shadcn preset `beqC8BzE` (`components.json`: style `radix-rhea`, base color zinc, menu accent subtle, lucide). The variables live in `src/styles/design-os.css` (`:root, .light` and `.dark`), the rhea utilities come from `shadcn/tailwind.css`. The components in `src/components/ui` are the rhea versions (imports kept on `@radix-ui/react-*` and `@/lib/utils`).
+- **Colors**: semantic tokens only (`bg-background`, `bg-card`, `bg-muted`, `text-foreground`, `text-muted-foreground`, `border-border`, `bg-primary`, `text-destructive`, `bg-sidebar`, ...), no palette steps for neutrals or accents and no manual `dark:` color pairs (guarded by `tests/design-os-theme.test.ts`). Status colors (amber, emerald) may stay Tailwind palettes. The Volta palette belongs to the prototype (`templates/volta/`).
+- **App chrome** (left navigation, chat, step panel): Linear-style layout, dark by default, sidebar 238px with 30px rows, content inset panel with `rounded-lg` and a 1px border. The shell sets its own `dark` or `light` scope (`.light` opts a subtree out of dark mode).
 - **Typography**: Inter for headings and body, IBM Plex Mono for code
 - **Layout**: Content fills the step panel; wide pages use the expanded panel mode
 - **Cards**: Minimal borders (1px), subtle shadows, generous padding

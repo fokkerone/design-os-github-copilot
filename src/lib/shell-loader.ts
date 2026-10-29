@@ -3,7 +3,6 @@
  */
 
 import type { ShellSpec, ShellInfo } from '@/types/product'
-import type { ComponentType, ReactNode } from 'react'
 
 // Load shell spec markdown file at build time
 const shellSpecFiles = import.meta.glob('/product/shell/*.md', {
@@ -12,17 +11,9 @@ const shellSpecFiles = import.meta.glob('/product/shell/*.md', {
   eager: true,
 }) as Record<string, string>
 
-// Load shell components lazily
-const shellComponentModules = import.meta.glob('/src/shell/components/*.tsx') as Record<
-  string,
-  () => Promise<{ default: ComponentType }>
->
-
-// Load shell preview component lazily
-const shellPreviewModules = import.meta.glob('/src/shell/*.tsx') as Record<
-  string,
-  () => Promise<{ default: ComponentType }>
->
+// The shell components and the shell preview, by name only: the preview (preview.html) runs them
+const shellComponentModules = import.meta.glob('/src/shell/components/*.tsx', { query: '?designos-file', import: 'default', eager: true }) as Record<string, true>
+const shellPreviewModules = import.meta.glob('/src/shell/*.tsx', { query: '?designos-file', import: 'default', eager: true }) as Record<string, true>
 
 /**
  * Parse shell spec.md content into ShellSpec structure
@@ -86,48 +77,12 @@ export function parseShellSpec(md: string): ShellSpec | null {
  * Check if shell components exist
  */
 export function hasShellComponents(): boolean {
-  // Check if AppShell.tsx exists
-  const exists = '/src/shell/components/AppShell.tsx' in shellComponentModules
-  // Debug: log available shell components
-  console.log('[Shell] hasShellComponents check:', {
-    exists,
-    availableComponents: Object.keys(shellComponentModules),
-    lookingFor: '/src/shell/components/AppShell.tsx'
-  })
-  return exists
+  return '/src/shell/components/AppShell.tsx' in shellComponentModules
 }
 
-/**
- * Load shell component dynamically
- */
-export function loadShellComponent(
-  componentName: string
-): (() => Promise<{ default: ComponentType }>) | null {
-  const path = `/src/shell/components/${componentName}.tsx`
-  return shellComponentModules[path] || null
-}
-
-/**
- * Load AppShell component that can wrap content
- * First tries to load ShellWrapper (designed for wrapping arbitrary content)
- * Falls back to AppShell if ShellWrapper doesn't exist
- */
-export function loadAppShell(): (() => Promise<{ default: ComponentType<{ children?: ReactNode }> }>) | null {
-  // First try ShellWrapper - a component specifically designed to wrap content
-  const wrapperPath = '/src/shell/components/ShellWrapper.tsx'
-  if (wrapperPath in shellComponentModules) {
-    return shellComponentModules[wrapperPath] as (() => Promise<{ default: ComponentType<{ children?: ReactNode }> }>)
-  }
-  // Fall back to AppShell
-  const path = '/src/shell/components/AppShell.tsx'
-  return shellComponentModules[path] as (() => Promise<{ default: ComponentType<{ children?: ReactNode }> }>) || null
-}
-
-/**
- * Load shell preview wrapper dynamically
- */
-export function loadShellPreview(): (() => Promise<{ default: ComponentType }>) | null {
-  return shellPreviewModules['/src/shell/ShellPreview.tsx'] || null
+/** Whether the shell has a preview wrapper (src/shell/ShellPreview.tsx) */
+export function hasShellPreview(): boolean {
+  return '/src/shell/ShellPreview.tsx' in shellPreviewModules
 }
 
 /**

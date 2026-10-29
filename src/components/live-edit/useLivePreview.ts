@@ -60,7 +60,9 @@ export function useLivePreview(iframeRef: RefObject<HTMLIFrameElement | null>, t
       if (!message) return
       const { live, picking, selection, target, guides } = state.current
       if (message.type === 'dos:ready') {
-        // The iframe (re)loaded: it forgot the picker state and the preview
+        // The iframe (re)loaded: it forgot the picker state and the preview. It has its own
+        // theme and follows the page's light or dark mode
+        post({ type: 'dos:theme', dark: document.documentElement.classList.contains('dark') })
         post({ type: 'dos:pick', active: picking })
         if (selection && live?.sent) {
           // A full reload after the request went out is the agent's change arriving

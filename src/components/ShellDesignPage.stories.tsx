@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ShellDesignFullscreen, ShellDesignPage } from './ShellDesignPage'
+import { ShellDesignPage } from './ShellDesignPage'
 
-/** The shell page frames the shell preview; Storybook renders a placeholder instead of the prototype shell */
+/** The shell page frames the shell preview; its iframe (preview.html) stays empty in Storybook */
 const meta = {
   title: 'Design OS/Pages/ShellDesignPage',
   component: ShellDesignPage,
@@ -15,8 +15,3 @@ type Story = StoryObj<typeof meta>
 export const Frame: Story = {}
 
 export const NoShellYet: Story = { parameters: { fixtures: 'empty' } }
-
-export const Fullscreen: Story = {
-  render: () => <ShellDesignFullscreen />,
-  parameters: { router: { path: '/design-system/shell/fullscreen', url: '/design-system/shell/fullscreen' } },
-}

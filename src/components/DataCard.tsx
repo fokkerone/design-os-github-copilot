@@ -50,14 +50,14 @@ export function DataCard({ data, sectionName }: DataCardProps) {
   const recordCount = countRecords(data)
 
   return (
-    <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
+    <Card className="border-border shadow-sm">
       <CardHeader className="pb-4">
         <div className="flex items-center gap-3">
-          <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">
+          <CardTitle className="text-lg font-semibold text-foreground">
             Sample Data
           </CardTitle>
           {recordCount > 0 && (
-            <span className="text-xs font-medium text-stone-500 dark:text-rwe-neutral-400 bg-stone-100 dark:bg-rwe-neutral-800 px-2 py-0.5 rounded">
+            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded">
               {recordCount} {recordCount === 1 ? 'record' : 'records'}
             </span>
           )}
@@ -69,19 +69,19 @@ export function DataCard({ data, sectionName }: DataCardProps) {
           <div className="space-y-6">
             {/* Models - Card Grid */}
             <div>
-              <h4 className="text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-3">
+              <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
                 Data Shapes
               </h4>
               <div className="grid grid-cols-1 @2xl:grid-cols-2 gap-4">
                 {Object.entries(meta.models).map(([modelName, description]) => (
                   <div
                     key={modelName}
-                    className="bg-stone-50 dark:bg-rwe-neutral-800/50 rounded-lg p-4"
+                    className="bg-muted rounded-lg p-4"
                   >
-                    <h3 className="font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-1">
+                    <h3 className="font-semibold text-foreground mb-1">
                       {modelName}
                     </h3>
-                    <p className="text-stone-600 dark:text-rwe-neutral-400 text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-sm leading-relaxed">
                       {description}
                     </p>
                   </div>
@@ -92,16 +92,16 @@ export function DataCard({ data, sectionName }: DataCardProps) {
             {/* Relationships */}
             {meta.relationships.length > 0 && (
               <div>
-                <h4 className="text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-3">
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
                   How They Connect
                 </h4>
                 <ul className="space-y-2">
                   {meta.relationships.map((relationship, index) => (
                     <li
                       key={index}
-                      className="text-stone-700 dark:text-rwe-neutral-300 flex items-start gap-3"
+                      className="text-foreground flex items-start gap-3"
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-stone-400 dark:bg-rwe-neutral-500 mt-2 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground mt-2 shrink-0" />
                       {relationship}
                     </li>
                   ))}
@@ -115,17 +115,17 @@ export function DataCard({ data, sectionName }: DataCardProps) {
         <Collapsible open={isJsonOpen} onOpenChange={setIsJsonOpen}>
           <CollapsibleTrigger className="flex items-center gap-2 text-left group">
             <ChevronDown
-              className={`w-4 h-4 text-stone-400 dark:text-rwe-neutral-500 transition-transform ${isJsonOpen ? 'rotate-180' : ''
+              className={`w-4 h-4 text-muted-foreground transition-transform ${isJsonOpen ? 'rotate-180' : ''
                 }`}
               strokeWidth={1.5}
             />
-            <span className="text-xs text-stone-500 dark:text-rwe-neutral-400 group-hover:text-stone-700 dark:group-hover:text-rwe-neutral-300 transition-colors">
+            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
               {isJsonOpen ? 'Hide' : 'View'} JSON
             </span>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="bg-stone-50 dark:bg-rwe-neutral-900 rounded-md p-4 overflow-x-auto mt-3">
-              <pre className="text-xs font-mono text-stone-700 dark:text-rwe-neutral-300 whitespace-pre-wrap">
+            <div className="bg-muted rounded-md p-4 overflow-x-auto mt-3">
+              <pre className="text-xs font-mono text-foreground whitespace-pre-wrap">
                 {JSON.stringify(dataWithoutMeta, null, 2)}
               </pre>
             </div>

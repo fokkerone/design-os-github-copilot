@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import { propEdit, propFields } from '@/lib/live-edit/component-props'
-import { createPicker } from '@/lib/live-edit/picker'
+import { createPicker } from '@/preview/bridge/picker'
 import type { PickedElement } from '@/lib/live-edit/protocol'
 import { serializeSelection, type LiveSelection } from '@/lib/live-edit/selection'
 

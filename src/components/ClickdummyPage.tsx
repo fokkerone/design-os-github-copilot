@@ -40,22 +40,22 @@ export function ClickdummyPage() {
       <div className="space-y-6">
         {/* Page intro */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-2">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
             Clickdummy
           </h1>
-          <p className="text-stone-600 dark:text-rwe-neutral-400">
+          <p className="text-muted-foreground">
             Assemble a navigable prototype to demo to stakeholders and gather feedback before final export.
           </p>
         </div>
 
         {/* Status Card */}
-        <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
+        <Card className="border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100 flex items-center gap-2">
+            <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
               {canAssemble ? (
                 <>
-                  <div className="w-6 h-6 rounded-full bg-brand-blue-100 dark:bg-energy-green-900/30 flex items-center justify-center">
-                    <Check className="w-4 h-4 text-brand-blue-600 dark:text-energy-green-400" strokeWidth={2.5} />
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-primary" strokeWidth={2.5} />
                   </div>
                   {allSectionsReady ? 'Ready to Assemble' : 'Partially Ready'}
                 </>
@@ -89,15 +89,15 @@ export function ClickdummyPage() {
 
         {/* Assemble Command */}
         {canAssemble && (
-          <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
+          <Card className="border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100 flex items-center gap-2">
+              <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <MousePointer2 className="w-5 h-5" strokeWidth={1.5} />
                 Assemble Clickdummy
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-stone-600 dark:text-rwe-neutral-400">
+              <p className="text-muted-foreground">
                 Use the following agent to assemble all your screen designs into a navigable prototype:
               </p>
               <AgentPrompt step="clickdummy" prompt="Assemble the clickdummy" />
@@ -106,18 +106,18 @@ export function ClickdummyPage() {
         )}
 
         {/* What is a Clickdummy? */}
-        <Card className="border-stone-200 dark:border-rwe-neutral-700 shadow-sm">
+        <Card className="border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100">
+            <CardTitle className="text-lg font-semibold text-foreground">
               What is a Clickdummy?
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-stone-600 dark:text-rwe-neutral-400">
+          <CardContent className="space-y-4 text-muted-foreground">
             <p>
               A clickdummy is a fully navigable prototype that wraps all your designed sections in the application shell with working inter-section navigation.
             </p>
             <div className="space-y-2">
-              <p className="font-medium text-stone-700 dark:text-rwe-neutral-300">Use it to:</p>
+              <p className="font-medium text-foreground">Use it to:</p>
               <ul className="list-disc list-inside space-y-1 ml-2">
                 <li>Demo to stakeholders (POs, UI/UX designers, clients)</li>
                 <li>Gather feedback on the overall flow and navigation</li>
@@ -126,21 +126,21 @@ export function ClickdummyPage() {
               </ul>
             </div>
             <p className="text-sm">
-              Once assembled, the clickdummy is available at <code className="font-mono text-stone-700 dark:text-rwe-neutral-300">/clickdummy/preview</code> and can be shared with anyone who has access to the dev server.
+              Once assembled, the clickdummy is available at <code className="font-mono text-foreground">/clickdummy/preview</code> and can be shared with anyone who has access to the dev server.
             </p>
           </CardContent>
         </Card>
 
         {/* Launch Button (if assembled) */}
         {clickdummyAssembled && (
-          <Card className="border-brand-blue-200 dark:border-energy-green-800 bg-brand-blue-50 dark:bg-energy-green-900/20 shadow-sm">
+          <Card className="border-primary/30 bg-primary/10 shadow-sm">
             <CardContent className="py-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-1">
+                  <h3 className="font-semibold text-foreground mb-1">
                     Clickdummy Ready
                   </h3>
-                  <p className="text-sm text-stone-600 dark:text-rwe-neutral-400">
+                  <p className="text-sm text-muted-foreground">
                     Your navigable prototype is assembled and ready to demo.
                   </p>
                 </div>
@@ -148,7 +148,7 @@ export function ClickdummyPage() {
                   href={paths.previewFullscreen}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-medium text-sm rounded-md transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm rounded-md transition-colors"
                 >
                   <Play className="w-4 h-4" strokeWidth={2} />
                   Launch Clickdummy
@@ -177,14 +177,14 @@ function ChecklistItem({ label, isComplete, isWarning }: ChecklistItemProps) {
             <Check className="w-3 h-3 text-amber-600 dark:text-amber-400" strokeWidth={2.5} />
           </div>
         ) : (
-          <div className="w-4 h-4 rounded-full bg-brand-blue-100 dark:bg-energy-green-900/30 flex items-center justify-center">
-            <Check className="w-3 h-3 text-brand-blue-600 dark:text-energy-green-400" strokeWidth={2.5} />
+          <div className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center">
+            <Check className="w-3 h-3 text-primary" strokeWidth={2.5} />
           </div>
         )
       ) : (
-        <div className="w-4 h-4 rounded-full border-2 border-stone-300 dark:border-rwe-neutral-600" />
+        <div className="w-4 h-4 rounded-full border-2 border-border" />
       )}
-      <span className={`text-sm ${isComplete ? 'text-stone-700 dark:text-rwe-neutral-300' : 'text-stone-500 dark:text-rwe-neutral-400'}`}>
+      <span className={`text-sm ${isComplete ? 'text-foreground' : 'text-muted-foreground'}`}>
         {label}
       </span>
     </div>

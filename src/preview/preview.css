@@ -1,0 +1,26 @@
+/*
+  The prototype's stylesheet, apart from the Design OS UI (src/styles/design-os.css): its own
+  Tailwind build that scans only the prototype, and the prototype theme from the slot
+  (scripts/prototype-theme.mjs): the product's token import or a template (templates/<id>/).
+*/
+@import "tailwindcss" source(none);
+@import "designos:prototype-theme";
+
+@source "../sections";
+@source "../shell";
+@source "../ui";
+@source "../clickdummy";
+@source "./";
+
+/* The page behind a screen: the theme's background and text color (every theme defines them) */
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}
+
+/* Marks the build for tests/build-separation.test.ts */
+:root {
+  --designos-scope: prototype;
+}

@@ -22,7 +22,7 @@ export default defineConfig([
     },
     rules: {
       // shadcn/ui components export their cva variants next to the component
-      'react-refresh/only-export-components': ['error', { allowExportNames: ['buttonVariants', 'badgeVariants'] }],
+      'react-refresh/only-export-components': ['error', { allowExportNames: ['buttonVariants', 'badgeVariants', 'tabsListVariants'] }],
     },
   },
   ...storybook.configs['flat/recommended'],

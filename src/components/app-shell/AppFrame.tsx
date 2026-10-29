@@ -63,7 +63,7 @@ export function LegacyOrNotFound() {
   return (
     <div className="px-6 py-12 text-[13px]">
       <p className="text-[15px] font-medium">Page not found</p>
-      <p className="mt-1 text-stone-500 dark:text-rwe-neutral-400">
+      <p className="mt-1 text-muted-foreground">
         <code>{pathname}</code> does not exist.
       </p>
       <Link to={paths.vision} className="mt-4 inline-block underline underline-offset-2">

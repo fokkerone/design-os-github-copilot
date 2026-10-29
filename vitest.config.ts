@@ -4,9 +4,12 @@ import path from 'path'
 import tailwindTheme from './scripts/tailwind-theme.mjs'
 // @ts-expect-error plain ESM script
 import componentProps from './scripts/component-props.mjs'
+// @ts-expect-error plain ESM script
+import prototypeFiles from './scripts/prototype-files.mjs'
 
 export default defineConfig({
-  plugins: [tailwindTheme(), componentProps()],
+  // Tailwind's default theme, not the prototype's: tests do not depend on product/
+  plugins: [tailwindTheme({ prototype: false }), componentProps(), prototypeFiles()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

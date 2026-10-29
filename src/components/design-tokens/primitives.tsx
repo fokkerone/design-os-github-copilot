@@ -19,16 +19,16 @@ export function TokenGroup({
   return (
     <section className="space-y-3">
       <div className="flex items-baseline justify-between gap-4">
-        <h4 className="text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide">
+        <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
           {title}
           {count !== undefined && (
-            <span className="ml-2 font-mono text-xs normal-case tracking-normal text-stone-400 dark:text-rwe-neutral-500">
+            <span className="ml-2 font-mono text-xs normal-case tracking-normal text-muted-foreground">
               {count}
             </span>
           )}
         </h4>
       </div>
-      {hint && <p className="text-xs text-stone-500 dark:text-rwe-neutral-400 -mt-1">{hint}</p>}
+      {hint && <p className="text-xs text-muted-foreground -mt-1">{hint}</p>}
       {children}
     </section>
   )
@@ -47,13 +47,13 @@ export function CopyValue({ value, className }: { value: string; className?: str
       }}
       title={`Copy ${value}`}
       className={cn(
-        'inline-flex max-w-full items-center gap-1 truncate rounded px-1 -mx-1 text-left font-mono text-[11px] text-stone-500 dark:text-rwe-neutral-400',
-        'hover:bg-stone-100 hover:text-stone-800 dark:hover:bg-rwe-neutral-800 dark:hover:text-rwe-neutral-200 transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500',
+        'inline-flex max-w-full items-center gap-1 truncate rounded px-1 -mx-1 text-left font-mono text-[11px] text-muted-foreground',
+        'hover:bg-accent hover:text-foreground transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         className,
       )}
     >
-      {copied ? <Check className="h-3 w-3 shrink-0 text-brand-blue-600" strokeWidth={2} /> : null}
+      {copied ? <Check className="h-3 w-3 shrink-0 text-primary" strokeWidth={2} /> : null}
       <span className="truncate">{copied ? 'Copied' : value}</span>
     </button>
   )
@@ -62,7 +62,7 @@ export function CopyValue({ value, className }: { value: string; className?: str
 /** Color value in the active format (OKLCH or hex), copyable. */
 export function ColorCode({ value, className }: { value: ColorValue | null; className?: string }) {
   const format = useValueFormat()
-  if (!value) return <span className={cn('font-mono text-[11px] text-stone-400', className)}>—</span>
+  if (!value) return <span className={cn('font-mono text-[11px] text-muted-foreground', className)}>—</span>
   return <CopyValue value={formatColor(value, format)} className={className} />
 }
 
@@ -85,7 +85,7 @@ export function Swatch({
     return (
       <div
         className={cn(
-          'flex items-center justify-center rounded-md border border-dashed border-stone-300 dark:border-rwe-neutral-600 text-[10px] text-stone-400',
+          'flex items-center justify-center rounded-md border border-dashed border-border text-[10px] text-muted-foreground',
           className,
         )}
         title={title ?? 'Not defined'}
@@ -107,7 +107,7 @@ export function CodePill({ children, className }: { children: ReactNode; classNa
   return (
     <code
       className={cn(
-        'rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-700 dark:bg-rwe-neutral-800 dark:text-rwe-neutral-300',
+        'rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-foreground',
         className,
       )}
     >

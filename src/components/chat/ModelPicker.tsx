@@ -14,7 +14,7 @@ export function ModelPicker({ options, value, onChange }: ModelPickerProps) {
       aria-label="Model"
       value={value ? modelKey(value) : ''}
       onChange={(e) => onChange(parseModelKey(e.target.value))}
-      className="h-7 max-w-[11rem] truncate rounded-sm bg-transparent px-1.5 text-[13px] text-stone-600 hover:bg-rwe-sand-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus dark:text-rwe-neutral-300 dark:hover:bg-rwe-neutral-800"
+      className="h-7 max-w-[11rem] truncate rounded-sm bg-transparent px-1.5 text-[13px] text-muted-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus"
     >
       <option value="">Default</option>
       {providers.map((provider) => (

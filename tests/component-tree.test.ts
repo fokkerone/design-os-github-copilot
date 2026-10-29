@@ -2,8 +2,8 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { createElement as h, forwardRef, Fragment, memo, act, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { buildTree, definitionOf, serializeProps } from '@/lib/live-edit/component-tree'
-import { createPicker } from '@/lib/live-edit/picker'
+import { buildTree, definitionOf, serializeProps } from '@/preview/bridge/component-tree'
+import { createPicker } from '@/preview/bridge/picker'
 import type { FromPreview } from '@/lib/live-edit/protocol'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true

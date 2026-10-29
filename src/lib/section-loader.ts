@@ -9,7 +9,6 @@
 
 import type { SectionData, ScreenDesignInfo, ScreenshotInfo } from '@/types/section'
 import { parseSpec } from './model/spec.ts'
-import type { ComponentType } from 'react'
 
 export { parseSpec }
 
@@ -25,11 +24,8 @@ const dataFiles = import.meta.glob('/product/sections/*/data.json', {
   eager: true,
 }) as Record<string, { default: Record<string, unknown> }>
 
-// Load screen design components from src/sections lazily
-const screenDesignModules = import.meta.glob('/src/sections/*/*.tsx') as Record<
-  string,
-  () => Promise<{ default: ComponentType }>
->
+// The screen designs in src/sections, by name only: the preview (preview.html) runs them
+const screenDesignModules = import.meta.glob('/src/sections/*/*.tsx', { query: '?designos-file', import: 'default', eager: true }) as Record<string, true>
 
 // Load screenshot files from product/sections at build time
 const screenshotFiles = import.meta.glob('/product/sections/*/*.png', {
@@ -118,17 +114,6 @@ export function getSectionScreenshots(sectionId: string): ScreenshotInfo[] {
   }
 
   return screenshots
-}
-
-/**
- * Load screen design component dynamically
- */
-export function loadScreenDesignComponent(
-  sectionId: string,
-  screenDesignName: string
-): (() => Promise<{ default: ComponentType }>) | null {
-  const path = `/src/sections/${sectionId}/${screenDesignName}.tsx`
-  return screenDesignModules[path] || null
 }
 
 /**

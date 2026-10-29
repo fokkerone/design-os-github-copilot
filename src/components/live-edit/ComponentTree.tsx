@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight, Component, Search } from 'lucide-react'
 import type { TreeNode } from '@/lib/live-edit/protocol'
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rwe-focus'
-const muted = 'text-stone-500 dark:text-rwe-neutral-400'
+const muted = 'text-muted-foreground'
 
 /** What stays the same for a node across trees (ids do not): kind, call site or source, index */
 const stableKey = (n: TreeNode) => `${n.kind}:${n.call ?? n.src}:${n.index}`
@@ -135,17 +135,17 @@ export function ComponentTree({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center gap-1.5 border-b border-stone-200 px-2.5 py-1.5 dark:border-rwe-neutral-800">
+      <div className="flex items-center gap-1.5 border-b border-border px-2.5 py-1.5">
         <Search className={`size-3.5 shrink-0 ${muted}`} strokeWidth={1.5} />
         <input
           aria-label="Filter components"
           placeholder="Filter"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className={`min-w-0 flex-1 bg-transparent text-[12px] text-rwe-neutral-900 placeholder:text-stone-400 dark:text-rwe-neutral-100 dark:placeholder:text-rwe-neutral-500 ${focusRing}`}
+          className={`min-w-0 flex-1 bg-transparent text-[12px] text-foreground placeholder:text-muted-foreground ${focusRing}`}
         />
         <label className={`flex shrink-0 items-center gap-1 text-[10px] ${muted}`}>
-          <input type="checkbox" checked={showElements} onChange={(e) => setShowElements(e.target.checked)} className="size-3 accent-brand-blue-500 dark:accent-energy-green-500" />
+          <input type="checkbox" checked={showElements} onChange={(e) => setShowElements(e.target.checked)} className="size-3 accent-primary" />
           Elements
         </label>
       </div>
@@ -180,8 +180,8 @@ export function ComponentTree({
               style={{ paddingLeft: 4 + depth * 12 }}
               className={`flex h-[22px] cursor-default items-center gap-1 pr-2.5 text-[12px] ${
                 isSelected
-                  ? 'bg-brand-blue-500/15 text-rwe-neutral-900 dark:bg-energy-green-500/15 dark:text-rwe-neutral-50'
-                  : `text-rwe-neutral-900 hover:bg-stone-100 dark:text-rwe-neutral-100 dark:hover:bg-rwe-neutral-800 ${node.id === cursor ? 'bg-stone-100 dark:bg-rwe-neutral-800/60' : ''}`
+                  ? 'bg-primary/15 text-foreground'
+                  : `text-foreground hover:bg-accent ${node.id === cursor ? 'bg-muted' : ''}`
               }`}
             >
               {hasChildren ? (
@@ -202,7 +202,7 @@ export function ComponentTree({
               )}
               {node.kind === 'component' ? (
                 <>
-                  <Component className="size-3 shrink-0 text-brand-blue-500 dark:text-energy-green-500" strokeWidth={1.75} />
+                  <Component className="size-3 shrink-0 text-primary" strokeWidth={1.75} />
                   <span className="max-w-full shrink-0 truncate font-medium">{node.name}</span>
                 </>
               ) : (

@@ -238,7 +238,7 @@ Repeat 7a–7d for every section in roadmap order.
 3. Run the command again for every further view.
 
 - **Result:** props-based components in `src/sections/<section-id>/components/` (no imported data, all actions as callbacks, responsive, light and dark mode) and a preview wrapper `src/sections/<section-id>/<ViewName>.tsx` that feeds the sample data.
-- **Check:** the section page lists the screen design; open it to see it inside the shell, with a fullscreen option. Restart the dev server if it does not appear. Callback clicks are logged to the browser console.
+- **Check:** the section page lists the screen design; open it to see it inside the shell, with a fullscreen option (`/preview.html#/screen/<section-id>/<screen>`). Restart the dev server if it does not appear. Callback clicks are logged to the browser console.
 
 ### 7d — Screenshot
 
@@ -263,7 +263,7 @@ Repeat 7a–7d for every section in roadmap order.
 2. Otherwise it assembles all screen designs inside the shell with working navigation between sections.
 
 - **Result:** `src/clickdummy/ClickdummyApp.tsx` and the route `/clickdummy/preview`.
-- **Check:** **Clickdummy** page, or open `http://localhost:3000/clickdummy/preview` directly. Share it with stakeholders and collect feedback; save the feedback with `/design-os:wiki-capture`.
+- **Check:** **Clickdummy** page, or open `http://localhost:3000/preview.html#/clickdummy` directly (the old `/clickdummy/preview` redirects there). Share it with stakeholders and collect feedback; save the feedback with `/design-os:wiki-capture`.
 
 ---
 

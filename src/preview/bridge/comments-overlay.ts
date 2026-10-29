@@ -7,7 +7,7 @@
 import { COMMAND_GROUPS, commandOf } from '@/lib/comments/commands'
 import type { CommentAnchor, DesignComment } from '@/lib/comments/format'
 import { describe, OVERLAY_ATTR, pickable, withSource } from './picker'
-import type { FromPreview } from './protocol'
+import type { FromPreview } from '@/lib/live-edit/protocol'
 
 const ACCENT = '#2563eb'
 const MUTED = '#71717a'

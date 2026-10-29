@@ -10,13 +10,13 @@ function ProviderState() {
   const live = useLiveEdit()
   return (
     <dl className="grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[13px]">
-      <dt className="text-stone-500 dark:text-rwe-neutral-400">OpenCode</dt>
+      <dt className="text-muted-foreground">OpenCode</dt>
       <dd>{chat?.status ?? 'no chat'}</dd>
-      <dt className="text-stone-500 dark:text-rwe-neutral-400">Agent</dt>
+      <dt className="text-muted-foreground">Agent</dt>
       <dd>{chat?.activity ?? '-'}</dd>
-      <dt className="text-stone-500 dark:text-rwe-neutral-400">Models</dt>
+      <dt className="text-muted-foreground">Models</dt>
       <dd>{chat?.options.length ?? 0}</dd>
-      <dt className="text-stone-500 dark:text-rwe-neutral-400">Live Edit</dt>
+      <dt className="text-muted-foreground">Live Edit</dt>
       <dd>{live ? (live.selection ? 'element picked' : 'ready') : 'no provider'}</dd>
     </dl>
   )

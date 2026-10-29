@@ -4,7 +4,7 @@
  */
 import { boxOf, buildTree, definitionOf, fiberName, hostsOf, serializeProps, type ComponentTree } from './component-tree'
 import { applyOverrides, originalsOf, propRenderer } from './prop-override'
-import type { FromPreview, PickedElement, TreeNode } from './protocol'
+import type { FromPreview, PickedElement, TreeNode } from '@/lib/live-edit/protocol'
 
 const SOURCE_ATTR = 'data-dos-src'
 const COMPONENT_ATTR = 'data-dos-comp'

@@ -1,5 +1,12 @@
 import type { RouteObject } from 'react-router-dom'
 import { AppFrame, LegacyOrNotFound } from '@/components/app-shell/AppFrame'
+import { paths } from '@/lib/paths'
+
+/** Leaves the router for the preview page (a document of its own, not a route) */
+function toPreview(url: string) {
+  window.location.replace(url)
+  return null
+}
 
 /** Lazy route for a named export, so pages load on demand */
 const page = <T extends Record<string, unknown>>(load: () => Promise<T>, name: keyof T): Pick<RouteObject, 'lazy'> => ({
@@ -8,19 +15,11 @@ const page = <T extends Record<string, unknown>>(load: () => Promise<T>, name: k
 
 
 export const appRoutes: RouteObject[] = [
-  // Fullscreen previews render outside the shell
-  {
-    path: '/prototype/sections/:sectionId/screen-designs/:screenDesignName/fullscreen',
-    ...page(() => import('@/components/ScreenDesignPage'), 'ScreenDesignFullscreen'),
-  },
-  {
-    path: '/prototype/preview/fullscreen',
-    ...page(() => import('@/components/ClickdummyFullscreen'), 'ClickdummyFullscreen'),
-  },
-  {
-    path: '/prototype/shell/fullscreen',
-    ...page(() => import('@/components/ShellDesignPage'), 'ShellDesignFullscreen'),
-  },
+  // The old fullscreen routes open the prototype preview (preview.html), which has its own
+  // document and stylesheet
+  { path: '/prototype/sections/:sectionId/screen-designs/:screenDesignName/fullscreen', loader: ({ params }) => toPreview(paths.screenFullscreen(params.sectionId ?? '', params.screenDesignName ?? '')) },
+  { path: '/prototype/preview/fullscreen', loader: () => toPreview(paths.previewFullscreen) },
+  { path: '/prototype/shell/fullscreen', loader: () => toPreview(paths.shellFullscreen) },
   {
     element: <AppFrame />,
     children: [

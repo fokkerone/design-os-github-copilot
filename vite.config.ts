@@ -18,6 +18,12 @@ import liveEditWriter from './scripts/live-edit-writer.mjs'
 import commentsStore from './scripts/comments-store.mjs'
 // @ts-expect-error plain ESM script, tested in tests/impeccable-context.test.ts
 import { impeccableContext } from './scripts/impeccable-context.mjs'
+// @ts-expect-error plain ESM script, tested in tests/prototype-theme.test.ts
+import prototypeTheme from './scripts/prototype-theme.mjs'
+// @ts-expect-error plain ESM script, tested in tests/prototype-theme.test.ts
+import prototypeFiles from './scripts/prototype-files.mjs'
+// @ts-expect-error plain ESM script, used by scripts/tests/build-separation.test.mjs
+import bundleModules from './scripts/bundle-modules.mjs'
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
@@ -25,7 +31,13 @@ export default defineConfig(({ command }) => ({
     // Live Edit: the dev server marks product UI elements with their source location
     react(command === 'serve' ? { babel: { plugins: [[babelSourceAttr, { root: __dirname }]] } } : {}),
     tailwindcss(),
-    // Tailwind's default theme as data for Live Edit (virtual:tailwind-theme)
+    // The prototype's theme slot for preview.css: the product's tokens.css or a template
+    prototypeTheme(),
+    // Design OS lists prototype files by name only (?designos-file); preview.html runs them
+    prototypeFiles(),
+    // Build only: which modules each chunk holds (npm run test:build)
+    bundleModules(),
+    // The prototype's Tailwind theme as data for Live Edit (virtual:tailwind-theme)
     tailwindTheme(),
     // Live Edit: keeps React's DevTools internals, so the preview can override props live
     reactDevtoolsHook(),
@@ -47,5 +59,10 @@ export default defineConfig(({ command }) => ({
   },
   server: {
     port: 3000,
+  },
+  // Two documents with their own stylesheets: the Design OS UI and the prototype preview
+  build: {
+    manifest: true,
+    rollupOptions: { input: { main: path.resolve(__dirname, 'index.html'), preview: path.resolve(__dirname, 'preview.html') } },
   },
 }))

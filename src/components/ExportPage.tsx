@@ -63,10 +63,10 @@ export function ExportPage() {
         {/* Page intro */}
         <div className='mb-8'>
           YoBros
-          <h1 className='text-2xl font-semibold text-stone-900 dark:text-rwe-neutral-100 mb-2'>
+          <h1 className='text-2xl font-semibold text-foreground mb-2'>
             {exportZipAvailable ? "Ready for implementation!" : "Export"}
           </h1>
-          <p className='text-stone-600 dark:text-rwe-neutral-400'>
+          <p className='text-muted-foreground'>
             {exportZipAvailable
               ? "Download your product design package and implement it in your codebase using the provided handoff prompts and assets."
               : "Generate a complete handoff package for your development team."}
@@ -75,14 +75,14 @@ export function ExportPage() {
 
         {/* Status - only show if zip not available */}
         {!exportZipAvailable && (
-          <Card className='border-stone-200 dark:border-rwe-neutral-700 shadow-sm'>
+          <Card className='border-border shadow-sm'>
             <CardHeader>
-              <CardTitle className='text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100 flex items-center gap-2'>
+              <CardTitle className='text-lg font-semibold text-foreground flex items-center gap-2'>
                 {requiredComplete ? (
                   <>
-                    <div className='w-6 h-6 rounded-full bg-brand-blue-100 dark:bg-energy-green-900/30 flex items-center justify-center'>
+                    <div className='w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center'>
                       <Check
-                        className='w-4 h-4 text-brand-blue-600 dark:text-energy-green-400'
+                        className='w-4 h-4 text-primary'
                         strokeWidth={2.5}
                       />
                     </div>
@@ -135,14 +135,14 @@ export function ExportPage() {
 
         {/* Export command */}
         {requiredComplete && (
-          <Card className='border-stone-200 dark:border-rwe-neutral-700 shadow-sm'>
+          <Card className='border-border shadow-sm'>
             <CardHeader>
-              <CardTitle className='text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100 flex items-center gap-2'>
+              <CardTitle className='text-lg font-semibold text-foreground flex items-center gap-2'>
                 {exportZipAvailable ? (
                   <>
-                    <div className='w-6 h-6 rounded-full bg-brand-blue-100 dark:bg-energy-green-900/30 flex items-center justify-center'>
+                    <div className='w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center'>
                       <Check
-                        className='w-4 h-4 text-brand-blue-600 dark:text-energy-green-400'
+                        className='w-4 h-4 text-primary'
                         strokeWidth={2.5}
                       />
                     </div>
@@ -156,37 +156,37 @@ export function ExportPage() {
             <CardContent className='space-y-6'>
               {exportZipAvailable && exportZipUrl ? (
                 <div className='space-y-4'>
-                  <div className='flex items-center gap-3 p-4 bg-brand-blue-50 dark:bg-energy-green-900/20 rounded-lg border border-brand-blue-200 dark:border-energy-green-800'>
-                    <div className='w-10 h-10 rounded-full bg-brand-blue-100 dark:bg-energy-green-900/40 flex items-center justify-center shrink-0'>
+                  <div className='flex items-center gap-3 p-4 bg-primary/10 rounded-lg border border-primary/30'>
+                    <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0'>
                       <Package
-                        className='w-5 h-5 text-brand-blue-600 dark:text-energy-green-400'
+                        className='w-5 h-5 text-primary'
                         strokeWidth={1.5}
                       />
                     </div>
                     <div className='flex-1 min-w-0'>
-                      <p className='font-medium text-stone-900 dark:text-rwe-neutral-100'>
+                      <p className='font-medium text-foreground'>
                         VV Download & use in your codebase
                       </p>
-                      <p className='text-sm text-stone-500 dark:text-rwe-neutral-400'>
+                      <p className='text-sm text-muted-foreground'>
                         product-plan.zip
                       </p>
                     </div>
                     <a
                       href={exportZipUrl}
                       download='product-plan.zip'
-                      className='inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-medium text-sm rounded-md transition-colors shrink-0'
+                      className='inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm rounded-md transition-colors shrink-0'
                     >
                       <Download className='w-4 h-4' strokeWidth={2} />
                       Download
                     </a>
                   </div>
-                  <p className='text-sm text-stone-500 dark:text-rwe-neutral-400'>
+                  <p className='text-sm text-muted-foreground'>
                     To regenerate, use <StepName step='export-product' /> again.
                   </p>
                 </div>
               ) : (
                 <div className='space-y-4'>
-                  <p className='text-stone-600 dark:text-rwe-neutral-400'>
+                  <p className='text-muted-foreground'>
                     Use the following agent to generate a complete export
                     package with all components, types, and handoff
                     documentation:
@@ -199,8 +199,8 @@ export function ExportPage() {
               )}
 
               {/* What's included */}
-              <div className='pt-4 border-t border-stone-200 dark:border-rwe-neutral-700'>
-                <h4 className='text-sm font-medium text-stone-500 dark:text-rwe-neutral-400 uppercase tracking-wide mb-4 flex items-center gap-2'>
+              <div className='pt-4 border-t border-border'>
+                <h4 className='text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4 flex items-center gap-2'>
                   <FolderTree className='w-4 h-4' strokeWidth={1.5} />
                   What's Included
                 </h4>
@@ -263,11 +263,11 @@ export function ExportPage() {
         )}
 
         {/* How to use */}
-        <Card className='border-stone-200 dark:border-rwe-neutral-700 shadow-sm'>
+        <Card className='border-border shadow-sm'>
           <CardHeader>
-            <CardTitle className='text-lg font-semibold text-stone-900 dark:text-rwe-neutral-100 flex items-center gap-2'>
+            <CardTitle className='text-lg font-semibold text-foreground flex items-center gap-2'>
               <FileText
-                className='w-5 h-5 text-stone-500 dark:text-rwe-neutral-400'
+                className='w-5 h-5 text-muted-foreground'
                 strokeWidth={1.5}
               />
               How to Use the Export
@@ -278,31 +278,31 @@ export function ExportPage() {
             <Collapsible>
               <CollapsibleTrigger className='flex items-start justify-between w-full text-left group'>
                 <div className='flex-1'>
-                  <h4 className='font-medium text-stone-900 dark:text-rwe-neutral-100'>
+                  <h4 className='font-medium text-foreground'>
                     Option A: Incremental (Recommended)
                   </h4>
-                  <p className='text-sm text-stone-500 dark:text-rwe-neutral-400 mt-1'>
+                  <p className='text-sm text-muted-foreground mt-1'>
                     Build milestone by milestone for better control and easier
                     debugging.
                   </p>
                 </div>
                 <ChevronDown
-                  className='w-4 h-4 text-stone-400 dark:text-rwe-neutral-500 mt-1 shrink-0 transition-transform group-data-[state=open]:rotate-180'
+                  className='w-4 h-4 text-muted-foreground mt-1 shrink-0 transition-transform group-data-[state=open]:rotate-180'
                   strokeWidth={1.5}
                 />
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <ol className='text-sm text-stone-600 dark:text-rwe-neutral-400 space-y-2 list-decimal list-inside mt-4 pl-1'>
+                <ol className='text-sm text-muted-foreground space-y-2 list-decimal list-inside mt-4 pl-1'>
                   <li>
                     Copy the{" "}
-                    <code className='font-mono text-stone-800 dark:text-rwe-neutral-200'>
+                    <code className='font-mono text-foreground'>
                       product-plan/
                     </code>{" "}
                     folder into your codebase
                   </li>
                   <li>
                     Start with Shell (
-                    <code className='font-mono text-stone-800 dark:text-rwe-neutral-200'>
+                    <code className='font-mono text-foreground'>
                       instructions/incremental/01-shell.md
                     </code>
                     ) — design tokens + app shell
@@ -311,19 +311,19 @@ export function ExportPage() {
                     For each section:
                     <ul className='mt-1.5 ml-5 space-y-1'>
                       <li className='flex items-center gap-2'>
-                        <span className='w-1 h-1 rounded-full bg-stone-400 dark:bg-rwe-neutral-500' />
+                        <span className='w-1 h-1 rounded-full bg-muted-foreground' />
                         Open{" "}
-                        <code className='font-mono text-stone-800 dark:text-rwe-neutral-200'>
+                        <code className='font-mono text-foreground'>
                           prompts/section-prompt.md
                         </code>
                       </li>
                       <li className='flex items-center gap-2'>
-                        <span className='w-1 h-1 rounded-full bg-stone-400 dark:bg-rwe-neutral-500' />
+                        <span className='w-1 h-1 rounded-full bg-muted-foreground' />
                         Fill in the section variables at the top (SECTION_NAME,
                         SECTION_ID, NN)
                       </li>
                       <li className='flex items-center gap-2'>
-                        <span className='w-1 h-1 rounded-full bg-stone-400 dark:bg-rwe-neutral-500' />
+                        <span className='w-1 h-1 rounded-full bg-muted-foreground' />
                         Copy/paste the prompt into your AI coding agent
                       </li>
                     </ul>
@@ -336,37 +336,37 @@ export function ExportPage() {
               </CollapsibleContent>
             </Collapsible>
 
-            <div className='border-t border-stone-200 dark:border-rwe-neutral-700' />
+            <div className='border-t border-border' />
 
             {/* Option B - One-Shot */}
             <Collapsible>
               <CollapsibleTrigger className='flex items-start justify-between w-full text-left group'>
                 <div className='flex-1'>
-                  <h4 className='font-medium text-stone-900 dark:text-rwe-neutral-100'>
+                  <h4 className='font-medium text-foreground'>
                     Option B: One-Shot
                   </h4>
-                  <p className='text-sm text-stone-500 dark:text-rwe-neutral-400 mt-1'>
+                  <p className='text-sm text-muted-foreground mt-1'>
                     Build the entire app in one session using a pre-written
                     prompt.
                   </p>
                 </div>
                 <ChevronDown
-                  className='w-4 h-4 text-stone-400 dark:text-rwe-neutral-500 mt-1 shrink-0 transition-transform group-data-[state=open]:rotate-180'
+                  className='w-4 h-4 text-muted-foreground mt-1 shrink-0 transition-transform group-data-[state=open]:rotate-180'
                   strokeWidth={1.5}
                 />
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <ol className='text-sm text-stone-600 dark:text-rwe-neutral-400 space-y-2 list-decimal list-inside mt-4 pl-1'>
+                <ol className='text-sm text-muted-foreground space-y-2 list-decimal list-inside mt-4 pl-1'>
                   <li>
                     Copy the{" "}
-                    <code className='font-mono text-stone-800 dark:text-rwe-neutral-200'>
+                    <code className='font-mono text-foreground'>
                       product-plan/
                     </code>{" "}
                     folder into your codebase
                   </li>
                   <li>
                     Open{" "}
-                    <code className='font-mono text-stone-800 dark:text-rwe-neutral-200'>
+                    <code className='font-mono text-foreground'>
                       prompts/one-shot-prompt.md
                     </code>
                   </li>
@@ -399,16 +399,16 @@ function ChecklistItem({ label, isComplete }: ChecklistItemProps) {
   return (
     <div className='flex items-center gap-2 py-1'>
       {isComplete ? (
-        <div className='w-4 h-4 rounded bg-stone-200 dark:bg-rwe-neutral-700 flex items-center justify-center'>
+        <div className='w-4 h-4 rounded bg-muted flex items-center justify-center'>
           <Check
-            className='w-2.5 h-2.5 text-stone-600 dark:text-rwe-neutral-400'
+            className='w-2.5 h-2.5 text-muted-foreground'
             strokeWidth={3}
           />
         </div>
       ) : (
         <div className='w-4 h-4 rounded border-2 border-amber-400 dark:border-amber-500' />
       )}
-      <span className='text-sm text-stone-700 dark:text-rwe-neutral-300'>
+      <span className='text-sm text-foreground'>
         {label}
       </span>
     </div>
@@ -423,17 +423,17 @@ interface ExportItemProps {
 
 function ExportItem({ title, description, items }: ExportItemProps) {
   return (
-    <div className='bg-stone-50 dark:bg-rwe-neutral-800/50 rounded-lg p-4'>
-      <h4 className='font-medium text-stone-900 dark:text-rwe-neutral-100 mb-1'>
+    <div className='bg-muted rounded-lg p-4'>
+      <h4 className='font-medium text-foreground mb-1'>
         {title}
       </h4>
-      <p className='text-xs text-stone-500 dark:text-rwe-neutral-400 mb-3'>
+      <p className='text-xs text-muted-foreground mb-3'>
         {description}
       </p>
-      <ul className='text-sm text-stone-600 dark:text-rwe-neutral-400 space-y-1'>
+      <ul className='text-sm text-muted-foreground space-y-1'>
         {items.map((item, index) => (
           <li key={index} className='flex items-center gap-2'>
-            <span className='w-1 h-1 rounded-full bg-stone-400 dark:bg-rwe-neutral-500' />
+            <span className='w-1 h-1 rounded-full bg-muted-foreground' />
             {item}
           </li>
         ))}

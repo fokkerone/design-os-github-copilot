@@ -50,11 +50,11 @@ Your design system already lives in Figma (variables, styles) or another tool th
 Strict import: every Tailwind namespace the import provides is reset first (`--color-*: initial`), so only imported tokens exist as utilities. Tokens without a Tailwind namespace (sizing, opacity scale, layout widths, decomposed Figma shadow parts) are documented in DESIGN.md and the model, with a reason, and are not emitted to CSS. No token is dropped silently.
 
 ## Separation from Design OS
-Design OS has its own theme (stone/lime, `src/index.css`); the product has the imported tokens. They never mix:
+Design OS and the prototype are two Tailwind setups with their own themes. The Design OS UI (`index.html`) uses `src/styles/design-os.css`; the prototype preview (`preview.html`) uses `src/preview/preview.css`, which imports the theme slot: `tokens/tokens.css` when tokens are imported, else a template (`templates/volta/`). They never mix:
 
-- The Design OS app reads product tokens only as data (`src/lib/design-tokens-loader.ts`) and shows them with inline values. It never loads `tokens.css`.
-- Screen designs, the shell and the clickdummy never use Design OS semantic utilities (`bg-primary`, `text-muted-foreground`, ...) or Design OS components (`@/components/*`) — inside Design OS these would show the Design OS theme. They import UI primitives from the product UI layer `src/ui/` (chosen in the tech stack step, see [[how-to/tech-stack]]) and use token classes from DESIGN.md plus a `token:` comment: the Tailwind class when the token has Tailwind's value (`p-4`, `bg-teal-600`), else the exact value, colors in OKLCH (`bg-[oklch(65.03%_0.11008_192.46)]`, `rounded-[0.25rem]`).
-- `tokens.css` is applied only in the exported codebase. `npm run test:tokens` enforces all of this.
+- The Design OS app reads product tokens only as data (`src/lib/design-tokens-loader.ts`) and shows them with inline values. It never loads `tokens.css`; only the preview does.
+- Screen designs, the shell and the clickdummy never import Design OS components (`@/components/*`). They import UI primitives from the product UI layer `src/ui/` (chosen in the tech stack step, see [[how-to/tech-stack]]) and use token classes from DESIGN.md plus a `token:` comment: the Tailwind class when the token has Tailwind's value (`p-4`, `bg-teal-600`), else the exact value, colors in OKLCH (`bg-[oklch(65.03%_0.11008_192.46)]`, `rounded-[0.25rem]`).
+- `tokens.css` is applied in the preview and in the exported codebase. `npm run test:tokens` and `npm run test:build` enforce the separation; `npm run preview:check` lists classes that render nothing in the prototype theme.
 
 ## Rules
 - Never edit `tokens/` or `DESIGN.md` by hand. Edit the inputs, then rebuild.
