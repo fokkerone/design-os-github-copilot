@@ -20,14 +20,15 @@ interface WikiStore {
   listeners: Set<() => void>
 }
 
-// Vitest's hot context has no data
-const hot = import.meta.hot?.data ? import.meta.hot : undefined
-const store: WikiStore = hot?.data.store ?? { files, revision: 0, listeners: new Set() }
+const store: WikiStore = import.meta.hot?.data?.store ?? { files, revision: 0, listeners: new Set() }
 store.files = files
 
-if (hot) {
-  hot.data.store = store
-  hot.accept(() => {
+// Vite marks the module as self-accepting only for a literal `import.meta.hot.accept(` call; an
+// alias (`const hot = import.meta.hot; hot.accept()`) is missed and the update reaches the pages.
+// Vitest's hot context has no data.
+if (import.meta.hot?.data) {
+  import.meta.hot.data.store = store
+  import.meta.hot.accept(() => {
     store.revision += 1
     for (const listener of store.listeners) listener()
   })

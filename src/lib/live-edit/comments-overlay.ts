@@ -13,6 +13,8 @@ const ACCENT = '#2563eb'
 const MUTED = '#71717a'
 const DONE = '#16a34a'
 const PIN = 26
+/** The composer grows with its text up to this height, then scrolls */
+const MAX_INPUT = 160
 const FONT = '13px/1.4 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif'
 
 export interface CommentsOverlay {
@@ -72,38 +74,47 @@ export function createCommentsOverlay(doc: Document, post: (message: FromPreview
   const visible = () => items.filter((c) => showResolved || c.status !== 'resolved')
   const nextNumber = () => Math.max(0, ...items.map((c) => c.number)) + 1
 
-  const pin = (label: string, color: string, x: number, y: number, title: string, onClick?: () => void) => {
-    const el = doc.createElement(onClick ? 'button' : 'div')
+  // Pins and the composer stay the same nodes while they move (scroll, a class change in the
+  // preview). A rebuilt button between mousedown and mouseup gets no click, and the click on the
+  // common ancestor used to close the composer: Delete and Send to chat did nothing.
+  const pins = new Map<string, HTMLElement>()
+  let composerBox: HTMLElement | null = null
+  let composerSig = ''
+
+  const pin = (key: string, label: string, color: string, x: number, y: number, title: string, onClick?: () => void) => {
+    let el = pins.get(key)
+    if (!el) {
+      el = doc.createElement(onClick ? 'button' : 'div')
+      css(el, {
+        position: 'fixed',
+        width: `${PIN}px`,
+        height: `${PIN}px`,
+        borderRadius: '9999px',
+        color: '#fff',
+        border: '2px solid #fff',
+        boxShadow: '0 1px 4px rgba(0,0,0,.35)',
+        font: '600 12px/1 ui-sans-serif, system-ui, sans-serif',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0',
+        cursor: onClick ? 'pointer' : 'default',
+        pointerEvents: 'auto',
+      })
+      if (onClick) {
+        el.addEventListener('click', (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          onClick()
+        })
+      }
+      pins.set(key, el)
+      layer.appendChild(el)
+    }
     el.textContent = label
     el.title = title
-    css(el, {
-      position: 'fixed',
-      left: `${x - PIN / 2}px`,
-      top: `${y - PIN / 2}px`,
-      width: `${PIN}px`,
-      height: `${PIN}px`,
-      borderRadius: '9999px',
-      background: color,
-      color: '#fff',
-      border: '2px solid #fff',
-      boxShadow: '0 1px 4px rgba(0,0,0,.35)',
-      font: '600 12px/1 ui-sans-serif, system-ui, sans-serif',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '0',
-      cursor: onClick ? 'pointer' : 'default',
-      pointerEvents: 'auto',
-    })
-    if (onClick) {
-      el.setAttribute('aria-label', title)
-      el.addEventListener('click', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        onClick()
-      })
-    }
-    layer.appendChild(el)
+    if (onClick) el.setAttribute('aria-label', title)
+    css(el, { left: `${x - PIN / 2}px`, top: `${y - PIN / 2}px`, background: color })
     return el
   }
 
@@ -153,21 +164,15 @@ export function createCommentsOverlay(doc: Document, post: (message: FromPreview
   }
 
   /** The composer next to a pin: a new comment, or an existing one to edit, send or delete */
-  const composer = (x: number, y: number) => {
-    if (!open) return
+  const composer = () => {
+    if (!open) return null
     const current = open.kind === 'comment' ? items.find((c) => c.number === (open as { number: number }).number) : undefined
-    if (open.kind === 'comment' && !current) return
+    if (open.kind === 'comment' && !current) return null
     const box = doc.createElement('div')
     box.setAttribute('role', 'dialog')
     box.dataset.open = openKey(open)
     box.setAttribute('aria-label', current ? `Comment ${current.number}` : 'New comment')
-    const viewWidth = view?.innerWidth ?? 800
-    const width = Math.min(380, viewWidth - 24)
-    // Right of the pin when it fits, else below it, so the pin stays visible
-    const besides = x + PIN / 2 + 8 + width <= viewWidth - 12
-    const left = besides ? x + PIN / 2 + 8 : Math.max(12, Math.min(x - width / 2, viewWidth - width - 12))
-    const top = besides ? Math.max(12, y - 34) : y + PIN / 2 + 6
-    css(box, { position: 'fixed', left: `${left}px`, top: `${top}px`, width: `${width}px`, pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' })
+    css(box, { position: 'fixed', zIndex: '1', pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' })
 
     const chip = doc.createElement('span')
     chip.textContent = current ? `#${current.number} · ${current.element}` : `<${open.kind === 'draft' ? open.tag : ''}>`
@@ -177,13 +182,18 @@ export function createCommentsOverlay(doc: Document, post: (message: FromPreview
     const panel = doc.createElement('div')
     css(panel, { background: '#09090b', border: '1px solid #3f3f46', borderRadius: '14px', padding: '6px', boxShadow: '0 8px 24px rgba(0,0,0,.35)', display: 'flex', flexDirection: 'column', gap: '6px' })
     const row = doc.createElement('div')
-    css(row, { display: 'flex', alignItems: 'center', gap: '6px' })
+    // Command and save stay at the bottom while a multi-line text grows the field
+    css(row, { display: 'flex', alignItems: 'flex-end', gap: '6px' })
     const input = doc.createElement('textarea')
     input.rows = 1
     input.placeholder = 'Add annotation'
     input.setAttribute('aria-label', 'Comment')
     input.value = current?.text ?? ''
-    css(input, { flex: '1', minWidth: '0', resize: 'none', background: 'transparent', color: '#fafafa', border: 'none', outline: 'none', font: FONT, padding: '6px 8px' })
+    css(input, { flex: '1', minWidth: '0', resize: 'none', background: 'transparent', color: '#fafafa', border: 'none', outline: 'none', font: FONT, padding: '6px 8px', overflowWrap: 'anywhere', overflowY: 'hidden', maxHeight: `${MAX_INPUT}px` })
+    input.addEventListener('input', () => {
+      grow(input)
+      schedule()
+    })
     const select = commandSelect(current?.command ?? null)
     const save = iconButton(current ? 'Save comment' : 'Add comment', '↑', true)
     row.append(input, select, save)
@@ -238,46 +248,106 @@ export function createCommentsOverlay(doc: Document, post: (message: FromPreview
         submit()
       }
     })
-    layer.appendChild(box)
-    if (open.kind === 'draft' || doc.activeElement === doc.body) input.focus()
+    return { box, input, select, focus: open.kind === 'draft' || doc.activeElement === doc.body }
+  }
+
+  /** Fits the field to its text; jsdom measures nothing, so it keeps its one row there */
+  const grow = (input: HTMLTextAreaElement) => {
+    input.style.height = 'auto'
+    if (!input.scrollHeight) return
+    input.style.height = `${Math.min(input.scrollHeight, MAX_INPUT)}px`
+    input.style.overflowY = input.scrollHeight > MAX_INPUT ? 'auto' : 'hidden'
+  }
+
+  /** Right of the pin when it fits, else below it (above it near the bottom), so the pin stays visible */
+  const place = (box: HTMLElement, x: number, y: number) => {
+    const viewWidth = view?.innerWidth ?? 800
+    const viewHeight = view?.innerHeight ?? 600
+    const width = Math.min(380, viewWidth - 24)
+    css(box, { width: `${width}px` })
+    const height = box.offsetHeight
+    const besides = x + PIN / 2 + 8 + width <= viewWidth - 12
+    const left = besides ? x + PIN / 2 + 8 : Math.max(12, Math.min(x - width / 2, viewWidth - width - 12))
+    const below = y + PIN / 2 + 6
+    const top = besides
+      ? Math.max(12, Math.min(y - 34, viewHeight - height - 12))
+      : below + height <= viewHeight - 12 ? below : Math.max(12, y - PIN / 2 - 6 - height)
+    css(box, { left: `${left}px`, top: `${top}px` })
+  }
+
+  /** What the open composer shows; it is rebuilt only when this changes, else just moved */
+  const signature = () => {
+    if (!open) return ''
+    const current = open.kind === 'comment' ? items.find((c) => c.number === (open as { number: number }).number) : undefined
+    const shown = current ? [current.text, current.command, current.status, current.notes, current.element] : open.kind === 'draft' ? [open.anchor, open.tag] : []
+    return JSON.stringify([openKey(open), shown, error])
   }
 
   const render = () => {
-    // Keep what the user is typing when pins move (scroll, re-render)
-    const typing = layer.querySelector('textarea')
-    const typedIn = typing?.closest<HTMLElement>('[data-open]')?.dataset.open
-    const draft = typing && open && typedIn === openKey(open) ? { value: typing.value, command: (layer.querySelector('select') as HTMLSelectElement | null)?.value } : null
-    layer.replaceChildren()
-    if (!active) return
+    if (!active) {
+      layer.replaceChildren()
+      pins.clear()
+      composerBox = null
+      composerSig = ''
+      return
+    }
+    const seen = new Set<string>()
+    let at: { x: number; y: number } | null = null
     let edge = 0
     for (const c of visible()) {
-      const at = anchorPoint(doc, c.anchor)
+      const point = anchorPoint(doc, c.anchor)
       const color = c.status === 'open' ? ACCENT : c.status === 'resolved' ? DONE : MUTED
       // An anchor whose element is gone (renamed, removed) waits at the edge
-      const x = at?.x ?? 20
-      const y = at?.y ?? 20 + edge++ * (PIN + 6)
-      const title = `#${c.number} ${c.command ? `/impeccable ${c.command} · ` : ''}${c.status}${at ? '' : ' · element moved'}: ${c.text}`
-      pin(String(c.number), color, x, y, title, () => {
+      const x = point?.x ?? 20
+      const y = point?.y ?? 20 + edge++ * (PIN + 6)
+      const title = `#${c.number} ${c.command ? `/impeccable ${c.command} · ` : ''}${c.status}${point ? '' : ' · element moved'}: ${c.text}`
+      const key = `comment-${c.number}`
+      seen.add(key)
+      pin(key, String(c.number), color, x, y, title, () => {
         open = { kind: 'comment', number: c.number }
         error = ''
         render()
       })
-      if (open?.kind === 'comment' && open.number === c.number) composer(x, y)
+      if (open?.kind === 'comment' && open.number === c.number) at = { x, y }
     }
     if (open?.kind === 'draft') {
-      const at = anchorPoint(doc, open.anchor)
-      if (at) {
-        pin(String(nextNumber()), ACCENT, at.x, at.y, 'New comment')
-        composer(at.x, at.y)
+      const point = anchorPoint(doc, open.anchor)
+      if (point) {
+        seen.add('draft')
+        pin('draft', String(nextNumber()), ACCENT, point.x, point.y, 'New comment')
+        at = point
       }
     }
-    if (draft) {
-      const input = layer.querySelector('textarea')
-      const select = layer.querySelector('select') as HTMLSelectElement | null
-      if (input) input.value = draft.value
-      if (select && draft.command !== undefined) select.value = draft.command
-      input?.focus()
+    for (const [key, el] of pins) {
+      if (seen.has(key)) continue
+      el.remove()
+      pins.delete(key)
     }
+
+    const sig = at ? signature() : ''
+    if (sig !== composerSig) {
+      // Keep what the user changed when the same composer is rebuilt (an error, a new anchor);
+      // what they left alone shows the new comment
+      const typing = composerBox?.querySelector('textarea')
+      const picked = composerBox?.querySelector('select')
+      const same = composerBox?.dataset.open === openKey(open)
+      const kept = same && typing && picked ? { value: typing.value !== typing.dataset.initial ? typing.value : undefined, command: picked.value !== picked.dataset.initial ? picked.value : undefined } : null
+      composerBox?.remove()
+      composerBox = null
+      composerSig = sig
+      const built = at ? composer() : null
+      if (built) {
+        composerBox = built.box
+        layer.appendChild(built.box)
+        built.input.dataset.initial = built.input.value
+        built.select.dataset.initial = built.select.value
+        if (kept?.value !== undefined) built.input.value = kept.value
+        if (kept?.command !== undefined) built.select.value = kept.command
+        grow(built.input)
+        if (kept || built.focus) built.input.focus()
+      }
+    }
+    if (composerBox && at) place(composerBox, at.x, at.y)
   }
 
   const close = () => {

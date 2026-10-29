@@ -104,4 +104,32 @@ describe('comments overlay', () => {
     overlay.showError('text must be 1–4000 characters')
     expect(layer().querySelector('[role="alert"]')?.textContent).toContain('text must be')
   })
+
+  it('keeps the composer and its buttons while the preview re-renders, so a click in between still lands', async () => {
+    overlay.setActive(true)
+    overlay.setComments([comment()], false)
+    pins()[0].click()
+    const remove = layer().querySelector<HTMLButtonElement>('button[aria-label="Delete comment"]')!
+    const pin = pins()[0]
+    button.className = 'hovered'
+    window.dispatchEvent(new Event('scroll'))
+    await new Promise((r) => setTimeout(r, 10))
+    overlay.setComments([comment()], false)
+    expect(layer().querySelector('button[aria-label="Delete comment"]')).toBe(remove)
+    expect(pins()[0]).toBe(pin)
+    remove.click()
+    expect(posted).toContainEqual({ type: 'dos:comment-delete', number: 1 })
+  })
+
+  it('rebuilds the composer when its comment changes and keeps the command and save at the bottom', () => {
+    overlay.setActive(true)
+    overlay.setComments([comment()], false)
+    pins()[0].click()
+    const before = layer().querySelector('[role="dialog"]')
+    overlay.setComments([comment({ text: 'Make it primary\nand larger' })], false)
+    const after = layer().querySelector('[role="dialog"]')!
+    expect(after).not.toBe(before)
+    expect(after.querySelector('textarea')!.value).toBe('Make it primary\nand larger')
+    expect((after.querySelector('textarea')!.parentElement as HTMLElement).style.alignItems).toBe('flex-end')
+  })
 })
