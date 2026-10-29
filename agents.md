@@ -186,6 +186,20 @@ The chat is [assistant-ui](https://www.assistant-ui.com/) on its external store 
 
 ---
 
+## Storybook (Design OS UI only)
+
+`npm run storybook` (port 6006) and `npm run build-storybook` show the **Design OS UI**, never the product or the prototype. Every component in `src/components/` has a `<Name>.stories.tsx` next to it (title `Design OS/<group>/<Name>`), enforced by `tests/storybook.test.ts`.
+
+- `.storybook/vite.config.ts` is Storybook's own Vite config: no OpenCode server, no Live Edit source markers, no comments store, no component-props scanner. `.storybook/preview.css` loads `src/styles/design-os.css` (the app stylesheet without the prototype sources), never `src/index.css`.
+- The loaders run unchanged: `.storybook/fixture-globs.ts` points their `import.meta.glob` patterns for `/product`, `/product-plan`, `/wiki`, `src/sections`, `src/shell` and `src/clickdummy` at `.storybook/fixtures/` (a fictitious sample project; prototype files are placeholder stubs). `virtual:component-props` comes from `.storybook/fixtures/component-props.json`.
+- Story parameters: `router: { path, url }`, `chat: 'online' | 'offline' | 'working' | 'waiting'` (fake chat context, no OpenCode), `fixtures: 'filled' | 'empty'`. Chat components use `StaticThread` from `.storybook/helpers.tsx`.
+- The comment UI has its own stories: `live-edit/CommentButton` and `live-edit/CommentsOverlay` (the preview overlay on a sample surface, with pins, composer, send and delete as actions).
+- Stories never import from `product/`, `src/sections`, `src/shell`, `src/ui` or `src/clickdummy`.
+
+The separation of Design OS and the prototype (CSS, tokens, components, loaders) and the path to several prototypes and templates are described in `docs/architecture/ui-prototype-separation.md`.
+
+---
+
 ## Project Brain (`wiki/`)
 
 `wiki/` is a Karpathy-style LLM wiki and Obsidian vault: the persistent memory behind the planning flow. Read it in the Design OS app at `/wiki` (header button "Wiki"), or open the folder in Obsidian. Sources (`wiki/raw/` plus the `product/` artifacts) are compiled into domain pages (`wiki/<domain>/`). The agent maintains the wiki; the user reads it and asks questions.

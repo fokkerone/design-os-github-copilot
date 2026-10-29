@@ -1,7 +1,7 @@
 /**
  * Boundary tests: Design OS tokens and product tokens stay separate.
  *
- *   Design OS app (src/components, src/lib, src/index.css)
+ *   Design OS app (src/components, src/lib, src/index.css, src/styles/design-os.css)
  *     - styled only by its own theme (stone/lime, src/index.css)
  *     - reads product tokens as DATA only, through src/lib/design-tokens-loader.ts
  *     - never loads product/design-system/tokens/tokens.css
@@ -74,10 +74,22 @@ test('product token files are read only by the token loader (as data)', () => {
   assert.doesNotMatch(loader, /\.css['"`]/, 'the loader must not import CSS')
 })
 
+const APP_CSS = 'src/styles/design-os.css'
+
 test('Design OS stylesheet contains no product tokens', () => {
-  const css = code(join(root, 'src/index.css'))
-  assert.doesNotMatch(css, /@import\s+["'][^"']*product\//, 'src/index.css must not import from product/')
-  assert.doesNotMatch(css, /--box-shadow-|-alpha-\d/, 'src/index.css must not contain generated product variables')
+  for (const file of ['src/index.css', APP_CSS]) {
+    const css = code(join(root, file))
+    assert.doesNotMatch(css, /@import\s+["'][^"']*product\//, `${file} must not import from product/`)
+    assert.doesNotMatch(css, /--box-shadow-|-alpha-\d/, `${file} must not contain generated product variables`)
+  }
+})
+
+test('the Design OS stylesheet scans only the Design OS UI, never the prototype', () => {
+  const css = code(join(root, APP_CSS))
+  assert.match(css, /@import\s+["']tailwindcss["']\s+source\(none\)/, `${APP_CSS} must turn off automatic source detection`)
+  const sources = [...css.matchAll(/@source\s+["']([^"']+)["']/g)].map((m) => m[1])
+  assert.deepEqual(sources.sort(), ['../components', '../lib'])
+  assert.match(code(join(root, 'src/index.css')), /@import\s+["']\.\/styles\/design-os\.css["']/, 'index.css must build on the Design OS stylesheet')
 })
 
 const FORBIDDEN_IMPORTS = [
@@ -134,7 +146,7 @@ test('product UI primitives (src/ui) use palette steps and import no Design OS U
 
 // --- App chrome look: the Design OS shell uses the Volta palette (same look as the reference app) ---
 
-test('the app chrome theme (src/app-theme.css) defines the Volta palette and is imported by index.css', () => {
+test('the app chrome theme (src/app-theme.css) defines the Volta palette and is imported by the Design OS stylesheet', () => {
   const themePath = join(root, 'src/app-theme.css')
   assert.ok(existsSync(themePath), 'src/app-theme.css must exist')
   const theme = code(themePath)
@@ -152,7 +164,7 @@ test('the app chrome theme (src/app-theme.css) defines the Volta palette and is 
   ]) {
     assert.match(theme, new RegExp(token + '\\s*:'), `${token} must be defined`)
   }
-  assert.match(code(join(root, 'src/index.css')), /@import\s+["']\.\/app-theme\.css["']/, 'index.css must import app-theme.css')
+  assert.match(code(join(root, APP_CSS)), /@import\s+["']\.\.\/app-theme\.css["']/, `${APP_CSS} must import app-theme.css`)
 })
 
 test('the app chrome theme stays separate from the product tokens', () => {
@@ -163,7 +175,7 @@ test('the app chrome theme stays separate from the product tokens', () => {
 
 test('the dark variant lets a nearer .light scope opt out (shell can differ from the page theme)', () => {
   assert.match(
-    code(join(root, 'src/index.css')),
+    code(join(root, APP_CSS)),
     /@custom-variant dark \(&:is\(\.dark \*\):not\(:is\(\.light \*\)\)\)/,
   )
 })

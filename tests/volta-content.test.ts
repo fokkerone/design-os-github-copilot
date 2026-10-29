@@ -38,7 +38,7 @@ describe('page content uses Volta', () => {
 })
 
 describe('theme variables', () => {
-  const css = readFileSync(join(root, 'src/index.css'), 'utf8')
+  const css = readFileSync(join(root, 'src/styles/design-os.css'), 'utf8')
   const rootBlock = css.match(/:root\s*\{[\s\S]*?\n\}/)![0]
   const darkBlock = css.match(/\.dark\s*\{[\s\S]*?\n\}/)![0]
 

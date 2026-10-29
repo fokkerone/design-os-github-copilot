@@ -1,0 +1,27 @@
+{
+  "props": {
+    "src/ui/button.tsx": {
+      "Button": [
+        { "name": "variant", "kind": "choice", "options": ["default", "outline", "ghost", "destructive"], "default": "default", "optional": true },
+        { "name": "size", "kind": "choice", "options": ["default", "sm", "lg", "icon"], "default": "default", "optional": true },
+        { "name": "disabled", "kind": "boolean", "optional": true },
+        { "name": "asChild", "kind": "boolean", "default": false, "optional": true, "from": "@radix-ui/react-slot" },
+        { "name": "onClick", "kind": "readonly", "type": "(event: MouseEvent) => void", "optional": true }
+      ]
+    },
+    "src/ui/input.tsx": {
+      "Input": [
+        { "name": "type", "kind": "string", "default": "text", "optional": true },
+        { "name": "placeholder", "kind": "string", "optional": true }
+      ]
+    },
+    "src/ui/badge.tsx": {
+      "Badge": [{ "name": "variant", "kind": "choice", "options": ["default", "secondary", "outline"], "default": "default", "optional": true }]
+    }
+  },
+  "usage": {
+    "src/ui/button.tsx": { "Button": ["src/sections/meter-readings/components/ReadingForm.tsx", "src/shell/components/UserMenu.tsx"] },
+    "src/ui/input.tsx": { "Input": ["src/sections/meter-readings/components/ReadingForm.tsx"] },
+    "src/ui/badge.tsx": { "Badge": [] }
+  }
+}

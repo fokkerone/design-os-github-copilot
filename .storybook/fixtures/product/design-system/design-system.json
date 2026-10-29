@@ -1,0 +1,7 @@
+{
+  "colors": { "primary": "teal", "secondary": "amber", "neutral": "zinc" },
+  "typography": { "heading": "Inter", "body": "Inter", "mono": "IBM Plex Mono" },
+  "personality": { "adjectives": ["calm", "precise", "friendly"], "mood": "Reassuring utility" },
+  "voice": { "tone": "Plain and encouraging", "characteristics": ["short sentences", "no jargon"] },
+  "uiStyle": { "borderRadius": "md", "shadows": "subtle", "density": "comfortable" }
+}

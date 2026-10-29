@@ -1,0 +1,11 @@
+{
+  "meters": [
+    { "id": "m-1", "kind": "electricity", "number": "1ESY1160669876" },
+    { "id": "m-2", "kind": "water", "number": "W-20391" }
+  ],
+  "readings": [
+    { "id": "r-1", "meterId": "m-1", "value": 18342, "date": "2026-09-30", "status": "confirmed" },
+    { "id": "r-2", "meterId": "m-1", "value": 18011, "date": "2026-06-30", "status": "confirmed" },
+    { "id": "r-3", "meterId": "m-2", "value": 412, "date": "2026-09-30", "status": "pending" }
+  ]
+}
