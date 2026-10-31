@@ -14,7 +14,7 @@ const viewportPrefix = /(?<![\w@-])(sm|md|lg|xl|2xl):/
 describe('step panel is a size container', () => {
   const split = readFileSync(join(root, 'app-shell/SplitLayout.tsx'), 'utf8')
   it('marks the scrolling area of the step as @container in every mode', () => {
-    const areas = split.match(/<div className="[^"]*overflow-y-auto[^"]*">\{(?:mode !== 'hidden' && )?children\}<\/div>/g) ?? []
+    const areas = split.match(/<div className=(["'])[^"']*overflow-y-auto[^"']*\1>\s*\{(?:mode !== ["']hidden["'] && )?children\}\s*<\/div>/g) ?? []
     expect(areas).toHaveLength(2)
     for (const a of areas) expect(a).toContain('@container')
   })

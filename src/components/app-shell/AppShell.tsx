@@ -93,11 +93,11 @@ export function AppShell({
   return (
     // The shell sets its own `dark` or `light` scope so it does not depend on the page theme.
     <div className={theme} style={{ colorScheme: theme }}>
-      <div className="relative isolate flex h-screen w-full overflow-hidden bg-muted font-['Inter',sans-serif] text-foreground antialiased">
+      <div className="relative isolate flex h-screen w-full overflow-hidden bg-background font-['Inter',sans-serif] text-foreground antialiased">
         {/* Doodle tile behind the frame (sidebar, gutters). The SVG is a mask, so it is tinted per theme; the content panel covers it. */}
         <div
           aria-hidden
-          className='pointer-events-none absolute inset-0 -z-10 bg-primary/6'
+          className='pointer-events-none absolute inset-0 -z-10 bg-foreground/10'
           style={{
             maskImage: `url(${doodle})`,
             WebkitMaskImage: `url(${doodle})`,
@@ -157,7 +157,7 @@ export function AppShell({
 
           {/* Content panel. The sidebar toggle sits at the left edge of the 48px header. */}
           <main
-            className={`relative min-h-0 flex-1 overflow-y-auto bg-background md:mr-1.5 md:mt-1.5 md:[&>*>header:first-child]:pl-12 ${
+            className={`relative min-h-0 flex-1 overflow-y-auto bg-card md:mr-1.5 md:mt-1.5 md:[&>*>header:first-child]:pl-12 ${
               collapsed ? "md:ml-1.5" : ""
             } md:rounded-lg md:border md:border-border`}
           >

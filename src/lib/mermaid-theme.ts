@@ -18,9 +18,10 @@ const text = "#e0e4f5";
 const onAccent = "#1a1b26";
 
 export const GITHUB_DARK = {
-  background: "",
+  background: "transparent",
   themeVariables: {
-    background: "#0d1117",
+    fontSize: ".85em",
+    background: "--background",
     primaryColor: base.primary,
     primaryBorderColor: base.primary,
     primaryTextColor: onAccent,
