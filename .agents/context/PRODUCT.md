@@ -1,1 +1,0 @@
-../../product/PRODUCT.md

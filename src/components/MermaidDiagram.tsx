@@ -1,30 +1,15 @@
 import { useEffect, useId, useState } from 'react'
+import { GITHUB_DARK } from '@/lib/mermaid-theme'
 
 interface MermaidDiagramProps {
   chart: string
 }
 
-function useIsDark() {
-  const [isDark, setIsDark] = useState(() =>
-    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-  )
-
-  useEffect(() => {
-    const root = document.documentElement
-    const observer = new MutationObserver(() => setIsDark(root.classList.contains('dark')))
-    observer.observe(root, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
-
-  return isDark
-}
-
 /**
- * Renders a Mermaid diagram. Mermaid is loaded lazily so it only ships
- * with pages that actually show a flow.
+ * Renders a Mermaid diagram in the GitHub Dark theme (light and dark mode alike, on its own
+ * dark surface). Mermaid is loaded lazily so it only ships with pages that actually show a flow.
  */
 export function MermaidDiagram({ chart }: MermaidDiagramProps) {
-  const isDark = useIsDark()
   const id = `mermaid-${useId().replace(/[^a-zA-Z0-9]/g, '')}`
   const [svg, setSvg] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -38,8 +23,8 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'strict',
-          theme: isDark ? 'dark' : 'neutral',
-          fontFamily: 'Inter, sans-serif',
+          theme: 'base',
+          themeVariables: { ...GITHUB_DARK.themeVariables, fontFamily: 'Inter, sans-serif' },
         })
         const { svg } = await mermaid.render(id, chart)
         if (!cancelled) {
@@ -55,7 +40,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
     return () => {
       cancelled = true
     }
-  }, [chart, id, isDark])
+  }, [chart, id])
 
   if (error) {
     return (
@@ -74,7 +59,8 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
 
   return (
     <div
-      className="overflow-x-auto [&_svg]:mx-auto [&_svg]:max-w-full [&_svg]:h-auto"
+      className="overflow-x-auto rounded-md p-4 [&_svg]:mx-auto [&_svg]:max-w-full [&_svg]:h-auto"
+      style={{ backgroundColor: GITHUB_DARK.background }}
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   )

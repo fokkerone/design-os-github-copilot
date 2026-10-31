@@ -19,6 +19,9 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      // Every checkout (project root and each .claude/worktrees/*) has its own tsconfig; pin the
+      // root to this config so typescript-eslint never has to choose between them
+      parserOptions: { tsconfigRootDir: import.meta.dirname },
     },
     rules: {
       // shadcn/ui components export their cva variants next to the component
