@@ -1,0 +1,4 @@
+{
+  "profile": { "name": "Ana Keller", "email": "ana.keller@example.com", "language": "en" },
+  "loginError": "The email or password is not correct."
+}

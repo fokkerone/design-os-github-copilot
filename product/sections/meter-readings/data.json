@@ -1,0 +1,14 @@
+{
+  "meters": [
+    { "id": "m-el-1", "type": "electricity", "serialNumber": "EL-884213", "location": "Hallway cupboard", "unit": "kWh", "previousValue": 12840, "previousDate": "2025-10-02" },
+    { "id": "m-wa-1", "type": "water", "serialNumber": "WA-120077", "location": "Bathroom", "unit": "m³", "previousValue": 312, "previousDate": "2025-10-02" }
+  ],
+  "readings": [
+    { "id": "r-1", "meterId": "m-el-1", "value": 12840, "unit": "kWh", "date": "2025-10-02", "status": "accepted", "reference": "MM-25-0412" },
+    { "id": "r-2", "meterId": "m-wa-1", "value": 312, "unit": "m³", "date": "2025-10-02", "status": "accepted", "reference": "MM-25-0413" },
+    { "id": "r-3", "meterId": "m-el-1", "value": 12310, "unit": "kWh", "date": "2024-10-05", "status": "accepted", "reference": "MM-24-0388" },
+    { "id": "r-4", "meterId": "m-wa-1", "value": 290, "unit": "m³", "date": "2024-10-05", "status": "rejected", "reason": "Value lower than the previous reading", "reference": "MM-24-0389" },
+    { "id": "r-5", "meterId": "m-el-1", "value": 13995, "unit": "kWh", "date": "2026-10-09", "status": "submitted", "reference": "MM-26-0107" }
+  ],
+  "draft": { "meterId": "m-el-1", "value": 13995 }
+}

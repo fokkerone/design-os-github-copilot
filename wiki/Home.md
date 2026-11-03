@@ -40,11 +40,19 @@ _(created automatically by `/design-os:wiki-ingest`; vocabulary in [[_meta/taxon
 
 | Domain | Pages | Last updated |
 |--------|-------|--------------|
+| [[design-changes/Home\|design-changes]] | 2 | 2026-10-24 |
 
 ## Recent Updates
 
 _(last 10, full history in [[log]])_
 
+- 2026-10-27: [[design-changes/meter-readings]] — ReadingHistory zebra rows, neutral stone (Comment #1)
+- 2026-10-26: [[design-changes/account]] — Login "Email me a sign-in link" button as outline (Comment #2)
+- 2026-10-26: [[design-changes/account]] — Login title bigger, bold, primary (Comment #1)
+- 2026-10-24: [[design-changes/account]] — Login Sign in submit button size `sm` → `lg` (Live Edit)
+- 2026-10-24: [[design-changes/account]] — Buttons (size, radius), CardFooter `justify-end`, Save order and saved state inside the Save button (Live Edit)
+- 2026-10-24: [[design-changes/meter-readings]] — check icon `size-16`, card text `text-orange-700` (Live Edit)
+- 2026-10-23: [[design-changes/meter-readings]] — ReadingForm title `text-lg` → `text-2xl` (Live Edit)
 - 2026-10-09: [[how-to/Home|How To]] — step-by-step guides for Design OS, the wiki, user flows and personas
 
 ## Wiki Operations

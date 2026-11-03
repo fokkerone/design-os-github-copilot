@@ -1,3 +1,140 @@
 {
-  "sources": []
+  "sources": [
+    {
+      "id": "2026-10-23-capture-2026-10-23-17-01",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-10-23-17-01.md",
+      "sha256": "a1af1593f9e87305e5b1768959346db61de9c250ca7a3ac9b609a8a31b3d7d06",
+      "ingested_at": "2026-10-23T15:01:49.769Z",
+      "disposition": [
+        "New"
+      ],
+      "pages_created": [
+        "design-changes/meter-readings"
+      ],
+      "pages_updated": []
+    },
+    {
+      "id": "2026-10-24-capture-2026-10-24-11-29",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-10-24-11-29.md",
+      "sha256": "5b1a96dfd2efb2560ffeff8f5eb69baae1227627c909c30acae9984f7bf8d20f",
+      "ingested_at": "2026-10-24T09:29:59.717Z",
+      "disposition": [
+        "New",
+        "Update"
+      ],
+      "pages_created": [
+        "design-changes/account"
+      ],
+      "pages_updated": [
+        "design-changes/meter-readings"
+      ]
+    },
+    {
+      "id": "2026-10-24-capture-2026-10-24-15-42",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-10-24-15-42.md",
+      "sha256": "b2faf1db29dfd7f5a9d59b64a2e86fc6d48cc8ab5a1a10aa61678ad005b2fda2",
+      "ingested_at": "2026-10-24T15:43:12.895Z",
+      "disposition": [
+        "Update"
+      ],
+      "pages_created": [
+        "design-changes/account"
+      ],
+      "pages_updated": [
+        "design-changes/account"
+      ]
+    },
+    {
+      "id": "2026-10-24-capture-2026-10-24-21-02",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-10-24-21-02.md",
+      "sha256": "b063905794d07215f7ea758b4b34c295a9e284b4268f67d39314dc15e7fae193",
+      "ingested_at": "2026-10-24T19:03:41.771Z",
+      "disposition": [
+        "Update"
+      ],
+      "pages_created": [
+        "design-changes/account"
+      ],
+      "pages_updated": [
+        "design-changes/account"
+      ]
+    },
+    {
+      "id": "2026-10-24-capture-2026-10-24-23-13",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-10-24-23-13.md",
+      "sha256": "60164aa94d8416e5bffa775d4fc8c12d598910dd18688189fd531fdf522dc64a",
+      "ingested_at": "2026-10-24T21:13:48.678Z",
+      "disposition": [
+        "Update"
+      ],
+      "pages_created": [
+        "design-changes/account"
+      ],
+      "pages_updated": [
+        "design-changes/account"
+      ]
+    },
+    {
+      "id": "2026-10-26-capture-2026-10-26-20-00",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-10-26-20-00.md",
+      "sha256": "107744f847a89381a05a0e66c23d1ee554620d681028dc7e02ac052f660936c5",
+      "ingested_at": "2026-10-26T19:00:27.088931Z",
+      "disposition": [
+        "Update"
+      ],
+      "pages_created": [],
+      "pages_updated": [
+        "design-changes/account"
+      ]
+    },
+    {
+      "id": "2026-10-26-capture-2026-10-26-20-01",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-10-26-20-01.md",
+      "sha256": "de2f7ac8892618e81771aca9834a57ff44fcd243cbf5ad84d4496d42c53b4d06",
+      "ingested_at": "2026-10-27T07:05:14.427793Z",
+      "disposition": [
+        "Update"
+      ],
+      "pages_created": [],
+      "pages_updated": [
+        "design-changes/account"
+      ]
+    },
+    {
+      "id": "2026-10-27-capture-2026-10-27-08-05",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-10-27-08-05.md",
+      "sha256": "154f900ea488f815acfb75248607364ac68f3cea496ea93ce982aa5fa8da55c6",
+      "ingested_at": "2026-10-27T07:05:14.427793Z",
+      "disposition": [
+        "Update"
+      ],
+      "pages_created": [],
+      "pages_updated": [
+        "design-changes/meter-readings"
+      ]
+    },
+    {
+      "id": "2026-11-03-capture-2026-11-03-08-06",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-11-03-08-06.md",
+      "sha256": "d86e59a592c29149aac1fde84f3cdfc053282bed3475bef20edd759a8c38ff10",
+      "ingested_at": "2026-11-03T07:07:04.533Z",
+      "disposition": [
+        "Update"
+      ],
+      "pages_created": [],
+      "pages_updated": [
+        "design-changes/meter-readings",
+        "comments/meter-readings"
+      ]
+    }
+  ]
 }
