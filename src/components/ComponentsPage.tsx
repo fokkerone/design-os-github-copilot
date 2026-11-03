@@ -2,6 +2,7 @@ import { Component } from 'lucide-react'
 import { AppLayout } from '@/components/AppLayout'
 import { PageTabs } from '@/components/PageTabs'
 import { designSystemTabs } from '@/components/tabs'
+import { PenpotSyncPanel } from '@/components/penpot/PenpotSyncPanel'
 import { uiComponents, type UiComponent } from '@/lib/ui-components'
 
 const muted = 'text-muted-foreground'
@@ -20,6 +21,9 @@ export function ComponentsPage() {
         <p className="text-muted-foreground">
           The UI primitives in <code className="font-mono text-[13px]">src/ui/</code> that screen designs and the shell are built from, with their variants and where designs use them. A design imports primitives only from here (<code className="font-mono text-[13px]">npm run ui:check</code>).
         </p>
+      </div>
+      <div className="mb-6">
+        <PenpotSyncPanel />
       </div>
       {components.length === 0 ? (
         <p className={`rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm ${muted}`}>

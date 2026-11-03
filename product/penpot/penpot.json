@@ -1,0 +1,739 @@
+{
+  "fileId": "4cb5aabb-25ac-802d-8008-e39c3accdce0",
+  "teamId": "4cb5aabb-25ac-802d-8008-e3701b41b287",
+  "projectId": "4cb5aabb-25ac-802d-8008-e3701b46746f",
+  "name": "Design OS",
+  "url": "http://localhost:9001/#/workspace?team-id=4cb5aabb-25ac-802d-8008-e3701b41b287&file-id=4cb5aabb-25ac-802d-8008-e39c3accdce0&page-id=4cb5aabb-25ac-802d-8008-e39c3accdce1",
+  "lastSync": {
+    "action": "all",
+    "at": "2026-11-03T12:59:47.187Z",
+    "tokens": {
+      "created": 0,
+      "updated": 0,
+      "same": 550,
+      "failed": []
+    },
+    "skippedTokens": [
+      "32 shadows with a negative spread (Penpot has no token for them)",
+      "7 gradients",
+      "17 blur effects",
+      "40 text styles (bound as font family, size and weight)"
+    ],
+    "unsupported": [],
+    "components": {
+      "total": 124,
+      "created": 4,
+      "unchanged": 120,
+      "removed": 10,
+      "variantFailures": [],
+      "groups": [
+        {
+          "name": "ui/Card",
+          "variants": 4
+        },
+        {
+          "name": "ui/CardHeader",
+          "variants": 2
+        },
+        {
+          "name": "ui/CardTitle",
+          "variants": 6
+        },
+        {
+          "name": "ui/CardDescription",
+          "variants": 10
+        },
+        {
+          "name": "ui/CardContent",
+          "variants": 6
+        },
+        {
+          "name": "ui/Label",
+          "variants": 14
+        },
+        {
+          "name": "ui/Input",
+          "variants": 16
+        },
+        {
+          "name": "ui/Button",
+          "variants": 18
+        },
+        {
+          "name": "composite/LoginForm",
+          "variants": 4
+        },
+        {
+          "name": "ui/CardFooter",
+          "variants": 2
+        },
+        {
+          "name": "composite/ProfileForm",
+          "variants": 4
+        },
+        {
+          "name": "composite/MainNav",
+          "variants": 5
+        },
+        {
+          "name": "composite/UserMenu",
+          "variants": 2
+        },
+        {
+          "name": "composite/AppShell",
+          "variants": 5
+        },
+        {
+          "name": "composite/ReadingConfirmationCard",
+          "variants": 4
+        },
+        {
+          "name": "composite/MeterPicture",
+          "variants": 4
+        },
+        {
+          "name": "composite/MeterReadingForm",
+          "variants": 4
+        },
+        {
+          "name": "ui/Badge",
+          "variants": 6
+        },
+        {
+          "name": "composite/ReadingHistoryList",
+          "variants": 4
+        },
+        {
+          "name": "composite/ReadingReviewCard",
+          "variants": 4
+        }
+      ]
+    },
+    "tokenViolations": [
+      {
+        "kind": "shadow",
+        "value": "0 1 2 -1 #000000/0.012, 0 1 3 0 #000000/0.012",
+        "where": [
+          "src/ui/card.tsx:7:5"
+        ]
+      },
+      {
+        "kind": "shadow",
+        "value": "0 0 0 2 #2dd4bf/1",
+        "where": [
+          "src/sections/meter-readings/components/MeterPicture.tsx:11:11"
+        ]
+      },
+      {
+        "kind": "color",
+        "value": "#292524 / 0.4",
+        "where": [
+          "src/sections/meter-readings/components/ReadingHistoryList.tsx:37:17"
+        ]
+      }
+    ],
+    "boards": [
+      {
+        "board": "Login / desktop / light",
+        "section": "account",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 1,
+        "shapes": 1,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1672,
+          "outsideText": 40,
+          "insideText": 1632,
+          "textShare": 4.2,
+          "share": 0.13
+        }
+      },
+      {
+        "board": "Login / desktop / dark",
+        "section": "account",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 1,
+        "shapes": 1,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2196,
+          "outsideText": 40,
+          "insideText": 2156,
+          "textShare": 5.5,
+          "share": 0.17
+        }
+      },
+      {
+        "board": "Login / mobile / light",
+        "section": "account",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 1,
+        "shapes": 1,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1725,
+          "outsideText": 40,
+          "insideText": 1685,
+          "textShare": 4.2,
+          "share": 0.52
+        }
+      },
+      {
+        "board": "Login / mobile / dark",
+        "section": "account",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 1,
+        "shapes": 1,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2217,
+          "outsideText": 40,
+          "insideText": 2177,
+          "textShare": 5.4,
+          "share": 0.67
+        }
+      },
+      {
+        "board": "Profile / desktop / light",
+        "section": "account",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 1,
+        "shapes": 1,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1649,
+          "outsideText": 146,
+          "insideText": 1503,
+          "textShare": 7,
+          "share": 0.13
+        }
+      },
+      {
+        "board": "Profile / desktop / dark",
+        "section": "account",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 1,
+        "shapes": 1,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2082,
+          "outsideText": 149,
+          "insideText": 1933,
+          "textShare": 9,
+          "share": 0.16
+        }
+      },
+      {
+        "board": "Profile / mobile / light",
+        "section": "account",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 1,
+        "shapes": 1,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1803,
+          "outsideText": 148,
+          "insideText": 1655,
+          "textShare": 7.1,
+          "share": 0.55
+        }
+      },
+      {
+        "board": "Profile / mobile / dark",
+        "section": "account",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 1,
+        "shapes": 1,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2108,
+          "outsideText": 149,
+          "insideText": 1959,
+          "textShare": 8.4,
+          "share": 0.64
+        }
+      },
+      {
+        "board": "ReadingConfirmation / desktop / light",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2070,
+          "outsideText": 548,
+          "insideText": 1522,
+          "textShare": 4.8,
+          "share": 0.16
+        }
+      },
+      {
+        "board": "ReadingConfirmation / desktop / dark",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2467,
+          "outsideText": 554,
+          "insideText": 1913,
+          "textShare": 6,
+          "share": 0.19
+        }
+      },
+      {
+        "board": "ReadingConfirmation / mobile / light",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2116,
+          "outsideText": 652,
+          "insideText": 1464,
+          "textShare": 5.1,
+          "share": 0.64
+        }
+      },
+      {
+        "board": "ReadingConfirmation / mobile / dark",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2173,
+          "outsideText": 660,
+          "insideText": 1513,
+          "textShare": 5.3,
+          "share": 0.66
+        }
+      },
+      {
+        "board": "ReadingForm / desktop / light",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1037,
+          "outsideText": 28,
+          "insideText": 1009,
+          "textShare": 2.2,
+          "share": 0.08
+        }
+      },
+      {
+        "board": "ReadingForm / desktop / dark",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1585,
+          "outsideText": 34,
+          "insideText": 1551,
+          "textShare": 3.4,
+          "share": 0.12
+        }
+      },
+      {
+        "board": "ReadingForm / mobile / light",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1139,
+          "outsideText": 132,
+          "insideText": 1007,
+          "textShare": 2.3,
+          "share": 0.35
+        }
+      },
+      {
+        "board": "ReadingForm / mobile / dark",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1645,
+          "outsideText": 140,
+          "insideText": 1505,
+          "textShare": 3.4,
+          "share": 0.5
+        }
+      },
+      {
+        "board": "ReadingHistory / desktop / light",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1440,
+          "outsideText": 4,
+          "insideText": 1436,
+          "textShare": 2.4,
+          "share": 0.11
+        }
+      },
+      {
+        "board": "ReadingHistory / desktop / dark",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2559,
+          "outsideText": 30,
+          "insideText": 2529,
+          "textShare": 4.3,
+          "share": 0.2
+        }
+      },
+      {
+        "board": "ReadingHistory / mobile / light",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1542,
+          "outsideText": 108,
+          "insideText": 1434,
+          "textShare": 2.5,
+          "share": 0.47
+        }
+      },
+      {
+        "board": "ReadingHistory / mobile / dark",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2619,
+          "outsideText": 136,
+          "insideText": 2483,
+          "textShare": 4.3,
+          "share": 0.8
+        }
+      },
+      {
+        "board": "ReadingReview / desktop / light",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1128,
+          "outsideText": 68,
+          "insideText": 1060,
+          "textShare": 2.7,
+          "share": 0.09
+        }
+      },
+      {
+        "board": "ReadingReview / desktop / dark",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2157,
+          "outsideText": 71,
+          "insideText": 2086,
+          "textShare": 5.4,
+          "share": 0.17
+        }
+      },
+      {
+        "board": "ReadingReview / mobile / light",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 1670,
+          "outsideText": 172,
+          "insideText": 1498,
+          "textShare": 3.6,
+          "share": 0.51
+        }
+      },
+      {
+        "board": "ReadingReview / mobile / dark",
+        "section": "meter-readings",
+        "size": {
+          "expected": [
+            390,
+            844
+          ],
+          "actual": [
+            390,
+            844
+          ]
+        },
+        "offsets": [],
+        "instances": 2,
+        "shapes": 2,
+        "pixels": {
+          "sizeMatches": true,
+          "changed": 2572,
+          "outsideText": 177,
+          "insideText": 2395,
+          "textShare": 5.8,
+          "share": 0.78
+        }
+      }
+    ],
+    "missing": []
+  }
+}

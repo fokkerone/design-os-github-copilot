@@ -16,6 +16,8 @@ import componentProps from './scripts/component-props.mjs'
 import liveEditWriter from './scripts/live-edit-writer.mjs'
 // @ts-expect-error plain ESM script, tested in tests/comments-store.test.ts
 import commentsStore from './scripts/comments-store.mjs'
+// @ts-expect-error plain ESM script, tested in tests/penpot-sync.test.ts
+import penpotSync from './scripts/penpot/plugin.mjs'
 // @ts-expect-error plain ESM script, tested in tests/impeccable-context.test.ts
 import { impeccableContext } from './scripts/impeccable-context.mjs'
 // @ts-expect-error plain ESM script, tested in tests/prototype-theme.test.ts
@@ -47,6 +49,8 @@ export default defineConfig(({ command }) => ({
     liveEditWriter(),
     // Comments: numbered comments on the preview, stored in wiki/comments/
     commentsStore(),
+    // Penpot sync: the panel on the Design System page talks to it (scripts/penpot/)
+    penpotSync(),
     // impeccable reads PRODUCT.md and DESIGN.md through .agents/context/ (npm run impeccable:context)
     impeccableContext(),
     // Starts OpenCode for this checkout and proxies /opencode to it (env switches: see the script)

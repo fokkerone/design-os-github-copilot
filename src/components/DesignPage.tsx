@@ -7,6 +7,7 @@ import { StepIndicator, type StepStatus } from "@/components/StepIndicator";
 import { NextPhaseButton } from "@/components/NextPhaseButton";
 import { PageTabs } from "@/components/PageTabs";
 import { designSystemTabs } from "@/components/tabs";
+import { PenpotSyncPanel } from "@/components/penpot/PenpotSyncPanel";
 import { loadProductData } from "@/lib/product-loader";
 import {
   hasDesignResources,
@@ -117,6 +118,8 @@ export function DesignPage() {
             Define the visual foundation of your product: tokens, brand and components.
           </p>
         </div>
+
+        <PenpotSyncPanel />
 
         {/* Step 1: Design System */}
         <StepIndicator step={1} status={stepStatuses[0]} isLast={!allStepsComplete}>

@@ -202,6 +202,20 @@ The Design OS UI and the prototype are two separate documents with two separate 
 - **Class coverage:** `npm run preview:check` lists classes of the prototype that render nothing in its theme (a strict token import resets Tailwind's defaults). Run it after writing a screen design or the shell.
 - **Guards:** `scripts/design-tokens/tests/separation.test.mjs` (stylesheets, the preview's import graph, no prototype imports in the app) and `npm run test:build` (`scripts/tests/build-separation.test.mjs`: the built entries share no module of the other side and each has its own CSS).
 
+## Penpot sync
+
+The Design System page (tabs Tokens and Components) has a Penpot panel (`src/components/penpot/PenpotSyncPanel.tsx`) that builds the prototype in a Penpot instance through the Penpot MCP server, without an LLM. It runs in the dev server: the panel talks to `/__designos/penpot` (`scripts/penpot/plugin.mjs`), the sync is `scripts/penpot/sync.mjs`.
+
+- **Setup:** `.env.local` (server side only) with `PENPOT_URL`, `PENPOT_MCP_KEY` (Penpot: Your account › Integrations › MCP Server) and `PENPOT_ACCESS_TOKEN` (Your account › Access tokens). The MCP runs code in a browser tab, so the file has to be open with File › MCP Server › Connect, and that tab has to stay visible and untouched during a sync: a browser suspends hidden tabs.
+- **File:** "Create Penpot file" uses the RPC API (the Plugin API cannot create files) and stores the link in `product/penpot/penpot.json`, with the last report. When Penpot answers that the linked file no longer exists, the panel offers a new file, which replaces the link; any other failure keeps the link. A sync refuses to write when the connected tab shows another file. A stopped run reports its step and reason, and the next run continues: components are matched by key, and unfinished variant groups are repaired. Penpot drops new copies at the page's (0,0), into the board covering it, so `layoutStart` in `scripts/penpot/runtime.js` keeps that point free; layouts start at (100, 100).
+- **Order:** always tokens, then components, then sections. One way only: tokens and components are updated in place, section boards are rebuilt, and changes by hand on boards are overwritten.
+- **Capture:** Playwright renders every screen in Chrome (desktop 1440 and mobile 390, light and dark; `capture.mjs`), `page-walker.js` reads geometry, computed styles, text lines and React components from the DOM. The dev server is required: owners and source markers exist only in dev builds.
+- **Tokens:** `token-map.mjs`. All sets stay active and Penpot themes are not used, because a theme applies to the whole file and light and dark boards sit side by side: `color.light.*`, `color.dark.*`, `color.teal.600`, `font.*`, `radius.*`, `spacing.*`, `shadow.*`, `opacity.*`. Penpot has no token for gradients, blur effects and shadows with a negative spread; the report lists them. A rendered value without a token keeps its exact value and is listed as a violation.
+- **Components:** `design-tree.mjs`. `src/ui/` and the `components/` folders of sections and the shell become library components, grouped as variants (`viewport`, `mode`, `state`). A primitive with only text and icons takes text and size as overrides. Penpot copies cannot get new layers, so slot content (`children`, told apart by React's owner chain) lies next to the instance. Elements that are no component are token-bound shapes.
+- **Positions:** boards are absolute, with the values the browser measured; only `src/ui` mains use flex.
+- **Check:** `verify.mjs` compares the positions of a board's top-level shapes and the exported picture with the screenshot, per board, inside and outside text. Penpot and Chrome smooth glyphs differently, so text never matches pixel by pixel.
+- **Limits:** the MCP server takes 100 KB per call and ends a task after 120 seconds, so `chunkOps` and the variant step split their work. `scripts/penpot/runtime.js` runs in the plugin as `storage.dos`.
+
 ## Storybook (Design OS UI only)
 
 `npm run storybook` (port 6006) and `npm run build-storybook` show the **Design OS UI**, never the product or the prototype. Every component in `src/components/` has a `<Name>.stories.tsx` next to it (title `Design OS/<group>/<Name>`), enforced by `tests/storybook.test.ts`.
@@ -283,6 +297,9 @@ product/                           # Product definition (portable)
 │   ├── DESIGN.md                  # GENERATED merged design guide (source of truth for product UI)
 │   ├── design-system.json         # Structured design system data for agents
 │   └── design-system.md           # Human-readable design system documentation
+│
+├── penpot/                        # Penpot sync (Design System page)
+│   └── penpot.json                # Linked file and last report, no keys
 │
 ├── shell/                         # Application shell
 │   └── spec.md                    # Shell specification

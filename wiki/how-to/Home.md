@@ -1,7 +1,7 @@
 ---
 title: How To
 tags: [index, how-to]
-updated: 2026-10-23
+updated: 2026-11-03
 ---
 
 # How To
@@ -19,4 +19,5 @@ Step-by-step guides for working with Design OS. These pages ship with the reposi
 | [[how-to/personas]] | Why personas, how to create one, and how to link, use and validate it | 2026-10-12 |
 | [[how-to/live-edit]] | Pick an element in the preview, tweak it in the inspector, describe the change in the chat and record it in the wiki | 2026-10-23 |
 | [[how-to/comments]] | Numbered comments on the preview with an impeccable command, sent to the agent one at a time and resolved in the wiki | 2026-10-24 |
+| [[how-to/penpot-sync]] | Build tokens, components and every screen in Penpot through its MCP server, from the Design System page | 2026-11-03 |
 | [[how-to/design-tokens]] | Import DTCG design tokens from Figma into a Tailwind v4 theme and a merged DESIGN.md | 2026-10-12 |
