@@ -135,6 +135,21 @@
         "design-changes/meter-readings",
         "comments/meter-readings"
       ]
+    },
+    {
+      "id": "2026-11-03-capture-2026-11-03-14-50",
+      "type": "capture",
+      "path": "wiki/raw/capture-2026-11-03-14-50.md",
+      "sha256": "255c74d67375b8988c7d5f1eec1023b27a56ac0e28473d0a315a62b5358194c3",
+      "ingested_at": "2026-11-03T13:55:00.000Z",
+      "disposition": [
+        "Update"
+      ],
+      "pages_created": [],
+      "pages_updated": [
+        "design-changes/meter-readings",
+        "comments/meter-readings"
+      ]
     }
   ]
 }

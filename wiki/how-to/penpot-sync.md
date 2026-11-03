@@ -26,6 +26,8 @@ The Penpot panel on the Design System page turns the running prototype into a Pe
 
 The bar moves by steps done, not by time, so it can pause on a long step.
 
+Every run arranges the `Components` page in rows sorted by name, so moving components there by hand does not last.
+
 **A run stopped?** The message says at which step and why. Finished work stays in the file, so click **Sync** again and it continues from there. A variant group that fails does not stop the run: the report lists it under "not grouped", and the next run repairs it.
 
 **Deleted the file in Penpot?** Click **Refresh**. The panel says the file is gone and offers **Create Penpot file** again; the new file replaces the link and the old report. Then sync everything once more.

@@ -46,6 +46,7 @@ _(created automatically by `/design-os:wiki-ingest`; vocabulary in [[_meta/taxon
 
 _(last 10, full history in [[log]])_
 
+- 2026-11-03: [[design-changes/meter-readings]] — ReadingConfirmation icon animation, shield pops in and check draws (Comment #2)
 - 2026-10-27: [[design-changes/meter-readings]] — ReadingHistory zebra rows, neutral stone (Comment #1)
 - 2026-10-26: [[design-changes/account]] — Login "Email me a sign-in link" button as outline (Comment #2)
 - 2026-10-26: [[design-changes/account]] — Login title bigger, bold, primary (Comment #1)

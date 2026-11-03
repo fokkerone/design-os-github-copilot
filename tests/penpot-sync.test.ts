@@ -285,6 +285,14 @@ describe('Penpot sync', () => {
       expect(fake.calls).toContain('startBoard')
     })
 
+    it('tidies the component page after the groups, and goes on when that fails', async () => {
+      const fake = createFakeMcp(LINKED)
+      fake.failures.set('arrangeComponents', new Error('Value not valid'))
+      await runSync({ root, baseUrl: 'b', action: 'all', env, connect: fake.connect, capture: twoLooks })
+      expect(fake.calls.indexOf('arrangeComponents')).toBeGreaterThan(fake.calls.indexOf('variants'))
+      expect(fake.calls).toContain('startBoard')
+    })
+
     it('still stops when the tab is gone, because nothing after it can work', async () => {
       const fake = createFakeMcp(LINKED)
       fake.failures.set('variants', new Error('No Penpot instance connected for user token.'))

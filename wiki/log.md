@@ -98,3 +98,9 @@ Append-only activity log. Every ingest, capture, query archive, lint, cross-link
 - **Source:** `wiki/raw/capture-2026-11-03-08-06.md` (capture)
 - **Disposition:** Update
 - **Updated:** [[design-changes/meter-readings]], [[comments/meter-readings]] (Comment #1 on ReadingConfirmation (harden))
+
+## [2026-11-03] ingest | Design changes — Meter readings
+
+- **Source:** `wiki/raw/capture-2026-11-03-14-50.md` (capture)
+- **Disposition:** Update
+- **Updated:** [[design-changes/meter-readings]], [[comments/meter-readings]] (Comment #2 on ReadingConfirmation (animate))

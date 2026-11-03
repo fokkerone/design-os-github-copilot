@@ -64,7 +64,7 @@ const group = (keys: string[]) => ({
 })
 
 describe('Penpot layout', () => {
-  const dosOn = (children: { x: number; y: number; width: number; height: number }[]) => {
+  const dosOn = (children: { name?: string; x: number; y: number; width: number; height: number }[]) => {
     const source = fs.readFileSync(path.join(process.cwd(), 'scripts/penpot/runtime.js'), 'utf8')
     return new Function('penpot', 'penpotUtils', 'storage', `return (${source.trim().replace(/;$/, '')})`)({ currentPage: { root: { children } } }, {}, {})
   }
@@ -77,6 +77,28 @@ describe('Penpot layout', () => {
     expect(atOrigin.y).toBe(500)
     expect(elsewhere).toMatchObject({ x: 300, y: 0 })
     expect(start).toEqual({ x: 100, y: 650 })
+  })
+
+  const shape = (name: string, x: number, y: number, width: number, height: number, wip = '') => ({ name, x, y, width, height, getSharedPluginData: () => wip })
+  const overlap = (a: ReturnType<typeof shape>, b: ReturnType<typeof shape>) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height
+
+  it('arranges components so that none lies on another and the drop point stays free', () => {
+    const shapes = [shape('ui / Card', 0, 0, 400, 200), shape('ui / Button', 0, 0, 2000, 100), shape('composite / Form', 50, 50, 1500, 300), shape('ui / Badge', 10, 10, 100, 20)]
+    dosOn(shapes).arrangeComponents()
+    for (const a of shapes) {
+      expect(a.x).toBeGreaterThan(0)
+      expect(a.y).toBeGreaterThan(0)
+      for (const b of shapes) if (a !== b) expect(overlap(a, b)).toBe(false)
+    }
+  })
+
+  it('sorts by name, so a rerun gives the same page', () => {
+    const shapes = [shape('b', 0, 0, 100, 100), shape('a', 0, 0, 100, 100)]
+    dosOn(shapes).arrangeComponents()
+    const first = shapes.map((s) => [s.name, s.x, s.y])
+    expect(shapes[1].x).toBeLessThan(shapes[0].x)
+    dosOn([...shapes].reverse()).arrangeComponents()
+    expect(shapes.map((s) => [s.name, s.x, s.y])).toEqual(first)
   })
 
   it('starts away from that point on an empty page', () => {

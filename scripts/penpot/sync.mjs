@@ -213,6 +213,10 @@ async function syncComponents(mcp, mains, phase) {
     })
   }
   const removed = await call(mcp, 'removeStale', mains.map((m) => m.key))
+  // Tidiness again: it may fail without ending the run
+  await call(mcp, 'arrangeComponents').catch((e) => {
+    if (TAB_LOST.test(String(e?.message ?? e))) throw e
+  })
   return { total: mains.length, created: fresh.length, unchanged: mains.length - fresh.length, removed, variantFailures, groups: groups.map((g) => ({ name: g.name, variants: g.members.length })) }
 }
 

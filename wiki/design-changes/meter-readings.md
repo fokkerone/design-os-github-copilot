@@ -2,7 +2,7 @@
 title: Design changes — Meter readings
 summary: Changes made to the Meter readings screens with Live Edit, newest first, with the reason for each.
 tags: [design-changes, capture]
-sources: [wiki/raw/capture-2026-10-23-17-01.md, wiki/raw/capture-2026-10-24-11-29.md, wiki/raw/capture-2026-10-27-08-05.md, wiki/raw/capture-2026-11-03-08-06.md]
+sources: [wiki/raw/capture-2026-10-23-17-01.md, wiki/raw/capture-2026-10-24-11-29.md, wiki/raw/capture-2026-10-27-08-05.md, wiki/raw/capture-2026-11-03-08-06.md, wiki/raw/capture-2026-11-03-14-50.md]
 created: 2026-10-23
 updated: 2026-11-03
 provenance:
@@ -17,6 +17,14 @@ provenance:
 Every change made to this area through Live Edit (`/design-os:live-edit`): picked in the preview, discussed in the chat, applied to the source. Newest first. Read it before changing the same element again.
 
 ## Changelog
+
+### 2026-11-03 — ReadingConfirmation › ReadingConfirmationCard › CardContent › ShieldCheck
+**Request:** "other icon animation" (Comment #2 on the ReadingConfirmation card, /design-os:comment → /impeccable animate)
+**Changed:** `src/sections/meter-readings/components/ReadingConfirmationCard.tsx:8-16,25` — new `ICON_CLASSES`: the shield scales from 50% and fades in (`transition duration-500 ease-out starting:scale-50 starting:opacity-0`), then the check draws itself (second path, `stroke-dasharray` 6, `stroke-dashoffset` 6 → 0, 400 ms, 300 ms delay); with `motion-reduce:` only the fade stays
+**Scope:** only this icon; plays once on arrival, no loop; shared primitives unchanged
+**Because:** The user picked "shield pops in, check draws" over a plain pop-in and a pulse ring. They asked for `tw-animate-css`, but the tech stack leaves animation undecided, so the motion uses Tailwind `starting:` and `transition` utilities and adds no dependency; an animation library is recorded with `/design-os:techstack update`.
+**Conflicts:** tw-animate-css requested, stack has no animation decision (not applied)
+**Source:** [[raw/capture-2026-11-03-14-50]] · [[comments/meter-readings]]
 
 ### 2026-11-03 — ReadingConfirmation › ReadingConfirmationCard › CardContent
 **Request:** "other icon harden design" (Comment #1 on the ReadingConfirmation card, /design-os:comment → /impeccable harden)

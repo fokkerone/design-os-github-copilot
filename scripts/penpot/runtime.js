@@ -305,6 +305,25 @@
       }
       return { x: LAYOUT_ORIGIN, y: bottom > 0 ? bottom + LAYOUT_ORIGIN : LAYOUT_ORIGIN }
     },
+    /** Rows sorted by name on the current page, so nothing lies on anything else, and reruns give the same page */
+    arrangeComponents() {
+      const shapes = [...penpot.currentPage.root.children].sort((a, b) => a.name.localeCompare(b.name))
+      let x = LAYOUT_ORIGIN
+      let y = LAYOUT_ORIGIN
+      let rowHeight = 0
+      for (const s of shapes) {
+        if (x > LAYOUT_ORIGIN && x + s.width > 3000) {
+          x = LAYOUT_ORIGIN
+          y += rowHeight + 80
+          rowHeight = 0
+        }
+        s.x = x
+        s.y = y
+        x += s.width + 80
+        rowHeight = Math.max(rowHeight, s.height)
+      }
+      return shapes.length
+    },
     /** Groups components of one name as variants; new ones join an existing group */
     async variants(groups) {
       const report = []

@@ -6,7 +6,7 @@
   "url": "http://localhost:9001/#/workspace?team-id=4cb5aabb-25ac-802d-8008-e3701b41b287&file-id=4cb5aabb-25ac-802d-8008-e39c3accdce0&page-id=4cb5aabb-25ac-802d-8008-e39c3accdce1",
   "lastSync": {
     "action": "all",
-    "at": "2026-11-03T12:59:47.187Z",
+    "at": "2026-11-03T18:59:25.862Z",
     "tokens": {
       "created": 0,
       "updated": 0,
@@ -21,10 +21,10 @@
     ],
     "unsupported": [],
     "components": {
-      "total": 124,
-      "created": 4,
-      "unchanged": 120,
-      "removed": 10,
+      "total": 122,
+      "created": 0,
+      "unchanged": 122,
+      "removed": 0,
       "variantFailures": [],
       "groups": [
         {
@@ -73,7 +73,7 @@
         },
         {
           "name": "composite/MainNav",
-          "variants": 5
+          "variants": 4
         },
         {
           "name": "composite/UserMenu",
@@ -81,7 +81,7 @@
         },
         {
           "name": "composite/AppShell",
-          "variants": 5
+          "variants": 4
         },
         {
           "name": "composite/ReadingConfirmationCard",
@@ -251,10 +251,10 @@
         "shapes": 1,
         "pixels": {
           "sizeMatches": true,
-          "changed": 1649,
-          "outsideText": 146,
-          "insideText": 1503,
-          "textShare": 7,
+          "changed": 1715,
+          "outsideText": 148,
+          "insideText": 1567,
+          "textShare": 7.3,
           "share": 0.13
         }
       },
@@ -351,9 +351,9 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 2070,
-          "outsideText": 548,
-          "insideText": 1522,
+          "changed": 2099,
+          "outsideText": 574,
+          "insideText": 1525,
           "textShare": 4.8,
           "share": 0.16
         }
@@ -376,8 +376,8 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 2467,
-          "outsideText": 554,
+          "changed": 2494,
+          "outsideText": 581,
           "insideText": 1913,
           "textShare": 6,
           "share": 0.19
@@ -401,11 +401,11 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 2116,
-          "outsideText": 652,
-          "insideText": 1464,
-          "textShare": 5.1,
-          "share": 0.64
+          "changed": 2145,
+          "outsideText": 678,
+          "insideText": 1467,
+          "textShare": 5.2,
+          "share": 0.65
         }
       },
       {
@@ -426,11 +426,11 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 2173,
-          "outsideText": 660,
+          "changed": 2200,
+          "outsideText": 687,
           "insideText": 1513,
           "textShare": 5.3,
-          "share": 0.66
+          "share": 0.67
         }
       },
       {
@@ -451,9 +451,9 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 1037,
+          "changed": 1040,
           "outsideText": 28,
-          "insideText": 1009,
+          "insideText": 1012,
           "textShare": 2.2,
           "share": 0.08
         }
@@ -501,9 +501,9 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 1139,
-          "outsideText": 132,
-          "insideText": 1007,
+          "changed": 1143,
+          "outsideText": 133,
+          "insideText": 1010,
           "textShare": 2.3,
           "share": 0.35
         }
@@ -551,9 +551,9 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 1440,
+          "changed": 1443,
           "outsideText": 4,
-          "insideText": 1436,
+          "insideText": 1439,
           "textShare": 2.4,
           "share": 0.11
         }
@@ -601,9 +601,9 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 1542,
-          "outsideText": 108,
-          "insideText": 1434,
+          "changed": 1546,
+          "outsideText": 109,
+          "insideText": 1437,
           "textShare": 2.5,
           "share": 0.47
         }
@@ -651,9 +651,9 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 1128,
+          "changed": 1131,
           "outsideText": 68,
-          "insideText": 1060,
+          "insideText": 1063,
           "textShare": 2.7,
           "share": 0.09
         }
@@ -676,11 +676,11 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 2157,
+          "changed": 2124,
           "outsideText": 71,
-          "insideText": 2086,
-          "textShare": 5.4,
-          "share": 0.17
+          "insideText": 2053,
+          "textShare": 5.3,
+          "share": 0.16
         }
       },
       {
@@ -701,9 +701,9 @@
         "shapes": 2,
         "pixels": {
           "sizeMatches": true,
-          "changed": 1670,
-          "outsideText": 172,
-          "insideText": 1498,
+          "changed": 1674,
+          "outsideText": 173,
+          "insideText": 1501,
           "textShare": 3.6,
           "share": 0.51
         }
