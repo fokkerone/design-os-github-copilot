@@ -21,62 +21,61 @@ const none: NavFacts = {
   flowCount: 0,
 }
 
-const flat = (items: NavItem[]): NavItem[] => items.flatMap((i) => [i, ...flat(i.children ?? [])])
-const byId = (items: NavItem[], id: string) => flat(items).find((i) => i.id === id)!
-const activeIds = (items: NavItem[]) => flat(items).filter((i) => i.isActive).map((i) => i.id)
+const byId = (items: NavItem[], id: string) => items.find((i) => i.id === id)!
+const activeIds = (items: NavItem[]) => items.filter((i) => i.isActive).map((i) => i.id)
 
 describe('navigation structure', () => {
-  it('has the six main entries in order', () => {
+  it('is one flat list of entries in order', () => {
     const nav = buildNavigation('/prototype/vision', none)
     expect(nav.map((i) => i.label)).toEqual([
+      'Vision',
+      'Shell',
+      'Roadmap',
+      'Sections',
       'Prototype',
+      'Export',
       'Personas',
       'User Flows',
       'Design System',
       'Tech Stack',
       'Wiki',
     ])
+    expect(nav.every((i) => !('children' in i))).toBe(true)
   })
 
-  it('puts the six steps under Prototype', () => {
-    const nav = buildNavigation('/prototype/vision', none)
-    expect(nav[0].children?.map((c) => c.label)).toEqual(['Vision', 'Shell', 'Roadmap', 'Sections', 'Prototype', 'Export'])
-    expect(nav[0].children?.map((c) => c.href)).toEqual([
+  it('links every entry to its route', () => {
+    expect(buildNavigation('/', none).map((i) => i.href)).toEqual([
       '/prototype/vision',
       '/prototype/shell',
       '/prototype/roadmap',
       '/prototype/sections',
       '/prototype/preview',
       '/prototype/export',
+      '/personas',
+      '/flows',
+      '/design-system',
+      '/techstack',
+      '/wiki',
     ])
-  })
-
-  it('links the other entries to their routes', () => {
-    const nav = buildNavigation('/', none)
-    expect(nav.slice(1).map((i) => i.href)).toEqual(['/personas', '/flows', '/design-system', '/techstack', '/wiki'])
-  })
-
-  it('links the Prototype group to its first step', () => {
-    expect(buildNavigation('/', none)[0].href).toBe('/prototype/vision')
   })
 })
 
 describe('active entry', () => {
   it.each([
-    ['/prototype/vision', ['prototype', 'vision']],
-    ['/prototype/roadmap', ['prototype', 'roadmap']],
-    ['/prototype/roadmap/data-shape', ['prototype', 'roadmap']],
-    ['/prototype/sections', ['prototype', 'sections']],
-    ['/prototype/sections/citizen-chat', ['prototype', 'sections']],
-    ['/prototype/sections/citizen-chat/screen-designs/Start', ['prototype', 'sections']],
-    ['/prototype/preview', ['prototype', 'preview']],
-    ['/prototype/export', ['prototype', 'export']],
+    ['/prototype/vision', ['vision']],
+    ['/prototype/roadmap', ['roadmap']],
+    ['/prototype/roadmap/data-shape', ['roadmap']],
+    ['/prototype/sections', ['sections']],
+    ['/prototype/sections/citizen-chat', ['sections']],
+    ['/prototype/sections/citizen-chat/screen-designs/Start', ['sections']],
+    ['/prototype/preview', ['preview']],
+    ['/prototype/export', ['export']],
     ['/personas', ['personas']],
     ['/personas/anna', ['personas']],
     ['/flows', ['flows']],
     ['/flows/signup', ['flows']],
     ['/design-system', ['design-system']],
-    ['/prototype/shell', ['prototype', 'shell']],
+    ['/prototype/shell', ['shell']],
     ['/design-system/components', ['design-system']],
     ['/techstack', ['techstack']],
     ['/wiki', ['wiki']],
@@ -87,7 +86,7 @@ describe('active entry', () => {
 
   it('does not confuse similar prefixes', () => {
     expect(activeIds(buildNavigation('/personas-archive', none))).toEqual([])
-    expect(activeIds(buildNavigation('/prototype', none))).toEqual(['prototype'])
+    expect(activeIds(buildNavigation('/prototype', none))).toEqual([])
   })
 
   it('has no active entry on unknown paths', () => {

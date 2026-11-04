@@ -11,12 +11,7 @@ import { useChat } from '@/lib/chat/chat-context'
 import { paths } from '@/lib/paths'
 
 function activeTitle(items: NavItem[]): string {
-  for (const item of items) {
-    const child = item.children?.find((c) => c.isActive)
-    if (child) return child.label
-    if (item.isActive) return item.label
-  }
-  return 'Design OS'
+  return items.find((item) => item.isActive)?.label ?? 'Design OS'
 }
 
 interface AppFrameProps {

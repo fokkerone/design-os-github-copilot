@@ -14,7 +14,7 @@ Comments are annotations on the preview, like v0: a numbered pin on an element w
 
 ## How to use it
 
-1. Open a screen design (Prototype › Sections › a screen) or the shell (Prototype › Shell).
+1. Open a screen design (Sections › a screen) or the shell (Shell).
 2. Click **Comment** in the toolbar, or press `C`. The pins of this screen appear; the badge counts the open ones.
 3. Click the element you mean. A numbered pin and a field **Add annotation** appear next to it.
 4. Write the comment, pick a command and save (↑ or Enter):

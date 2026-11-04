@@ -26,28 +26,21 @@ function setup(path = '/prototype/roadmap', onNavigate?: (href: string) => void)
 }
 
 describe('MainNav', () => {
-  it('renders the main entries and the five prototype steps', () => {
+  it('renders every entry on one level, without groups', () => {
     setup()
-    for (const label of ['Prototype', 'Vision', 'Roadmap', 'Sections', 'Export', 'Personas', 'User Flows', 'Design System', 'Tech Stack', 'Wiki']) {
+    for (const label of ['Vision', 'Shell', 'Roadmap', 'Sections', 'Prototype', 'Export', 'Personas', 'User Flows', 'Design System', 'Tech Stack', 'Wiki']) {
       expect(screen.getByRole('link', { name: new RegExp(`^${label}`) }), label).toBeInTheDocument()
     }
+    const nav = screen.getByRole('navigation', { name: 'Main' })
+    expect(within(nav).queryByRole('button')).not.toBeInTheDocument()
+    expect(within(nav).queryByRole('list')).not.toBeInTheDocument()
+    expect([...nav.children].every((row) => row.tagName === 'A')).toBe(true)
   })
 
   it('marks only the active route with aria-current', () => {
     setup('/prototype/roadmap')
     const current = screen.getAllByRole('link').filter((l) => l.getAttribute('aria-current') === 'page')
     expect(current.map((l) => l.textContent)).toEqual(['Roadmap'])
-  })
-
-  it('collapses and expands the Prototype group', async () => {
-    setup('/personas')
-    const toggle = screen.getByRole('button', { name: /Prototype/ })
-    expect(toggle).toHaveAttribute('aria-expanded', 'true')
-    await userEvent.click(toggle)
-    expect(toggle).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.queryByRole('link', { name: 'Vision' })).not.toBeInTheDocument()
-    await userEvent.click(toggle)
-    expect(screen.getByRole('link', { name: 'Vision' })).toBeInTheDocument()
   })
 
   it('navigates on click and reports it', async () => {
